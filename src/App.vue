@@ -163,16 +163,21 @@ const changeFocus = (Boolean: boolean) => {
             }}
           </div>
           <div
-            class="view_center_search_view_item"
-            v-for="(item, index) in cityArray"
-            :key="item.adcode"
-            v-if="isGetCitysFinally"
-            @click="ChooseCityWeather(item)"
+          v-if="isGetCitysFinally"
           >
-            <div class="view_center_search_view_item_index">{{ index }}</div>
-            <div class="view_center_search_view_item_name">{{ item.name }}</div>
-            <div class="view_center_search_view_item_adcode">
-              {{ item.adcode }}
+            <div
+              class="view_center_search_view_item"
+              v-for="(item, index) in cityArray"
+              :key="item.adcode"
+              @click="ChooseCityWeather(item)"
+            >
+              <div class="view_center_search_view_item_index">{{ index }}</div>
+              <div class="view_center_search_view_item_name">
+                {{ item.name }}
+              </div>
+              <div class="view_center_search_view_item_adcode">
+                {{ item.adcode }}
+              </div>
             </div>
           </div>
         </div>
