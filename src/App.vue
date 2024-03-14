@@ -30,15 +30,14 @@ const isErrorCityText = ref(false);
 const cityText = ref("");
 watch(cityText, (newVal, oldVal) => {
   const fn = debounce(() => {
-    // 判断是否是中文且有内容
+    // 判断是否是中文且有内容    
     if (!chineseReg.test(newVal.trim()) && newVal.trim() !== "") {
       // 加载中flag
       isGetCitysFinally.value = false;
 
-      getCitys(newVal)
+      getCitys(newVal.trim())
         .then((res) => {
-          console.log(res);
-
+          // console.log(res);
           // 获得内容数组
           let allArray = res.data.data?.districts as City[];
           // 将所有的districts获取
@@ -109,8 +108,6 @@ const ChooseCityWeather = (item: City) => {
 
   // 放值到cityText
   cityText.value = item.name;
-  // 表示不要搜索
-  isNotSelectCity.value = true;
 
   // 请求对应编码的天气
   getWeather(item.adcode).then((res) => {
@@ -148,18 +145,16 @@ const changeFocus = (Boolean: boolean) => {
           </span>
         </div>
         <div class="view_center_search_view" v-if="isFocus">
-          <div v-show="!isGetCitysFinally && cityText !== ''">
+          <div v-show="!isGetCitysFinally ">
             {{ "加载中。。。" }}
           </div>
           <div
-            v-show="
-              cityArray.length === 0 && isErrorCityText && isGetCitysFinally
-            "
+            v-show="cityArray.length === 0 && isErrorCityText && isGetCitysFinally"
           >
             {{
               `请遵循以下规则查找：
-          只支持单个关键词语搜索关键词支持:行政区名称、城市编码、邮件编码
-            例如，搜索省份（例如山东），能够显示市（例如济南），区（例如历下区）,若你频繁看到提示，可能输入的关键词有误或网络错误`
+              只支持单个关键词语搜索关键词支持:行政区名称、城市编码、邮件编码
+              例如，搜索省份（例如山东），能够显示市（例如济南），区（例如历下区）,若你频繁看到提示，可能输入的关键词有误或网络错误`
             }}
           </div>
           <div
@@ -169,7 +164,7 @@ const changeFocus = (Boolean: boolean) => {
               class="view_center_search_view_item"
               v-for="(item, index) in cityArray"
               :key="item.adcode"
-              @click="ChooseCityWeather(item)"
+              @click="ChooseCityWeather(item), changeFocus(false)"
             >
               <div class="view_center_search_view_item_index">{{ index }}</div>
               <div class="view_center_search_view_item_name">
