@@ -6,7 +6,6 @@ const router: Router = express.Router();
 
 router.get("/weather", async (req, res) => {
     // console.log(req.query);
-    
   const result = await axios.get(
     "https://restapi.amap.com/v3/weather/weatherInfo",
     {

@@ -3,6 +3,10 @@ import { onMounted, ref, watch, type Ref } from "vue";
 import { getWeather } from "./network/weather";
 import { getCitys } from "./network/city";
 import { debounce } from "./assets/ts/debounce";
+import * as echarts from "echarts";
+import "./assets/js/china";
+import { geoCoordMap } from "./assets/ts/geomap";
+
 const props = withDefaults(defineProps<{}>(), {});
 const emits = defineEmits<{
   (e: "emit", i: void): void;
@@ -10,13 +14,140 @@ const emits = defineEmits<{
 
 // 正则
 const chineseReg = /[^0-9\u4e00-\u9fa5]/g;
+
 // 尝试响应后端
 onMounted(() => {
-  getWeather("120000").then((res) => {
-    console.log(res);
-  });
-  getCitys("天津").then((res) => {
-    console.log(res);
+  let myChart = echarts.init(document.getElementById("china"));
+  let data = [
+    {
+      name: "内蒙古",
+      itemStyle: {
+        areaColor: "#56b1da",
+      },
+      value: [110.3467, 41.4899],
+    },
+  ];
+  myChart.setOption({
+    backgroundColor: "black",
+    geo: {
+      map: "china",
+      aspectScale: 0.8,
+      layoutCenter: ["50%", "50%"],
+      layoutSize: "120%",
+      itemStyle: {
+        normal: {
+          areaColor: {
+            type: "linear-gradient",
+            x: 0,
+            y: 1200,
+            x2: 1000,
+            y2: 0,
+            colorStops: [
+              {
+                offset: 0,
+                color: "#152E6E", // 0% 处的颜色
+              },
+              {
+                offset: 1,
+                color: "#0673AD", // 50% 处的颜色
+              },
+            ],
+            global: true, // 缺省为 false
+          },
+          shadowColor: "#0f5d9d",
+          shadowOffsetX: 0,
+          shadowOffsetY: 15,
+          opacity: 0.5,
+        },
+        emphasis: {
+          areaColor: "#0f5d9d",
+        },
+      },
+
+      regions: [
+        {
+          name: "南海诸岛",
+          itemStyle: {
+            areaColor: "rgba(0, 10, 52, 1)",
+            borderColor: "rgba(0, 10, 52, 1)",
+            normal: {
+              opacity: 0,
+              label: {
+                show: false,
+                color: "#009cc9",
+              },
+            },
+          },
+          label: {
+            show: false,
+            color: "#FFFFFF",
+            fontSize: 12,
+          },
+        },
+      ],
+    },
+    series: [
+      {
+        type: "map",
+        selectedMode: "multiple",
+        mapType: "china",
+        aspectScale: 0.8,
+        layoutCenter: ["50%", "50%"], //地图位置
+        layoutSize: "120%",
+        zoom: 1, //当前视角的缩放比例
+        // roam: true, //是否开启平游或缩放
+        scaleLimit: {
+          //滚轮缩放的极限控制
+          min: 1,
+          max: 2,
+        },
+        label: {
+          show: false,
+          color: "#FFFFFF",
+          fontSize: 16,
+        },
+        itemStyle: {
+          normal: {
+            areaColor: "#0c3653",
+            borderColor: "#1cccff",
+            borderWidth: 1.8,
+          },
+          emphasis: {
+            areaColor: "#56b1da",
+            label: {
+              show: false,
+              color: "#fff",
+            },
+          },
+        },
+        data: data,
+      },
+      {
+        name: "Top 5",
+        type: "scatter",
+        coordinateSystem: "geo",
+        //   symbol: 'image://http://ssq168.shupf.cn/data/biaoji.png',
+        // symbolSize: [30,120],
+        // symbolOffset:[0, '-40%'] ,
+        label: {
+          normal: {
+            show: false,
+          },
+        },
+        itemStyle: {
+          normal: {
+            color: "#D8BC37", //标志颜色
+          },
+        },
+        data: data,
+        showEffectOn: "render",
+        rippleEffect: {
+          brushType: "stroke",
+        },
+        hoverAnimation: true,
+        zlevel: 1,
+      },
+    ],
   });
 });
 // 加载getCitys的flag
@@ -30,7 +161,7 @@ const isErrorCityText = ref(false);
 const cityText = ref("");
 watch(cityText, (newVal, oldVal) => {
   const fn = debounce(() => {
-    // 判断是否是中文且有内容    
+    // 判断是否是中文且有内容
     if (!chineseReg.test(newVal.trim()) && newVal.trim() !== "") {
       // 加载中flag
       isGetCitysFinally.value = false;
@@ -123,9 +254,12 @@ const changeFocus = (Boolean: boolean) => {
 };
 </script>
 <template>
+
   <div class="view">
+
     <div class="view_let">左视图</div>
-    <div class="view_center">
+    <div id="china" style="width: 50vw; height: 60vh; position: absolute; bottom: 10vh;"></div>
+    <div  class="view_center"> 
       <div class="view_center_search">
         <div class="view_center_search_input">
           <input
@@ -145,11 +279,13 @@ const changeFocus = (Boolean: boolean) => {
           </span>
         </div>
         <div class="view_center_search_view" v-if="isFocus">
-          <div v-show="!isGetCitysFinally ">
+          <div v-show="!isGetCitysFinally">
             {{ "加载中。。。" }}
           </div>
           <div
-            v-show="cityArray.length === 0 && isErrorCityText && isGetCitysFinally"
+            v-show="
+              cityArray.length === 0 && isErrorCityText && isGetCitysFinally
+            "
           >
             {{
               `请遵循以下规则查找：
@@ -157,9 +293,7 @@ const changeFocus = (Boolean: boolean) => {
               例如，搜索省份（例如山东），能够显示市（例如济南），区（例如历下区）,若你频繁看到提示，可能输入的关键词有误或网络错误`
             }}
           </div>
-          <div
-          v-if="isGetCitysFinally"
-          >
+          <div v-if="isGetCitysFinally">
             <div
               class="view_center_search_view_item"
               v-for="(item, index) in cityArray"
@@ -177,12 +311,14 @@ const changeFocus = (Boolean: boolean) => {
           </div>
         </div>
       </div>
+
     </div>
     <div class="view_right">右视图</div>
   </div>
 </template>
 <style scoped>
 .view {
+  position: relative;
   display: flex;
   height: 100vh;
   overflow: hidden;
