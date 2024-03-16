@@ -15,67 +15,60 @@ const emits = defineEmits<{
 // 正则
 const chineseReg = /[^0-9\u4e00-\u9fa5]/g;
 
-// 尝试响应后端
+// 加载化地图配置
 onMounted(() => {
   let myChart = echarts.init(document.getElementById("china"));
+  // data 展示地图对应方块 value对应坐标 x y
+ 
   let data = [
     {
-      name: "内蒙古",
-      itemStyle: {
-        areaColor: "#56b1da",
-      },
-      value: [110.3467, 41.4899],
+      name: "光照镇",
+      value: ["105.299982","25.8453"],
     },
   ];
   myChart.setOption({
-    backgroundColor: "black",
     geo: {
       map: "china",
       aspectScale: 0.8,
       layoutCenter: ["50%", "50%"],
       layoutSize: "120%",
       itemStyle: {
-        normal: {
-          areaColor: {
-            type: "linear-gradient",
-            x: 0,
-            y: 1200,
-            x2: 1000,
-            y2: 0,
-            colorStops: [
-              {
-                offset: 0,
-                color: "#152E6E", // 0% 处的颜色
-              },
-              {
-                offset: 1,
-                color: "#0673AD", // 50% 处的颜色
-              },
-            ],
-            global: true, // 缺省为 false
-          },
-          shadowColor: "#0f5d9d",
-          shadowOffsetX: 0,
-          shadowOffsetY: 15,
-          opacity: 0.5,
+        areaColor: {
+          type: "linear-gradient",
+          x: 0,
+          y: 1200,
+          x2: 1000,
+          y2: 0,
+          colorStops: [
+            {
+              offset: 0,
+              color: "#152E6E", // 0% 处的颜色
+            },
+            {
+              offset: 1,
+              color: "#0673AD", // 50% 处的颜色
+            },
+          ],
+          global: true, // 缺省为 false
         },
-        emphasis: {
-          areaColor: "#0f5d9d",
-        },
+        shadowColor: "#0f5d9d",
+        shadowOffsetX: 0,
+        shadowOffsetY: 15,
+        opacity: 0.5,
       },
-
+      emphasis: {
+        areaColor: "#0f5d9d",
+      },
       regions: [
         {
           name: "南海诸岛",
           itemStyle: {
             areaColor: "rgba(0, 10, 52, 1)",
             borderColor: "rgba(0, 10, 52, 1)",
-            normal: {
-              opacity: 0,
-              label: {
-                show: false,
-                color: "#009cc9",
-              },
+            opacity: 0,
+            label: {
+              show: false,
+              color: "#009cc9",
             },
           },
           label: {
@@ -90,7 +83,7 @@ onMounted(() => {
       {
         type: "map",
         selectedMode: "multiple",
-        mapType: "china",
+        map: "china",
         aspectScale: 0.8,
         layoutCenter: ["50%", "50%"], //地图位置
         layoutSize: "120%",
@@ -102,50 +95,42 @@ onMounted(() => {
           max: 2,
         },
         label: {
-          show: false,
+          show: true,
           color: "#FFFFFF",
-          fontSize: 16,
+          fontSize: 9,
         },
         itemStyle: {
-          normal: {
-            areaColor: "#0c3653",
-            borderColor: "#1cccff",
-            borderWidth: 1.8,
-          },
-          emphasis: {
-            areaColor: "#56b1da",
-            label: {
-              show: false,
-              color: "#fff",
-            },
+          areaColor: "#0c3653",
+          borderColor: "#1cccff",
+          borderWidth: 1.8,
+        },
+        emphasis: {
+          areaColor: "#56b1da",
+          label: {
+            show: true,
+            color: "#fff",
           },
         },
         data: data,
       },
       {
-        name: "Top 5",
         type: "scatter",
         coordinateSystem: "geo",
-        //   symbol: 'image://http://ssq168.shupf.cn/data/biaoji.png',
-        // symbolSize: [30,120],
+        symbol: "pin",
+        symbolSize: [45, 45],
         // symbolOffset:[0, '-40%'] ,
         label: {
-          normal: {
-            show: false,
+          show: true,
+          // 标点展示的值
+          color: "#000000",
+          formatter(value: any) {
+            return value.data.name;
           },
         },
         itemStyle: {
-          normal: {
-            color: "#D8BC37", //标志颜色
-          },
+          color: "#D8BC37", //标志颜色
         },
         data: data,
-        showEffectOn: "render",
-        rippleEffect: {
-          brushType: "stroke",
-        },
-        hoverAnimation: true,
-        zlevel: 1,
       },
     ],
   });
@@ -168,7 +153,7 @@ watch(cityText, (newVal, oldVal) => {
 
       getCitys(newVal.trim())
         .then((res) => {
-          // console.log(res);
+          console.log(res);
           // 获得内容数组
           let allArray = res.data.data?.districts as City[];
           // 将所有的districts获取
@@ -254,12 +239,14 @@ const changeFocus = (Boolean: boolean) => {
 };
 </script>
 <template>
-
   <div class="view">
-
     <div class="view_let">左视图</div>
-    <div id="china" style="width: 50vw; height: 60vh; position: absolute; bottom: 10vh;"></div>
-    <div  class="view_center"> 
+    <!-- 地图绘制 -->
+    <div
+      id="china"
+      style="width: 70vw; height: 70vh; position: absolute; bottom: 10vh"
+    ></div>
+    <div class="view_center">
       <div class="view_center_search">
         <div class="view_center_search_input">
           <input
@@ -311,7 +298,6 @@ const changeFocus = (Boolean: boolean) => {
           </div>
         </div>
       </div>
-
     </div>
     <div class="view_right">右视图</div>
   </div>
@@ -323,7 +309,8 @@ const changeFocus = (Boolean: boolean) => {
   height: 100vh;
   overflow: hidden;
   justify-content: center;
-  background-color: rgb(128, 168, 255);
+  background-image: url("./assets/big_pic/bg.jpg");
+  background-size: cover;
 }
 
 .view div {
@@ -331,7 +318,6 @@ const changeFocus = (Boolean: boolean) => {
 }
 
 .view_let {
-  background-color: red;
 }
 
 .view .view_center {
@@ -339,7 +325,6 @@ const changeFocus = (Boolean: boolean) => {
 }
 
 .view_right {
-  background-color: blue;
 }
 
 .view_center_search {
@@ -369,9 +354,11 @@ const changeFocus = (Boolean: boolean) => {
 }
 
 .view_center_search_view {
+  position: relative;
   height: 40vh;
   overflow: scroll;
   background-color: aliceblue;
+  z-index: 9999;
 }
 
 /* 隐藏滚动条 */

@@ -1,5 +1,7 @@
 import './assets/main.css'
 
+import 'default-passive-events'
+
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 
@@ -11,7 +13,7 @@ import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 const app = createApp(App)
 
 app.use(createPinia())
-app.use(router)
+// app.use(router)
 app.use(ElementPlus)
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
     app.component(key, component)
