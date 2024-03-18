@@ -4,17 +4,22 @@ import { geoCoordMap } from "../ts/geomap";
 
 import { getCitys } from "../../network/city";
 import { debounce } from "../ts/debounce";
-import { forDistricts } from "../ts/forDistricts";
+import { forDistricts, type City } from "../ts/forDistricts";
+import { useCityArray } from "../../stores/item"
+import { ref } from "vue";
 
-export default function (doc: HTMLElement | null) {
+
+export default function thisInitMap(doc: HTMLElement | null) {
   let myChart = echarts.init(doc);
   // data 展示地图对应方块 value对应坐标 x y
-  let data = [
-    {
-      name: "光照镇",
-      value: ["105.299982", "25.8453"],
-    },
-  ];
+  let data =
+    [
+      {
+        name: useCityArray().localCityArray[0].name,
+        value: useCityArray().localCityArray[0].center.split(",")
+      },
+    ]
+
   myChart.setOption({
     geo: {
       map: "china",
@@ -127,9 +132,31 @@ export default function (doc: HTMLElement | null) {
   myChart.on("click", (e) => {
     // 请求数据
     const fn = debounce(() => {
-      getCitys(e.name).then((res) => {
-        // console.log(res);
-        console.log(forDistricts(res.data.data?.districts));
+      getCitys(e.name, 3).then((res) => {
+        console.log(res);
+
+        useCityArray().addLocalCityArray(forDistricts(res.data.data?.districts))
+        // console.log(useCityArray().localCityArray);
+        console.log(useCityArray().localCityArray[0].center.split(","));
+
+        // 同步小圆点,重新绘制标点
+        myChart.setOption({
+          series: [
+            {
+              data: [{
+                name: useCityArray().localCityArray[0].name,
+                value: useCityArray().localCityArray[0].center.split(",")
+              }],
+            },
+            {
+              data: [{
+                name: useCityArray().localCityArray[0].name,
+                value: useCityArray().localCityArray[0].center.split(",")
+              }],
+            },
+          ],
+        })
+
       });
     });
     fn();

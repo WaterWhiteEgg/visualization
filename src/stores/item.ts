@@ -1,16 +1,17 @@
-import { ref, computed } from "vue";
+import { ref, computed, type Ref } from "vue";
 import { defineStore } from "pinia";
+import { type City } from "../assets/ts/forDistricts";
 
-export const useCounterStore = defineStore(
+export const useCityArray = defineStore(
   "item",
-  (): object => {
-    const count = ref(0);
-    const doubleCount = computed(() => count.value * 2);
-    function increment() {
-      count.value++;
+  (): { localCityArray: typeof localCityArray, addLocalCityArray: typeof addLocalCityArray } => {
+    // 全局保存CityArray
+    const localCityArray: Ref<City[]> = ref([]);
+    function addLocalCityArray(data: City[]) {
+      localCityArray.value = data
     }
 
-    return { count, doubleCount, increment };
+    return { localCityArray, addLocalCityArray };
   },
   { persist: true }
 );

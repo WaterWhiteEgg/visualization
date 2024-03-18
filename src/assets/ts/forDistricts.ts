@@ -1,6 +1,6 @@
 // 将里面的districts全部遍历出来
 export type City = {
-  citycode: string;
+  citycode: string | null[];
   adcode: string;
   name: string;
   level: string;

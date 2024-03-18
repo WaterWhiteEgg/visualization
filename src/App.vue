@@ -4,6 +4,8 @@ import { getWeather } from "./network/weather";
 import { getCitys } from "./network/city";
 import { debounce } from "./assets/ts/debounce";
 import { forDistricts, type City } from "./assets/ts/forDistricts";
+import { useCityArray } from "./stores/item";
+// import { getLocalIP } from "./assets/ts/ipGet";
 import initMap from "./assets/ts/initMap";
 
 const props = withDefaults(defineProps<{}>(), {});
@@ -17,6 +19,8 @@ const chineseReg = /[^0-9\u4e00-\u9fa5]/g;
 // 加载化地图配置
 onMounted(() => {
   initMap(document.getElementById("china"));
+  const ip = window.location;
+  console.log("ipValue: ", ip);
 });
 // 加载getCitys的flag
 const isGetCitysFinally = ref(true);
@@ -74,7 +78,7 @@ const clearCityText = () => {
 };
 // 选择了某个城市触发
 const ChooseCityWeather = (item: City) => {
-  console.log(item);
+  // console.log(item);
 
   // 放值到cityText
   cityText.value = item.name;
@@ -82,6 +86,8 @@ const ChooseCityWeather = (item: City) => {
   // 请求对应编码的天气
   getWeather(item.adcode).then((res) => {
     console.log(res);
+    // 将数据同步表格,这只是搜索表格内的数据
+    useCityArray().addLocalCityArray(cityArray.value);
   });
   // console.log(item);
 };
@@ -98,7 +104,7 @@ const changeFocus = (Boolean: boolean) => {
     <!-- 地图绘制 -->
     <div
       id="china"
-      style="width: 70vw; height: 70vh; position: absolute; bottom: 10vh"
+      style="width: 55vw; height: 55vh; position: absolute; bottom: 10vh"
     ></div>
     <div class="view_center">
       <div class="view_center_search">
@@ -130,15 +136,15 @@ const changeFocus = (Boolean: boolean) => {
           >
             {{
               `请遵循以下规则查找：
-              只支持单个关键词语搜索关键词支持:行政区名称、城市编码、邮件编码
-              例如，搜索省份（例如山东），能够显示市（例如济南），区（例如历下区）,若你频繁看到提示，可能输入的关键词有误或网络错误`
+            只支持单个关键词语搜索关键词支持:行政区名称、城市编码、邮件编码
+            例如，搜索省份（例如山东），能够显示市（例如济南），区（例如历下区）,若你频繁看到提示，可能输入的关键词有误或网络错误`
             }}
           </div>
           <div v-if="isGetCitysFinally">
             <div
               class="view_center_search_view_item"
               v-for="(item, index) in cityArray"
-              :key="item.adcode"
+              :key="item.adcode + index"
               @click="ChooseCityWeather(item), changeFocus(false)"
             >
               <div class="view_center_search_view_item_index">
@@ -155,7 +161,31 @@ const changeFocus = (Boolean: boolean) => {
         </div>
       </div>
     </div>
-    <div class="view_right">右视图</div>
+    <div class="view_right">
+      <div class="view_right_table">
+        <table>
+          <tr>
+            <th>顺序</th>
+            <th>城市编号</th>
+            <th>名称</th>
+            <th>城市编码</th>
+            <th>等级</th>
+          </tr>
+          <tr
+            v-for="(item, index) in useCityArray().localCityArray"
+            :key="item.adcode + index"
+          >
+            <td style="text-align: center">{{ index + 1 }}</td>
+            <td>
+              {{ item.citycode?.length === 0 ? "无编号" : item.citycode }}
+            </td>
+            <td>{{ item.name }}</td>
+            <td>{{ item.adcode }}</td>
+            <td>{{ item.level }}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
   </div>
 </template>
 <style scoped>
@@ -220,9 +250,6 @@ const changeFocus = (Boolean: boolean) => {
 /* 隐藏滚动条 */
 .view_center_search_view::-webkit-scrollbar {
   width: 0;
-}
-
-.view_center_search_view::-webkit-scrollbar {
   height: 0;
 }
 
@@ -259,5 +286,47 @@ const changeFocus = (Boolean: boolean) => {
 }
 
 .view_center_search_view_item .view_center_search_view_item_adcode {
+}
+
+.view_right {
+  display: flex;
+}
+
+.view_right_table {
+  display: flex;
+  justify-content: right;
+
+  height: 50vh;
+
+  margin-top: 10vh;
+  overflow: scroll;
+}
+
+/* 隐藏滚动条 */
+.view_right_table::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+.view_right_table table {
+  height: 8vh;
+  width: 20vw;
+  background-color: rgb(0, 110, 255);
+  color: #fff;
+}
+
+.view_right_table tr {
+  background-color: rgb(0, 0, 0);
+}
+
+.view_right_table th,
+.view_right_table td {
+  max-width: 6vw;
+  white-space: nowrap;
+  /* 保证文本在一行内显示 */
+  overflow: hidden;
+  /* 隐藏溢出的内容 */
+  text-overflow: ellipsis;
+  /* 文字溢出显示省略号 */
 }
 </style>
