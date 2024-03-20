@@ -3,34 +3,30 @@ import "../js/china";
 import { getCitys } from "../../network/city";
 import { debounce } from "../ts/debounce";
 import { forDistricts, type City } from "../ts/forDistricts";
-import { useCityArray } from "../../stores/item"
+import { useCityArray } from "../../stores/item";
 import { getMyIpCity } from "./toGetIp";
 import { ref } from "vue";
 
-
-export let myChart: echarts.ECharts | null = null
+export let myChart: echarts.ECharts;
 export async function thisInitMap(doc: HTMLElement | null) {
   myChart = echarts.init(doc);
 
   // 检测useCityArray，若没有任何初始化值则将本地ip定位
   if (useCityArray().localCityArray.length === 0) {
-    const cityIpObj = await getMyIpCity()
+    const cityIpObj = await getMyIpCity();
     // 定位后找数据，要进行异步等待
     await getCitys(cityIpObj?.adcode as string).then((res) => {
-      useCityArray().addLocalCityArray(forDistricts(res.data.data?.districts))
-    })
+      useCityArray().addLocalCityArray(forDistricts(res.data.data?.districts));
+    });
   }
-  
+
   // data 展示地图对应方块 value对应坐标 x y
-  let data =
-    [
-      {
-        name: useCityArray().localCityArray[0].name,
-        value: useCityArray().localCityArray[0].center.split(",")
-      },
-    ]
-
-
+  let data = [
+    {
+      name: useCityArray().localCityArray[0].name,
+      value: useCityArray().localCityArray[0].center.split(","),
+    },
+  ];
 
   myChart.setOption({
     geo: {
@@ -142,19 +138,20 @@ export async function thisInitMap(doc: HTMLElement | null) {
   });
   // 监听事件
   myChart.on("click", (e) => {
-    let inmyChart = myChart
+    let inmyChart = myChart;
     // 请求数据
     const fn = debounce(() => {
       getCitys(e.name, 3).then((res) => {
         console.log(res);
 
-        useCityArray().addLocalCityArray(forDistricts(res.data.data?.districts))
+        useCityArray().addLocalCityArray(
+          forDistricts(res.data.data?.districts)
+        );
         // console.log(useCityArray().localCityArray);
         console.log(useCityArray().localCityArray[0].center.split(","));
 
         // 同步小圆点,重新绘制标点
-        redrawValue(inmyChart as echarts.ECharts)
-
+        redrawValue(inmyChart as echarts.ECharts);
       });
     });
     fn();
@@ -166,17 +163,21 @@ export function redrawValue(myChart: echarts.ECharts) {
   myChart.setOption({
     series: [
       {
-        data: [{
-          name: useCityArray().localCityArray[0].name,
-          value: useCityArray().localCityArray[0].center.split(",")
-        }],
+        data: [
+          {
+            name: useCityArray().localCityArray[0].name,
+            value: useCityArray().localCityArray[0].center.split(","),
+          },
+        ],
       },
       {
-        data: [{
-          name: useCityArray().localCityArray[0].name,
-          value: useCityArray().localCityArray[0].center.split(",")
-        }],
+        data: [
+          {
+            name: useCityArray().localCityArray[0].name,
+            value: useCityArray().localCityArray[0].center.split(","),
+          },
+        ],
       },
     ],
-  })
+  });
 }

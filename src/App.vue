@@ -6,7 +6,7 @@ import { debounce } from "./assets/ts/debounce";
 import { forDistricts, type City } from "./assets/ts/forDistricts";
 import { useCityArray } from "./stores/item";
 import { thisInitMap, myChart, redrawValue } from "./assets/ts/initMap";
-
+import "animate.css"
 const props = withDefaults(defineProps<{}>(), {});
 const emits = defineEmits<{
   (e: "emit", i: void): void;
@@ -18,6 +18,8 @@ const chineseReg = /[^0-9\u4e00-\u9fa5]/g;
 // 加载化地图配置
 onMounted(() => {
   thisInitMap(document.getElementById("china"));
+
+
 });
 // 加载getCitys的flag
 const isGetCitysFinally = ref(true);
@@ -100,6 +102,7 @@ const redrawData = () => {
   useCityArray().addLocalCityArray(cityArray.value);
   // 刷新地图的标点
   redrawValue(myChart)
+
 }
 // 判断焦点flag
 const isFocus = ref(false);
@@ -107,10 +110,23 @@ const isFocus = ref(false);
 const changeFocus = (Boolean: boolean) => {
   isFocus.value = Boolean;
 };
+
+// 观察useCityArray().localCityArray
+// 隐藏背景
+const isHaddenBgc = ref(false)
+watch(() => useCityArray().localCityArray, () => {
+  isHaddenBgc.value = true
+
+  const animate = debounce(() => {
+    isHaddenBgc.value = false
+  }, 500)
+  animate()
+})
 </script>
 <template>
+
   <div class="view">
-    <div class="view_let">左视图</div>
+    <div class="view_left" style="color: aliceblue;">左视图</div>
     <!-- 地图绘制 -->
     <div id="china" style="width: 55vw; height: 55vh; position: absolute; bottom: 10vh"></div>
     <div class="view_center">
@@ -153,8 +169,8 @@ const changeFocus = (Boolean: boolean) => {
       </div>
     </div>
     <div class="view_right">
-      <div class="view_right_table">
-        <table>
+      <div class="view_right_table animated fadeInDown" :class="{ 'hig': isHaddenBgc }">
+        <table :class="{ 'bgc-hid': isHaddenBgc }">
           <tr>
             <th>顺序</th>
             <th>城市编号</th>
@@ -162,22 +178,42 @@ const changeFocus = (Boolean: boolean) => {
             <th>城市编码</th>
             <th>等级</th>
           </tr>
-          <tr v-for="(item, index) in useCityArray().localCityArray" :key="item.adcode + index">
-            <td style="text-align: center">{{ index + 1 }}</td>
-            <td>
-              {{ item.citycode?.length === 0 ? "无编号" : item.citycode }}
-            </td>
-            <td>{{ item.name }}</td>
-            <td>{{ item.adcode }}</td>
-            <td>{{ item.level }}</td>
-          </tr>
+          <TransitionGroup enter-active-class="animated fadeInRight" leave-active-class="animated fadeOutLeft"
+            tag="tbody">
+            <tr v-for="(item, index) in useCityArray().localCityArray" :key="item.adcode + index"  >
+              <td style="text-align: center">{{ index + 1 }}</td>
+              <td>
+                {{ item.citycode?.length === 0 ? "无编号" : item.citycode }}
+              </td>
+              <td>{{ item.name }}</td>
+              <td>{{ item.adcode }}</td>
+              <td>{{ item.level }}</td>
+            </tr>
+          </TransitionGroup>
+
+
         </table>
       </div>
     </div>
   </div>
 </template>
 <style scoped>
+.animated {
+  animation-duration: 0.5s !important;
+  /* 任何过度持续时间加快 */
+}
+
+/* 背景隐藏 */
+.bgc-hid {
+  background-color: #ffffff00 !important;
+  color: #fff00000 !important;
+}
+/* 高度最大屏幕 */
+.hig{
+  height: 100vh!important;
+}
 .view {
+
   position: relative;
   display: flex;
   height: 100vh;
@@ -191,7 +227,7 @@ const changeFocus = (Boolean: boolean) => {
   flex: 1;
 }
 
-.view_let {}
+.view_left {}
 
 .view .view_center {
   flex: 2;
@@ -279,10 +315,9 @@ const changeFocus = (Boolean: boolean) => {
 .view_right_table {
   display: flex;
   justify-content: right;
-
   height: 50vh;
-
   margin-top: 10vh;
+  transition: .5s all;
   overflow: scroll;
 }
 
@@ -295,12 +330,21 @@ const changeFocus = (Boolean: boolean) => {
 .view_right_table table {
   height: 8vh;
   width: 20vw;
-  background-color: rgb(0, 110, 255);
+
+  transition: .5s all;
+
+  background-color: #1100ff;
   color: #fff;
 }
 
+.view_right_table table:hover {}
+
 .view_right_table tr {
   background-color: rgb(0, 0, 0);
+}
+
+.view_right_table th {
+  color: rgb(206, 248, 255);
 }
 
 .view_right_table th,
@@ -312,5 +356,9 @@ const changeFocus = (Boolean: boolean) => {
   /* 隐藏溢出的内容 */
   text-overflow: ellipsis;
   /* 文字溢出显示省略号 */
+}
+
+.view_right_table td:hover {
+  color: rgb(114, 187, 255);
 }
 </style>
