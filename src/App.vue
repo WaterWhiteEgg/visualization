@@ -6,7 +6,7 @@ import { debounce } from "./assets/ts/debounce";
 import { forDistricts, type City } from "./assets/ts/forDistricts";
 import { useCityArray } from "./stores/item";
 import { thisInitMap, myChart, redrawValue } from "./assets/ts/initMap";
-import "animate.css"
+import "animate.css";
 const props = withDefaults(defineProps<{}>(), {});
 const emits = defineEmits<{
   (e: "emit", i: void): void;
@@ -17,9 +17,7 @@ const chineseReg = /[^0-9\u4e00-\u9fa5]/g;
 
 // 加载化地图配置
 onMounted(() => {
-  thisInitMap(document.getElementById("china"));
-
-
+  thisInitMap(document.getElementById("china"), mapClick, mapStartClick);
 });
 // 加载getCitys的flag
 const isGetCitysFinally = ref(true);
@@ -28,22 +26,20 @@ const isNotSelectCity = ref(false);
 // 表示错误的输入的flag
 const isErrorCityText = ref(false);
 
-
-
 // 搜索城市编号
 const cityText = ref("");
 watch(cityText, (newVal, oldVal) => {
+  // 防抖
   const fn = debounce(() => {
+    // 加载中flag
+    isGetCitysFinally.value = false;
     // 判断是否是中文且有内容
     if (!chineseReg.test(newVal.trim()) && newVal.trim() !== "") {
-      // 加载中flag
-      isGetCitysFinally.value = false;
-
       getCitys(newVal.trim())
         .then((res) => {
           // 获得内容数组
+          // console.log(res);
           cityArray.value = forDistricts(res.data.data?.districts as City[]);
-
         })
         // 加载完成后提示
         .finally(() => {
@@ -51,16 +47,19 @@ watch(cityText, (newVal, oldVal) => {
           isGetCitysFinally.value = true;
           // 观察有没有内容，没有就报错
           if (cityArray.value.length === 0) {
-            isErrorCityText.value = true
+            isErrorCityText.value = true;
           } else {
-            isErrorCityText.value = false
+            isErrorCityText.value = false;
             // 同步刷新数据
-            redrawData()
+            redrawData();
           }
         });
     }
     // 不满足条件，提示问题
     else {
+      // 隐藏flag
+      isGetCitysFinally.value = true;
+      // 提示
       isErrorCityText.value = true;
     }
   }, 500);
@@ -86,13 +85,10 @@ const clearCityText = () => {
 const ChooseCityWeather = (item: City) => {
   // console.log(item);
   // 放值到cityText
-  cityText.value = item.name;
-
+  ChooseCity(item.name);
   // 请求对应编码的天气
   getWeather(item.adcode).then((res) => {
     console.log(res);
-    // 将数据同步刷新
-    redrawData()
   });
 };
 // 同步数据以及刷新地图
@@ -101,9 +97,22 @@ const redrawData = () => {
 
   useCityArray().addLocalCityArray(cityArray.value);
   // 刷新地图的标点
-  redrawValue(myChart)
-
-}
+  redrawValue(myChart);
+};
+// 地图点击后没有网络请求前回调
+const mapStartClick = () => {
+  isGetCitysFinally.value = false;
+};
+// 地图点击回调
+const mapClick = () => {
+  clearCityText();
+  isGetCitysFinally.value = true;
+};
+// 选择城市切换名字
+const ChooseCity = (name: string) => {
+  // 放值到cityText
+  cityText.value = name;
+};
 // 判断焦点flag
 const isFocus = ref(false);
 // 切换焦点flag
@@ -113,27 +122,42 @@ const changeFocus = (Boolean: boolean) => {
 
 // 观察useCityArray().localCityArray
 // 隐藏背景
-const isHaddenBgc = ref(false)
-watch(() => useCityArray().localCityArray, () => {
-  isHaddenBgc.value = true
+const isHaddenBgc = ref(false);
+watch(
+  () => useCityArray().localCityArray,
+  () => {
+    isHaddenBgc.value = true;
 
-  const animate = debounce(() => {
-    isHaddenBgc.value = false
-  }, 500)
-  animate()
-})
+    const animate = debounce(() => {
+      isHaddenBgc.value = false;
+    }, 500);
+    animate();
+  }
+);
 </script>
 <template>
-
   <div class="view">
-    <div class="view_left" style="color: aliceblue;">左视图</div>
+    <div class="view_left" style="color: aliceblue">左视图</div>
     <!-- 地图绘制 -->
-    <div id="china" style="width: 55vw; height: 55vh; position: absolute; bottom: 10vh"></div>
+    <div
+      id="china"
+      style="width: 60vw; height: 60vh; position: absolute; bottom: 20vh"
+    ></div>
     <div class="view_center">
       <div class="view_center_search">
+        <div style="color: #fff" v-show="!isGetCitysFinally">加载中</div>
         <div class="view_center_search_input">
-          <input type="text" placeholder="搜索" v-model="cityText" @focus="changeFocus(true)" />
-          <span class="view_center_search_input_close" v-show="isFocus" @click="clearCityText(), changeFocus(false)">
+          <input
+            type="text"
+            placeholder="搜索"
+            v-model="cityText"
+            @focus="changeFocus(true)"
+          />
+          <span
+            class="view_center_search_input_close"
+            v-show="isFocus"
+            @click="clearCityText(), changeFocus(false)"
+          >
             <el-icon>
               <Close />
             </el-icon>
@@ -143,17 +167,24 @@ watch(() => useCityArray().localCityArray, () => {
           <div v-show="!isGetCitysFinally">
             {{ "加载中。。。" }}
           </div>
-          <div v-show="cityArray.length === 0 && isErrorCityText && isGetCitysFinally
-            ">
+          <div
+            v-show="
+              cityArray.length === 0 && isErrorCityText && isGetCitysFinally
+            "
+          >
             {{
-            `请遵循以下规则查找：
+              `请遵循以下规则查找：
             只支持单个关键词语搜索关键词支持:行政区名称、城市编码、邮件编码
             例如，搜索省份（例如山东），能够显示市（例如济南），区（例如历下区）,若你频繁看到提示，可能输入的关键词有误或网络错误`
-          }}
+            }}
           </div>
           <div v-if="isGetCitysFinally">
-            <div class="view_center_search_view_item" v-for="(item, index) in cityArray" :key="item.adcode + index"
-              @click="ChooseCityWeather(item), changeFocus(false)">
+            <div
+              class="view_center_search_view_item"
+              v-for="(item, index) in cityArray"
+              :key="item.adcode + index"
+              @click="ChooseCityWeather(item), changeFocus(false)"
+            >
               <div class="view_center_search_view_item_index">
                 {{ index + 1 }}
               </div>
@@ -169,7 +200,10 @@ watch(() => useCityArray().localCityArray, () => {
       </div>
     </div>
     <div class="view_right">
-      <div class="view_right_table animated fadeInDown" :class="{ 'hig': isHaddenBgc }">
+      <div
+        class="view_right_table animated fadeInDown"
+        :class="{ hig: isHaddenBgc }"
+      >
         <table :class="{ 'bgc-hid': isHaddenBgc }">
           <tr>
             <th>顺序</th>
@@ -178,20 +212,29 @@ watch(() => useCityArray().localCityArray, () => {
             <th>城市编码</th>
             <th>等级</th>
           </tr>
-          <TransitionGroup enter-active-class="animated fadeInRight" leave-active-class="animated fadeOutLeft"
-            tag="tbody">
-            <tr v-for="(item, index) in useCityArray().localCityArray" :key="item.adcode + index"  >
+          <TransitionGroup
+            enter-active-class="animated fadeInRight"
+            leave-active-class="animated fadeOutLeft"
+            tag="tbody"
+          >
+            <tr
+              v-for="(item, index) in useCityArray().localCityArray"
+              :key="item.adcode + index"
+            >
               <td style="text-align: center">{{ index + 1 }}</td>
               <td>
                 {{ item.citycode?.length === 0 ? "无编号" : item.citycode }}
               </td>
-              <td>{{ item.name }}</td>
+              <td
+                class="view_right_table_tdname"
+                @click="ChooseCityWeather(item)"
+              >
+                {{ item.name }}
+              </td>
               <td>{{ item.adcode }}</td>
               <td>{{ item.level }}</td>
             </tr>
           </TransitionGroup>
-
-
         </table>
       </div>
     </div>
@@ -209,11 +252,10 @@ watch(() => useCityArray().localCityArray, () => {
   color: #fff00000 !important;
 }
 /* 高度最大屏幕 */
-.hig{
-  height: 100vh!important;
+.hig {
+  height: 100vh !important;
 }
 .view {
-
   position: relative;
   display: flex;
   height: 100vh;
@@ -227,15 +269,18 @@ watch(() => useCityArray().localCityArray, () => {
   flex: 1;
 }
 
-.view_left {}
+.view_left {
+}
 
 .view .view_center {
   flex: 2;
 }
 
-.view_right {}
+.view_right {
+}
 
-.view_center_search {}
+.view_center_search {
+}
 
 .view_center_search_input {
   position: relative;
@@ -306,7 +351,8 @@ watch(() => useCityArray().localCityArray, () => {
   /* 文字溢出显示省略号 */
 }
 
-.view_center_search_view_item .view_center_search_view_item_adcode {}
+.view_center_search_view_item .view_center_search_view_item_adcode {
+}
 
 .view_right {
   display: flex;
@@ -317,7 +363,7 @@ watch(() => useCityArray().localCityArray, () => {
   justify-content: right;
   height: 50vh;
   margin-top: 10vh;
-  transition: .5s all;
+  transition: 0.5s all;
   overflow: scroll;
 }
 
@@ -331,13 +377,11 @@ watch(() => useCityArray().localCityArray, () => {
   height: 8vh;
   width: 20vw;
 
-  transition: .5s all;
+  transition: 0.5s all;
 
   background-color: #1100ff;
   color: #fff;
 }
-
-.view_right_table table:hover {}
 
 .view_right_table tr {
   background-color: rgb(0, 0, 0);
@@ -360,5 +404,8 @@ watch(() => useCityArray().localCityArray, () => {
 
 .view_right_table td:hover {
   color: rgb(114, 187, 255);
+}
+.view_right_table_tdname {
+  cursor: pointer;
 }
 </style>

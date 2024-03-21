@@ -8,7 +8,11 @@ import { getMyIpCity } from "./toGetIp";
 import { ref } from "vue";
 
 export let myChart: echarts.ECharts;
-export async function thisInitMap(doc: HTMLElement | null) {
+export async function thisInitMap(
+  doc: HTMLElement | null,
+  clickCallback?: Function,
+  startClickCallback?: Function
+) {
   myChart = echarts.init(doc);
 
   // 检测useCityArray，若没有任何初始化值则将本地ip定位
@@ -138,21 +142,27 @@ export async function thisInitMap(doc: HTMLElement | null) {
   });
   // 监听事件
   myChart.on("click", (e) => {
+    // 开始时触发回调
+    startClickCallback && startClickCallback();
     let inmyChart = myChart;
     // 请求数据
     const fn = debounce(() => {
-      getCitys(e.name, 3).then((res) => {
-        console.log(res);
+      getCitys(e.name, 3)
+        .then((res) => {
+          // console.log(res);
 
-        useCityArray().addLocalCityArray(
-          forDistricts(res.data.data?.districts)
-        );
-        // console.log(useCityArray().localCityArray);
-        console.log(useCityArray().localCityArray[0].center.split(","));
+          useCityArray().addLocalCityArray(
+            forDistricts(res.data.data?.districts)
+          );
+          // console.log(useCityArray().localCityArray[0]?.center.split(","));
 
-        // 同步小圆点,重新绘制标点
-        redrawValue(inmyChart as echarts.ECharts);
-      });
+          // 同步小圆点,重新绘制标点
+          redrawValue(inmyChart);
+        })
+        .finally(() => {
+          // 执行回调
+          clickCallback && clickCallback();
+        });
     });
     fn();
   });
@@ -165,16 +175,16 @@ export function redrawValue(myChart: echarts.ECharts) {
       {
         data: [
           {
-            name: useCityArray().localCityArray[0].name,
-            value: useCityArray().localCityArray[0].center.split(","),
+            name: useCityArray().localCityArray[0]?.name,
+            value: useCityArray().localCityArray[0]?.center.split(","),
           },
         ],
       },
       {
         data: [
           {
-            name: useCityArray().localCityArray[0].name,
-            value: useCityArray().localCityArray[0].center.split(","),
+            name: useCityArray().localCityArray[0]?.name,
+            value: useCityArray().localCityArray[0]?.center.split(","),
           },
         ],
       },
