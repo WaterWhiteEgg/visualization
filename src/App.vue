@@ -3,9 +3,19 @@ import { onMounted, ref, watch, type Ref } from "vue";
 import { getWeather } from "./network/weather";
 import { getCitys, getMyIp, getIpCity } from "./network/city";
 import { debounce } from "./assets/ts/debounce";
-import { forDistricts, type City } from "./assets/ts/forDistricts";
+import {
+  forDistricts,
+  type City,
+  type Weather,
+  type DataWeather,
+} from "./assets/ts/forDistricts";
 import { useCityArray } from "./stores/item";
-import { thisInitMap, myChart, redrawValue } from "./assets/ts/initMap";
+import {
+  thisInitMap,
+  myChart,
+  redrawValue,
+  inGetWeather,
+} from "./assets/ts/initMap";
 import "animate.css";
 const props = withDefaults(defineProps<{}>(), {});
 const emits = defineEmits<{
@@ -87,10 +97,9 @@ const ChooseCityWeather = (item: City) => {
   // 放值到cityText
   ChooseCity(item.name);
   // 请求对应编码的天气
-  getWeather(item.adcode).then((res) => {
-    console.log(res);
-  });
+  inGetWeather(item.adcode);
 };
+
 // 同步数据以及刷新地图
 const redrawData = () => {
   // 将数据同步表格
@@ -107,6 +116,7 @@ const mapStartClick = () => {
 const mapClick = () => {
   clearCityText();
   isGetCitysFinally.value = true;
+  inGetWeather(useCityArray()?.localCityArray[0]?.adcode);
 };
 // 选择城市切换名字
 const ChooseCity = (name: string) => {
@@ -137,7 +147,40 @@ watch(
 </script>
 <template>
   <div class="view">
-    <div class="view_left" style="color: aliceblue">左视图</div>
+    <div class="view_left" style="color: aliceblue">
+      <div class="view_left_weather">
+        <div
+          class="view_left_weather_item"
+          v-for="(item, index) in useCityArray().localWeather"
+          :key="item.adcode + index"
+        >
+          <div>
+            城市名
+            {{ item.city }}
+          </div>
+          <div>
+            天气状况
+            {{ item.weather }}
+          </div>
+          <div>
+            气温
+            {{ item.temperature }}
+          </div>
+          <div>
+            风力等级
+            {{ item.windpower }}
+          </div>
+          <div>
+            湿度
+            {{ item.humidity }}
+          </div>
+          <div>
+            更新时间
+            {{ item.reporttime }}
+          </div>
+        </div>
+      </div>
+    </div>
     <!-- 地图绘制 -->
     <div
       id="china"

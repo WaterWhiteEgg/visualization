@@ -7,6 +7,27 @@ export type City = {
   center: string;
   districts: City[];
 };
+export type Weather = {
+  adcode: string;
+  city: string;
+  humidity: string;
+  humidity_float: string;
+  province: string;
+  reporttime: string;
+  temperature: string;
+  temperature_float: string;
+  weather: string;
+  winddirection: string;
+  windpower: string;
+};
+
+export type DataWeather = {
+  count: string;
+  info: string;
+  infocode: string;
+  lives: Weather[];
+  status: string;
+};
 
 export function forDistricts(city: City[]) {
   let allArray = city;

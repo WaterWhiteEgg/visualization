@@ -1,11 +1,13 @@
 import * as echarts from "echarts";
 import "../js/china";
 import { getCitys } from "../../network/city";
+import { getWeather } from "../../network/weather";
 import { debounce } from "../ts/debounce";
-import { forDistricts, type City } from "../ts/forDistricts";
+import { forDistricts, type City, type DataWeather } from "../ts/forDistricts";
 import { useCityArray } from "../../stores/item";
 import { getMyIpCity } from "./toGetIp";
 import { ref } from "vue";
+import type { AxiosResponse } from "axios";
 
 export let myChart: echarts.ECharts;
 export async function thisInitMap(
@@ -22,6 +24,8 @@ export async function thisInitMap(
     await getCitys(cityIpObj?.adcode as string).then((res) => {
       useCityArray().addLocalCityArray(forDistricts(res.data.data?.districts));
     });
+    // 同时请求天气,天气不需要与地图数据绑定，可以非异步等待回调
+    inGetWeather(cityIpObj?.adcode as string);
   }
 
   // data 展示地图对应方块 value对应坐标 x y
@@ -147,21 +151,21 @@ export async function thisInitMap(
     let inmyChart = myChart;
     // 请求数据
     const fn = debounce(() => {
+      let inRes: AxiosResponse;
       getCitys(e.name, 3)
         .then((res) => {
           // console.log(res);
-
+          inRes = res;
           useCityArray().addLocalCityArray(
             forDistricts(res.data.data?.districts)
           );
           // console.log(useCityArray().localCityArray[0]?.center.split(","));
-
           // 同步小圆点,重新绘制标点
           redrawValue(inmyChart);
         })
         .finally(() => {
           // 执行回调
-          clickCallback && clickCallback();
+          clickCallback && clickCallback(inRes);
         });
     });
     fn();
@@ -191,3 +195,12 @@ export function redrawValue(myChart: echarts.ECharts) {
     ],
   });
 }
+// 城市天气请求，一定要城市编码
+export const inGetWeather = (code: string) => {
+  getWeather(code).then((res) => {
+    let weatherData = res.data.data as DataWeather;
+    let weatherLive = weatherData.lives;
+    useCityArray().addLocalWeather(weatherLive);
+    // console.log(weatherLive);
+  });
+};
