@@ -147,38 +147,40 @@ watch(
 </script>
 <template>
   <div class="view">
-    <div class="view_left" style="color: aliceblue">
-      <div class="view_left_weather">
-        <div
-          class="view_left_weather_item"
-          v-for="(item, index) in useCityArray().localWeather"
-          :key="item.adcode + index"
-        >
-          <div>
-            城市名
-            {{ item.city }}
+    <div class="view_left">
+      <div class="view_left_weather animated fadeInDown">
+        <transition-group enter-active-class="animated rotateInDownLeft">
+          <div
+            class="view_left_weather_item"
+            v-for="(item, index) in useCityArray().localWeather"
+            :key="item.adcode + index"
+          >
+            <div>
+              <span>城市名</span>
+              {{ item.city }}
+            </div>
+            <div>
+              <span>天气状况</span>
+              {{ item.weather }}
+            </div>
+            <div>
+              <span>气温</span>
+              {{ item.temperature }}°
+            </div>
+            <div>
+              <span> 风力等级 </span>
+              {{ item.windpower }}
+            </div>
+            <div>
+              <span>湿度</span>
+              {{ item.humidity }}
+            </div>
+            <div>
+              <span> 更新时间 </span>
+              {{ item.reporttime }}
+            </div>
           </div>
-          <div>
-            天气状况
-            {{ item.weather }}
-          </div>
-          <div>
-            气温
-            {{ item.temperature }}
-          </div>
-          <div>
-            风力等级
-            {{ item.windpower }}
-          </div>
-          <div>
-            湿度
-            {{ item.humidity }}
-          </div>
-          <div>
-            更新时间
-            {{ item.reporttime }}
-          </div>
-        </div>
+        </transition-group>
       </div>
     </div>
     <!-- 地图绘制 -->
@@ -308,11 +310,8 @@ watch(
   background-size: cover;
 }
 
-.view div {
-  flex: 1;
-}
-
 .view_left {
+  flex: 1;
 }
 
 .view .view_center {
@@ -320,6 +319,7 @@ watch(
 }
 
 .view_right {
+  flex: 1;
 }
 
 .view_center_search {
@@ -450,5 +450,39 @@ watch(
 }
 .view_right_table_tdname {
   cursor: pointer;
+}
+.view_left_weather {
+  display: flex;
+  position: relative;
+  margin-top: 10vh;
+  margin-left: 4vw;
+  width: 20vw;
+  max-width: 250px;
+  min-width: 190px;
+  min-height: 100px;
+  font-size: 0.8rem;
+}
+.view_left_weather_item {
+  display: flex;
+  position: absolute;
+  z-index: 9999;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+.view_left_weather_item div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 5vw;
+  width: 5vw;
+  min-height: 70px;
+  min-width: 70px;
+  overflow: hidden;
+  border: 0.2px solid #ffffff6b;
+  color: #fff;
+  background-color: #1100ff65;
+  backdrop-filter: blur(10px); /* 添加模糊效果 */
 }
 </style>
