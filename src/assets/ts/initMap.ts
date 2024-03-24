@@ -13,7 +13,8 @@ export let myChart: echarts.ECharts;
 export async function thisInitMap(
   doc: HTMLElement | null,
   clickCallback?: Function,
-  startClickCallback?: Function
+  startClickCallback?: Function,
+  resize:boolean = false
 ) {
   myChart = echarts.init(doc);
 
@@ -143,7 +144,7 @@ export async function thisInitMap(
         data: data,
       },
     ],
-  });
+  },resize);
   // 监听事件
   myChart.on("click", (e) => {
     // 开始时触发回调

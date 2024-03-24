@@ -28,7 +28,19 @@ const chineseReg = /[^0-9\u4e00-\u9fa5]/g;
 // 加载化地图配置
 onMounted(() => {
   thisInitMap(document.getElementById("china"), mapClick, mapStartClick);
+  // 注册监听屏幕大小的事件
+  window.addEventListener("resize", handleResize);
 });
+// 屏幕大小改变触发事件
+const thisInnerWidth = ref(window.innerWidth);
+const handleResize = () => {
+  let resize = debounce(() => {
+    thisInnerWidth.value = window.innerWidth;
+    myChart.resize();
+  }, 300);
+  resize();
+};
+
 // 加载getCitys的flag
 const isGetCitysFinally = ref(true);
 // 表示跳过本次改变搜索的flag
@@ -133,6 +145,7 @@ const changeFocus = (Boolean: boolean) => {
 // 观察useCityArray().localCityArray
 // 隐藏背景
 const isHaddenBgc = ref(false);
+// 动画会在数据变化时500ms内执行变化flag使得过渡生效
 watch(
   () => useCityArray().localCityArray,
   () => {
@@ -144,6 +157,7 @@ watch(
     animate();
   }
 );
+// 观察bom
 </script>
 <template>
   <div class="view">
@@ -186,7 +200,7 @@ watch(
     <!-- 地图绘制 -->
     <div
       id="china"
-      style="width: 60vw; height: 60vh; position: absolute; bottom: 20vh"
+      style="width: 100vw; height: 60vh; position: absolute; bottom: 20vh"
     ></div>
     <div class="view_center">
       <div class="view_center_search">
