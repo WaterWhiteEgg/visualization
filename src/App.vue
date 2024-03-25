@@ -164,11 +164,8 @@ watch(
     <div class="view_left">
       <div class="view_left_weather animated fadeInDown">
         <transition-group enter-active-class="animated rotateInDownLeft">
-          <div
-            class="view_left_weather_item"
-            v-for="(item, index) in useCityArray().localWeather"
-            :key="item.adcode + index"
-          >
+          <div class="view_left_weather_item" v-for="(item, index) in useCityArray().localWeather"
+            :key="item.adcode + index">
             <div>
               <span>城市名</span>
               {{ item.city }}
@@ -198,25 +195,13 @@ watch(
       </div>
     </div>
     <!-- 地图绘制 -->
-    <div
-      id="china"
-      style="width: 100vw; height: 60vh; position: absolute; bottom: 20vh"
-    ></div>
+    <div id="china" style="width: 100vw; height: 60vh; position: absolute; bottom: 20vh"></div>
     <div class="view_center">
       <div class="view_center_search">
         <div style="color: #fff" v-show="!isGetCitysFinally">加载中</div>
         <div class="view_center_search_input">
-          <input
-            type="text"
-            placeholder="搜索"
-            v-model="cityText"
-            @focus="changeFocus(true)"
-          />
-          <span
-            class="view_center_search_input_close"
-            v-show="isFocus"
-            @click="clearCityText(), changeFocus(false)"
-          >
+          <input type="text" placeholder="搜索" v-model="cityText" @focus="changeFocus(true)" />
+          <span class="view_center_search_input_close" v-show="isFocus" @click="clearCityText(), changeFocus(false)">
             <el-icon>
               <Close />
             </el-icon>
@@ -226,24 +211,17 @@ watch(
           <div v-show="!isGetCitysFinally">
             {{ "加载中。。。" }}
           </div>
-          <div
-            v-show="
-              cityArray.length === 0 && isErrorCityText && isGetCitysFinally
-            "
-          >
+          <div v-show="cityArray.length === 0 && isErrorCityText && isGetCitysFinally
+            ">
             {{
-              `请遵循以下规则查找：
+            `请遵循以下规则查找：
             只支持单个关键词语搜索关键词支持:行政区名称、城市编码、邮件编码
             例如，搜索省份（例如山东），能够显示市（例如济南），区（例如历下区）,若你频繁看到提示，可能输入的关键词有误或网络错误`
-            }}
+          }}
           </div>
           <div v-if="isGetCitysFinally">
-            <div
-              class="view_center_search_view_item"
-              v-for="(item, index) in cityArray"
-              :key="item.adcode + index"
-              @click="ChooseCityWeather(item), changeFocus(false)"
-            >
+            <div class="view_center_search_view_item" v-for="(item, index) in cityArray" :key="item.adcode + index"
+              @click="ChooseCityWeather(item), changeFocus(false)">
               <div class="view_center_search_view_item_index">
                 {{ index + 1 }}
               </div>
@@ -259,10 +237,7 @@ watch(
       </div>
     </div>
     <div class="view_right">
-      <div
-        class="view_right_table animated fadeInDown"
-        :class="{ hig: isHaddenBgc }"
-      >
+      <div class="view_right_table animated fadeInDown" :class="{ hig: isHaddenBgc }">
         <table :class="{ 'bgc-hid': isHaddenBgc }">
           <tr>
             <th>顺序</th>
@@ -271,23 +246,14 @@ watch(
             <th>城市编码</th>
             <th>等级</th>
           </tr>
-          <TransitionGroup
-            enter-active-class="animated fadeInRight"
-            leave-active-class="animated fadeOutLeft"
-            tag="tbody"
-          >
-            <tr
-              v-for="(item, index) in useCityArray().localCityArray"
-              :key="item.adcode + index"
-            >
+          <TransitionGroup enter-active-class="animated fadeInRight" leave-active-class="animated fadeOutLeft"
+            tag="tbody">
+            <tr v-for="(item, index) in useCityArray().localCityArray" :key="item.adcode + index">
               <td style="text-align: center">{{ index + 1 }}</td>
               <td>
                 {{ item.citycode?.length === 0 ? "无编号" : item.citycode }}
               </td>
-              <td
-                class="view_right_table_tdname"
-                @click="ChooseCityWeather(item)"
-              >
+              <td class="view_right_table_tdname" @click="ChooseCityWeather(item)">
                 {{ item.name }}
               </td>
               <td>{{ item.adcode }}</td>
@@ -310,10 +276,12 @@ watch(
   background-color: #ffffff00 !important;
   color: #fff00000 !important;
 }
+
 /* 高度最大屏幕 */
 .hig {
   height: 100vh !important;
 }
+
 .view {
   position: relative;
   display: flex;
@@ -328,16 +296,49 @@ watch(
   flex: 1;
 }
 
+.view_left_weather {
+  display: flex;
+  position: relative;
+  margin-top: 10vh;
+  margin-left: 4vw;
+  width: 20vw;
+  max-width: 250px;
+  min-width: 190px;
+  min-height: 100px;
+  font-size: 0.8rem;
+}
+
+.view_left_weather_item {
+  display: flex;
+  position: absolute;
+  z-index: 9999;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+.view_left_weather_item div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 5vw;
+  width: 5vw;
+  min-height: 70px;
+  min-width: 70px;
+  overflow: hidden;
+  border: 0.2px solid #ffffff6b;
+  color: #fff;
+  background-color: #1100ff65;
+  backdrop-filter: blur(10px);
+  /* 添加模糊效果 */
+}
+
 .view .view_center {
   flex: 2;
 }
 
-.view_right {
-  flex: 1;
-}
-
-.view_center_search {
-}
+.view_center_search {}
 
 .view_center_search_input {
   position: relative;
@@ -408,11 +409,14 @@ watch(
   /* 文字溢出显示省略号 */
 }
 
-.view_center_search_view_item .view_center_search_view_item_adcode {
-}
+.view_center_search_view_item .view_center_search_view_item_adcode {}
+
+
 
 .view_right {
   display: flex;
+  flex: 1;
+
 }
 
 .view_right_table {
@@ -462,41 +466,88 @@ watch(
 .view_right_table td:hover {
   color: rgb(114, 187, 255);
 }
+
 .view_right_table_tdname {
   cursor: pointer;
 }
-.view_left_weather {
-  display: flex;
-  position: relative;
-  margin-top: 10vh;
-  margin-left: 4vw;
-  width: 20vw;
-  max-width: 250px;
-  min-width: 190px;
-  min-height: 100px;
-  font-size: 0.8rem;
+
+
+
+@media screen and (max-width:969px) {
+
+  /* 手机 */
+  /* 类平板 */
+  .view {
+    flex-direction: column;
+    overflow: scroll;
+    justify-content: start;
+  }
+
+  .view_left {
+    width: 100vw;
+  }
+
+  .view_left_weather {
+    width: 100vw;
+    height: 100%;
+    margin: 0;
+    max-width: 0px;
+    min-width: 0px;
+    min-height: 0px;
+  }
+
+  .view_left_weather_item {
+    position: relative;
+
+
+  }
+
+  .view_left_weather_item div {
+    width: 100vw;
+  }
+
+  .view_center_search input {
+    border-radius: 0;
+  }
+
+  .view_center {
+    margin-bottom: 70vh;
+
+    order: -99;
+  }
+
+  .view_center_search {}
+
+  .view_right {}
+
+
+
+  .view_right_table {
+   margin: 0;
+  }
+  .view_right_table table {
+
+    width: 100vw;
+
+  }
+
+
+  .view_right_table th,
+  .view_right_table td {
+    max-width: 6vw;
+    white-space: nowrap;
+    /* 保证文本在一行内显示 */
+    overflow: hidden;
+    /* 隐藏溢出的内容 */
+    text-overflow: ellipsis;
+    /* 文字溢出显示省略号 */
+  }
+
 }
-.view_left_weather_item {
-  display: flex;
-  position: absolute;
-  z-index: 9999;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-}
-.view_left_weather_item div {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 5vw;
-  width: 5vw;
-  min-height: 70px;
-  min-width: 70px;
-  overflow: hidden;
-  border: 0.2px solid #ffffff6b;
-  color: #fff;
-  background-color: #1100ff65;
-  backdrop-filter: blur(10px); /* 添加模糊效果 */
+
+@media screen and (min-width:970px) {
+
+  /* 大屏幕电脑 */
+  .view {}
 }
 </style>
