@@ -16,6 +16,8 @@ import {
   redrawValue,
   inGetWeather,
 } from "./assets/ts/initMap";
+import { initPie, myPicChart } from "./assets/ts/initPie";
+import { initLine, myLineChart } from "./assets/ts/initLine";
 import "animate.css";
 const props = withDefaults(defineProps<{}>(), {});
 const emits = defineEmits<{
@@ -28,8 +30,12 @@ const chineseReg = /[^0-9\u4e00-\u9fa5]/g;
 // 加载化地图配置
 onMounted(() => {
   thisInitMap(document.getElementById("china"), mapClick, mapStartClick);
+  initPie(document.querySelector(".view_left_pie"))
+  initLine(document.querySelector(".view_left_line"))
+
   // 注册监听屏幕大小的事件
   window.addEventListener("resize", handleResize);
+
 });
 // 屏幕大小改变触发事件
 const thisInnerWidth = ref(window.innerWidth);
@@ -37,20 +43,22 @@ const handleResize = () => {
   let resize = debounce(() => {
     thisInnerWidth.value = window.innerWidth;
     myChart.resize();
+    myPicChart.resize();
+    myLineChart.resize();
   }, 300);
   resize();
 };
 
 // 加载getCitys的flag
 const isGetCitysFinally = ref(true);
-// 表示跳过本次改变搜索的flag
-const isNotSelectCity = ref(false);
+
 // 表示错误的输入的flag
 const isErrorCityText = ref(false);
 
 // 搜索城市编号
 const cityText = ref("");
 watch(cityText, (newVal, oldVal) => {
+
   // 防抖
   const fn = debounce(() => {
     // 加载中flag
@@ -87,20 +95,13 @@ watch(cityText, (newVal, oldVal) => {
   }, 500);
 
   // 执行上面的方法
-  // 判断需不需要执行,若不需要则跳过这一次
-  if (!isNotSelectCity.value) {
-    fn();
-  }
-  // 恢复状态
-  isNotSelectCity.value = false;
+  fn();
 });
 
 const cityArray: Ref<City[]> = ref([]);
 
 // 清除CityText的值，等于关闭搜索
 const clearCityText = () => {
-  // 跳过搜索
-  isNotSelectCity.value = true;
   cityText.value = "";
 };
 // 选择了某个城市触发
@@ -193,6 +194,8 @@ watch(
           </div>
         </transition-group>
       </div>
+      <div class="view_left_pie"></div>
+      <div class="view_left_line"></div>
     </div>
     <!-- 地图绘制 -->
     <div id="china" style="width: 100vw; height: 60vh; position: absolute; bottom: 20vh"></div>
@@ -292,29 +295,30 @@ watch(
   background-size: cover;
 }
 
+/* 隐藏滚动条 */
+.view::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
 .view_left {
   flex: 1;
+  margin-top: 10vh;
+  margin-left: 2vw;
 }
 
 .view_left_weather {
   display: flex;
   position: relative;
-  margin-top: 10vh;
-  margin-left: 4vw;
+  height: 20vh;
   width: 20vw;
-  max-width: 250px;
-  min-width: 190px;
-  min-height: 100px;
+  max-height: 140px;
   font-size: 0.8rem;
 }
 
 .view_left_weather_item {
   display: flex;
-  position: absolute;
-  z-index: 9999;
   flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
 }
 
 .view_left_weather_item div {
@@ -332,6 +336,19 @@ watch(
   background-color: #1100ff65;
   backdrop-filter: blur(10px);
   /* 添加模糊效果 */
+}
+
+.view_left_pie {
+  margin-top: 5vh;
+  width: 20vw;
+  height: 30vh;
+  z-index: 99999;
+}
+
+.view_left_line {
+  width: 20vw;
+  height: 30vh;
+  z-index: 9999;
 }
 
 .view .view_center {
@@ -367,7 +384,7 @@ watch(
   position: relative;
   height: 40vh;
   overflow: scroll;
-  background-color: aliceblue;
+  background-color: #f0f8ff;
   z-index: 9999;
 }
 
@@ -440,7 +457,7 @@ watch(
 
   transition: 0.5s all;
 
-  background-color: #1100ff;
+  background-color: #877eff;
   color: #fff;
 }
 
@@ -477,6 +494,11 @@ watch(
 
   /* 手机 */
   /* 类平板 */
+  /* 取消宽度调整 */
+  .hig {
+    height: 100% !important;
+  }
+
   .view {
     flex-direction: column;
     overflow: scroll;
@@ -484,26 +506,53 @@ watch(
   }
 
   .view_left {
-    width: 100vw;
+    margin: 0;
+    /* 提供绝对定位的视窗 */
+    padding-bottom: 40vh;
   }
 
   .view_left_weather {
+    max-width: none;
+    max-height: none;
+    min-height: 0;
+    min-width: 0;
     width: 100vw;
-    height: 100%;
+    height: 18vh;
+
     margin: 0;
-    max-width: 0px;
-    min-width: 0px;
-    min-height: 0px;
+    align-items: start;
+    justify-content: start;
+    overflow: scroll;
+  }
+
+  /* 隐藏滚动条 */
+  .view_left_weather::-webkit-scrollbar {
+    width: 0;
+    height: 0;
   }
 
   .view_left_weather_item {
-    position: relative;
-
-
+    max-width: none;
+    max-height: none;
+    min-height: 0;
+    min-width: 0;
+    align-items: start;
+    justify-content: start;
   }
 
   .view_left_weather_item div {
-    width: 100vw;
+    max-width: none;
+    max-height: none;
+    min-height: 40px;
+    min-width: 0;
+    width: 50vw;
+    height: 6vh;
+  }
+
+  .view_left_pie {
+    margin-top: 0;
+    width: 50vw;
+    height: 40vh;
   }
 
   .view_center_search input {
@@ -523,8 +572,9 @@ watch(
 
 
   .view_right_table {
-   margin: 0;
+    margin: 0;
   }
+
   .view_right_table table {
 
     width: 100vw;
@@ -532,16 +582,6 @@ watch(
   }
 
 
-  .view_right_table th,
-  .view_right_table td {
-    max-width: 6vw;
-    white-space: nowrap;
-    /* 保证文本在一行内显示 */
-    overflow: hidden;
-    /* 隐藏溢出的内容 */
-    text-overflow: ellipsis;
-    /* 文字溢出显示省略号 */
-  }
 
 }
 

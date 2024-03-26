@@ -6,6 +6,9 @@ import { debounce } from "../ts/debounce";
 import { forDistricts, type City, type DataWeather } from "../ts/forDistricts";
 import { useCityArray } from "../../stores/item";
 import { getMyIpCity } from "./toGetIp";
+
+import { myPicChart, redrawPieValue } from "./initPie";
+
 import { ref } from "vue";
 import type { AxiosResponse } from "axios";
 
@@ -14,7 +17,7 @@ export async function thisInitMap(
   doc: HTMLElement | null,
   clickCallback?: Function,
   startClickCallback?: Function,
-  resize:boolean = false
+  resize: boolean = false
 ) {
   myChart = echarts.init(doc);
 
@@ -144,7 +147,7 @@ export async function thisInitMap(
         data: data,
       },
     ],
-  },resize);
+  }, resize);
   // 监听事件
   myChart.on("click", (e) => {
     // 开始时触发回调
@@ -173,7 +176,6 @@ export async function thisInitMap(
   });
 }
 // 同步小圆点,重新绘制标点
-
 export function redrawValue(myChart: echarts.ECharts) {
   myChart.setOption({
     series: [
@@ -203,5 +205,7 @@ export const inGetWeather = (code: string) => {
     let weatherLive = weatherData.lives;
     useCityArray().addLocalWeather(weatherLive);
     // console.log(weatherLive);
+    // 刷新饼图的数据
+    redrawPieValue(myPicChart)
   });
 };
