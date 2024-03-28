@@ -17,7 +17,7 @@ import {
   inGetWeather,
 } from "./assets/ts/initMap";
 import { initPie, myPicChart } from "./assets/ts/initPie";
-import { initLine, myLineChart } from "./assets/ts/initLine";
+import { initLine, myLineChart, redrawLineValue } from "./assets/ts/initLine";
 import "animate.css";
 const props = withDefaults(defineProps<{}>(), {});
 const emits = defineEmits<{
@@ -29,13 +29,12 @@ const chineseReg = /[^0-9\u4e00-\u9fa5]/g;
 
 // 加载化地图配置
 onMounted(() => {
-  thisInitMap(document.getElementById("china"), mapClick, mapStartClick);
-  initPie(document.querySelector(".view_left_pie"))
-  initLine(document.querySelector(".view_left_line"))
+  thisInitMap(document.getElementById("china"), mapClick);
+  initPie(document.querySelector(".view_left_pie"));
+  initLine(document.querySelector(".view_left_line"));
 
   // 注册监听屏幕大小的事件
   window.addEventListener("resize", handleResize);
-
 });
 // 屏幕大小改变触发事件
 const thisInnerWidth = ref(window.innerWidth);
@@ -58,7 +57,6 @@ const isErrorCityText = ref(false);
 // 搜索城市编号
 const cityText = ref("");
 watch(cityText, (newVal, oldVal) => {
-
   // 防抖
   const fn = debounce(() => {
     // 加载中flag
@@ -121,15 +119,26 @@ const redrawData = () => {
   // 刷新地图的标点
   redrawValue(myChart);
 };
-// 地图点击后没有网络请求前回调
-const mapStartClick = () => {
-  isGetCitysFinally.value = false;
-};
+
 // 地图点击回调
-const mapClick = () => {
-  clearCityText();
-  isGetCitysFinally.value = true;
-  inGetWeather(useCityArray()?.localCityArray[0]?.adcode);
+const mapClick = (e: echarts.ECElementEvent) => {
+  // 准备搜索
+  isGetCitysFinally.value = false;
+  // 点击地图块
+  let click = debounce(() => {
+    // 清除cityText
+    clearCityText();
+    isGetCitysFinally.value = true;
+    // 请求天气以及城市数据
+    getCitys(e.name).then((res) => {
+      // 赋值给全局
+      useCityArray().addLocalCityArray(forDistricts(res.data.data?.districts));
+      // 同步小圆点,重新绘制标点
+      redrawValue(myChart);
+    });
+    inGetWeather(useCityArray()?.localCityArray[0]?.adcode);
+  }, 300);
+  click();
 };
 // 选择城市切换名字
 const ChooseCity = (name: string) => {
@@ -150,8 +159,9 @@ const isHaddenBgc = ref(false);
 watch(
   () => useCityArray().localCityArray,
   () => {
+    // 改变时刷新图标数据
+    redrawLineValue(myLineChart);
     isHaddenBgc.value = true;
-
     const animate = debounce(() => {
       isHaddenBgc.value = false;
     }, 500);
@@ -165,8 +175,11 @@ watch(
     <div class="view_left">
       <div class="view_left_weather animated fadeInDown">
         <transition-group enter-active-class="animated rotateInDownLeft">
-          <div class="view_left_weather_item" v-for="(item, index) in useCityArray().localWeather"
-            :key="item.adcode + index">
+          <div
+            class="view_left_weather_item"
+            v-for="(item, index) in useCityArray().localWeather"
+            :key="item.adcode + index"
+          >
             <div>
               <span>城市名</span>
               {{ item.city }}
@@ -198,13 +211,25 @@ watch(
       <div class="view_left_line"></div>
     </div>
     <!-- 地图绘制 -->
-    <div id="china" style="width: 100vw; height: 60vh; position: absolute; bottom: 20vh"></div>
+    <div
+      id="china"
+      style="width: 100vw; height: 60vh; position: absolute; bottom: 20vh"
+    ></div>
     <div class="view_center">
       <div class="view_center_search">
         <div style="color: #fff" v-show="!isGetCitysFinally">加载中</div>
         <div class="view_center_search_input">
-          <input type="text" placeholder="搜索" v-model="cityText" @focus="changeFocus(true)" />
-          <span class="view_center_search_input_close" v-show="isFocus" @click="clearCityText(), changeFocus(false)">
+          <input
+            type="text"
+            placeholder="搜索"
+            v-model="cityText"
+            @focus="changeFocus(true)"
+          />
+          <span
+            class="view_center_search_input_close"
+            v-show="isFocus"
+            @click="clearCityText(), changeFocus(false)"
+          >
             <el-icon>
               <Close />
             </el-icon>
@@ -214,17 +239,24 @@ watch(
           <div v-show="!isGetCitysFinally">
             {{ "加载中。。。" }}
           </div>
-          <div v-show="cityArray.length === 0 && isErrorCityText && isGetCitysFinally
-            ">
+          <div
+            v-show="
+              cityArray.length === 0 && isErrorCityText && isGetCitysFinally
+            "
+          >
             {{
-            `请遵循以下规则查找：
+              `请遵循以下规则查找：
             只支持单个关键词语搜索关键词支持:行政区名称、城市编码、邮件编码
             例如，搜索省份（例如山东），能够显示市（例如济南），区（例如历下区）,若你频繁看到提示，可能输入的关键词有误或网络错误`
-          }}
+            }}
           </div>
           <div v-if="isGetCitysFinally">
-            <div class="view_center_search_view_item" v-for="(item, index) in cityArray" :key="item.adcode + index"
-              @click="ChooseCityWeather(item), changeFocus(false)">
+            <div
+              class="view_center_search_view_item"
+              v-for="(item, index) in cityArray"
+              :key="item.adcode + index"
+              @click="ChooseCityWeather(item), changeFocus(false)"
+            >
               <div class="view_center_search_view_item_index">
                 {{ index + 1 }}
               </div>
@@ -240,7 +272,10 @@ watch(
       </div>
     </div>
     <div class="view_right">
-      <div class="view_right_table animated fadeInDown" :class="{ hig: isHaddenBgc }">
+      <div
+        class="view_right_table animated fadeInDown"
+        :class="{ hig: isHaddenBgc }"
+      >
         <table :class="{ 'bgc-hid': isHaddenBgc }">
           <tr>
             <th>顺序</th>
@@ -249,14 +284,23 @@ watch(
             <th>城市编码</th>
             <th>等级</th>
           </tr>
-          <TransitionGroup enter-active-class="animated fadeInRight" leave-active-class="animated fadeOutLeft"
-            tag="tbody">
-            <tr v-for="(item, index) in useCityArray().localCityArray" :key="item.adcode + index">
+          <TransitionGroup
+            enter-active-class="animated fadeInRight"
+            leave-active-class="animated fadeOutLeft"
+            tag="tbody"
+          >
+            <tr
+              v-for="(item, index) in useCityArray().localCityArray"
+              :key="item.adcode + index"
+            >
               <td style="text-align: center">{{ index + 1 }}</td>
               <td>
                 {{ item.citycode?.length === 0 ? "无编号" : item.citycode }}
               </td>
-              <td class="view_right_table_tdname" @click="ChooseCityWeather(item)">
+              <td
+                class="view_right_table_tdname"
+                @click="ChooseCityWeather(item)"
+              >
                 {{ item.name }}
               </td>
               <td>{{ item.adcode }}</td>
@@ -269,6 +313,30 @@ watch(
   </div>
 </template>
 <style scoped>
+@keyframes anim1 {
+  0% {
+    transform: scale(1) rotate(0deg); /* 初始状态为原始大小和角度 */
+  }
+  10% {
+    transform: scale(1.01) rotate(0deg); /* 初始状态为原始大小和角度 */
+  }
+  20% {
+    transform: scale(1.2) rotate(5deg);
+  }
+  50%{
+    transform: scale(1.5) rotate(10deg); 
+
+  }
+ 
+  70%{
+    transform: scale(1.5) rotate(5deg); 
+
+  }
+100%{
+  transform: scale(1) rotate(0deg); 
+}
+ 
+}
 .animated {
   animation-duration: 0.5s !important;
   /* 任何过度持续时间加快 */
@@ -291,8 +359,20 @@ watch(
   height: 100vh;
   overflow: hidden;
   justify-content: center;
+  /* background-image: url("./assets/big_pic/bg.jpg"); */
+  /* background-size: cover; */
+  background-color: blue;
+}
+.view::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%; /* 增大宽度以覆盖整个盒子 */
+  height: 100%;
   background-image: url("./assets/big_pic/bg.jpg");
   background-size: cover;
+  animation: anim1 10s infinite cubic-bezier(0.25, 0.1, 0.25, 0.25); /* 添加旋转动画效果 */
 }
 
 /* 隐藏滚动条 */
@@ -312,6 +392,7 @@ watch(
   position: relative;
   height: 20vh;
   width: 20vw;
+  min-width: 210px;
   max-height: 140px;
   font-size: 0.8rem;
 }
@@ -346,8 +427,9 @@ watch(
 }
 
 .view_left_line {
-  width: 20vw;
-  height: 30vh;
+  position: absolute;
+  width: 40vw;
+  height: 35vh;
   z-index: 9999;
 }
 
@@ -355,7 +437,8 @@ watch(
   flex: 2;
 }
 
-.view_center_search {}
+.view_center_search {
+}
 
 .view_center_search_input {
   position: relative;
@@ -426,14 +509,12 @@ watch(
   /* 文字溢出显示省略号 */
 }
 
-.view_center_search_view_item .view_center_search_view_item_adcode {}
-
-
+.view_center_search_view_item .view_center_search_view_item_adcode {
+}
 
 .view_right {
   display: flex;
   flex: 1;
-
 }
 
 .view_right_table {
@@ -458,7 +539,7 @@ watch(
   transition: 0.5s all;
 
   background-color: #877eff;
-  color: #fff;
+  color: #ffffff;
 }
 
 .view_right_table tr {
@@ -481,17 +562,14 @@ watch(
 }
 
 .view_right_table td:hover {
-  color: rgb(114, 187, 255);
+  color: #72bbff;
 }
 
 .view_right_table_tdname {
   cursor: pointer;
 }
 
-
-
-@media screen and (max-width:969px) {
-
+@media screen and (max-width: 969px) {
   /* 手机 */
   /* 类平板 */
   /* 取消宽度调整 */
@@ -503,6 +581,12 @@ watch(
     flex-direction: column;
     overflow: scroll;
     justify-content: start;
+    background-image: url("./assets/big_pic/bg.jpg");
+  background-size: cover;
+  }
+  .view::before{
+    animation: anim1 0s;
+    background:none ;
   }
 
   .view_left {
@@ -551,43 +635,47 @@ watch(
 
   .view_left_pie {
     margin-top: 0;
-    width: 50vw;
+    width: 100vw;
     height: 40vh;
   }
 
-  .view_center_search input {
-    border-radius: 0;
+  .view_left_line {
+    margin-top: 0;
+    width: 100vw;
+    height: 40vh;
   }
 
   .view_center {
-    margin-bottom: 70vh;
+    margin-bottom: 75vh;
 
     order: -99;
   }
 
-  .view_center_search {}
+  .view_center_search input {
+    height: 5vh;
+    min-height: 20px;
+    border-radius: 0;
+    background-color: #beedffe0;
+  }
 
-  .view_right {}
+  .view_center_search {
+  }
 
-
+  .view_right {
+  }
 
   .view_right_table {
     margin: 0;
   }
 
   .view_right_table table {
-
     width: 100vw;
-
   }
-
-
-
 }
 
-@media screen and (min-width:970px) {
-
+@media screen and (min-width: 970px) {
   /* 大屏幕电脑 */
-  .view {}
+  .view {
+  }
 }
 </style>

@@ -2,7 +2,7 @@ const express = require("express");
 import axios from "axios";
 import os from "os"
 import type { Router } from "express";
-
+import { key } from "./key";
 const router: Router = express.Router();
 
 router.get("/weather", async (req, res) => {
@@ -11,7 +11,7 @@ router.get("/weather", async (req, res) => {
     "https://restapi.amap.com/v3/weather/weatherInfo",
     {
       params: {
-        key: "8a4977220888c941451dee7742d6a3e3",
+        key,
         city: req.query.city,
       },
     }
@@ -31,7 +31,7 @@ router.get("/city", async (req, res) => {
     "https://restapi.amap.com/v3/config/district?parameters",
     {
       params: {
-        key: "8a4977220888c941451dee7742d6a3e3",
+        key ,
         keywords: req.query.keywords,
       },
     }
@@ -50,7 +50,7 @@ router.get("/ipcity", async (req, res) => {
     "https://restapi.amap.com/v3/ip",
     {
       params: {
-        key: "8a4977220888c941451dee7742d6a3e3",
+        key,
         ip: req.query.ip,
       },
     }

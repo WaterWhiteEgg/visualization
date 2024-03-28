@@ -3,45 +3,61 @@ import { useCityArray } from "../../stores/item";
 export let myLineChart: echarts.ECharts;
 // 饼图绘制
 export function initLine(doc: HTMLElement | null) {
-    myLineChart = echarts.init(doc)
+  myLineChart = echarts.init(doc);
 
-    // 数据
-    let data = [
-        { value: useCityArray().localWeather[0].humidity_float, name: '湿度' },
-        { value: useCityArray().localWeather[0].temperature_float, name: '温度' },
-    ]
+  // 底部数据
+  let Xdata = useCityArray().localCityArray.map((item) => item.name);
+  // 顶部数据
+  let Ydata = useCityArray().localCityArray.map((item) => item.adcode);
 
+  myLineChart.setOption({
+    xAxis: {
+      type: "category",
+      data: Xdata,
+      axisLabel: {
+        color: "#fff",
+        interval: 0,
+        rotate: "90",
+      },
+      // formatter:function(param){
 
-    myLineChart.setOption({
-        xAxis: {
-            type: 'category',
-            boundaryGap: false,
-            data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+      // }
+    },
+    yAxis: {
+      type: "value",
+      min: "dataMin",
+      max:"dataMax",
+      scale: true,
+    },
+    label: {
+      show: true,
+      color: "#c7c7c7",
+      rotate: "90",
+      padding: [0, -40, -5, 0],
+    },
+
+    series: [
+      {
+        data: Ydata,
+        type: "line",
+        areaStyle: {
+          color: "#72bbff",
         },
-        yAxis: {
-            type: 'value'
-        },
-        series: [
-            {
-                data: [820, 932, 901, 934, 1290, 1330, 1320],
-                type: 'line',
-                areaStyle: {}
-            }
-        ]
-    });
-
+      },
+    ],
+  });
 }
-
 
 // 重新加载数据
 export function redrawLineValue(myLineChart: echarts.ECharts) {
-    myLineChart.setOption({
-        series: [
-            {
-                data: [
-
-                ]
-            }
-        ],
-    });
+  myLineChart.setOption({
+    xAxis: {
+      data: useCityArray().localCityArray.map((item) => item.name),
+    },
+    series: [
+      {
+        data: useCityArray().localCityArray.map((item) => item.adcode),
+      },
+    ],
+  });
 }

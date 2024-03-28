@@ -153,26 +153,8 @@ export async function thisInitMap(
     // 开始时触发回调
     startClickCallback && startClickCallback();
     let inmyChart = myChart;
-    // 请求数据
-    const fn = debounce(() => {
-      let inRes: AxiosResponse;
-      getCitys(e.name, 3)
-        .then((res) => {
-          // console.log(res);
-          inRes = res;
-          useCityArray().addLocalCityArray(
-            forDistricts(res.data.data?.districts)
-          );
-          // console.log(useCityArray().localCityArray[0]?.center.split(","));
-          // 同步小圆点,重新绘制标点
-          redrawValue(inmyChart);
-        })
-        .finally(() => {
-          // 执行回调
-          clickCallback && clickCallback(inRes);
-        });
-    });
-    fn();
+    clickCallback && clickCallback(e)
+
   });
 }
 // 同步小圆点,重新绘制标点
