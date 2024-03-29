@@ -16,7 +16,7 @@ const app = createApp(App)
 const pinia = createPinia()
 app.use(pinia)
 pinia.use(piniaPluginPersistedstate)
-// app.use(router)
+app.use(router)
 app.use(ElementPlus)
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
     app.component(key, component)
