@@ -7,7 +7,8 @@ import { createPinia } from 'pinia'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 
 import App from './App.vue'
-import router from './router'
+import router from './router/index'
+import './router/middleware' // 导入路由守卫
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
