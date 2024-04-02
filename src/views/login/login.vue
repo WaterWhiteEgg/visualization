@@ -1,12 +1,6 @@
 <template>
   <div style="display: flex">
     <h2
-      style="
-        font-size: 2rem;
-        margin-top: 10vh;
-        text-align: center;
-        width: 100vw;
-      "
     >
       注册你的账号
     </h2>
