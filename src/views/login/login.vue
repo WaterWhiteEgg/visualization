@@ -1,12 +1,9 @@
 <template>
   <div style="display: flex">
-    <h2
-    >
+    <h2>
       注册你的账号
     </h2>
-    <el-form
-      ref="ruleFormRef"
-      style="
+    <el-form ref="ruleFormRef" style="
         position: absolute;
         top: 50%; /* 将元素顶部定位到父容器中间位置 */
         left: 50%; /* 将元素左侧定位到父容器中间位置 */
@@ -15,25 +12,13 @@
           -50%
         ); /* 利用transform平移来使元素完全垂直居中 */
         margin: 20px; /* 外边距 */
-      "
-      :model="ruleForm"
-      :rules="rules"
-      label-width="auto"
-      class="demo-ruleForm"
-      :size="formSize"
-      status-icon
-    >
+      " :model="ruleForm" :rules="rules" label-width="auto" class="demo-ruleForm" :size="formSize" status-icon>
       <el-form-item label="用户名" prop="name">
         <el-input v-model="ruleForm.name" />
       </el-form-item>
       <!-- 密码 -->
       <el-form-item label="密码" style="position: relative" prop="password">
-        <el-input
-          type="password"
-          v-model="ruleForm.password"
-          placeholder="输入新密码"
-          show-password
-        >
+        <el-input type="password" v-model="ruleForm.password" placeholder="输入新密码" show-password>
         </el-input>
       </el-form-item>
 
@@ -67,15 +52,12 @@
 <script lang="ts" setup>
 import { reactive, ref } from "vue";
 import type { FormInstance, FormRules } from "element-plus";
+import { commitUser } from "../../network/db";
 
 interface RuleForm {
   name: string;
   region: string;
   password: string;
-  date1: string;
-  date2: string;
-  delivery: boolean;
-  type: string[];
   resource: string;
   desc: string;
 }
@@ -86,10 +68,6 @@ const ruleForm = reactive<RuleForm>({
   name: "",
   region: "male",
   password: "",
-  date1: "",
-  date2: "",
-  delivery: false,
-  type: [],
   resource: "1",
   desc: "",
 });
@@ -131,7 +109,9 @@ const submitForm = async (formEl: FormInstance | undefined) => {
   if (!formEl) return;
   await formEl.validate((valid, fields) => {
     if (valid) {
-      console.log("submit!");
+      commitUser(ruleForm)
+      // console.log(JSON.stringify(ruleForm));
+
     } else {
       console.log("error submit!", fields);
     }
