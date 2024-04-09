@@ -31,7 +31,7 @@ router.get("/city", async (req, res) => {
     "https://restapi.amap.com/v3/config/district?parameters",
     {
       params: {
-        key ,
+        key,
         keywords: req.query.keywords,
       },
     }

@@ -14,7 +14,7 @@ render(loadingNode,document.body)
 router.beforeEach((to, from, next) => {
   loadingNode.component?.exposed?.startLoading()
   if (useToken().token) {
-    console.log(useToken().token);
+    // console.log(useToken().token);
 
   } else {
 

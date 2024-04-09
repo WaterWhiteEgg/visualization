@@ -7,8 +7,8 @@ export function initPie(doc: HTMLElement | null) {
 
     // 数据
     let data = [
-        { value: useCityArray().localWeather[0].humidity_float, name: '湿度' },
-        { value: useCityArray().localWeather[0].temperature_float, name: '温度' },
+        { value: useCityArray().localWeather[0]?.humidity_float || 0, name: '湿度' },
+        { value: useCityArray().localWeather[0]?.temperature_float || 0, name: '温度' },
     ]
 
 

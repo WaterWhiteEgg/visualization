@@ -109,7 +109,10 @@ const submitForm = async (formEl: FormInstance | undefined) => {
   if (!formEl) return;
   await formEl.validate((valid, fields) => {
     if (valid) {
-      commitUser(ruleForm)
+      commitUser(ruleForm).then((res) => {
+        console.log(res);
+
+      })
       // console.log(JSON.stringify(ruleForm));
 
     } else {
