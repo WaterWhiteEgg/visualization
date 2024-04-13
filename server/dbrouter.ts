@@ -1,6 +1,6 @@
 import type { Router } from "express";
 import { SECRET_KEY } from "./key"
-const jwt = require('jsonwebtoken')
+import jwt from 'jsonwebtoken'
 
 const connection = require("./dbmain")
 
@@ -39,7 +39,7 @@ dbrouter.post("/commit", async (req, res) => {
 
 dbrouter.post("/login", async (req, res) => {
 
-    console.log(req.body);
+    // console.log(req.body);
     const { name, password, resource, desc, region } = req.body
     let set = `INSERT INTO _user (username, password, status,gender,descs) VALUES ('${name}', '${password}', '${resource}','${region}','${desc}')`;
     connection.query(set, function (err: any, results: any, fields: any) {
