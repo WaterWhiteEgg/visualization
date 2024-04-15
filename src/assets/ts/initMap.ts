@@ -2,21 +2,17 @@ import * as echarts from "echarts";
 import "../js/china";
 import { getCitys } from "../../network/city";
 import { getWeather } from "../../network/weather";
-import { debounce } from "../ts/debounce";
-import { forDistricts, type City, type DataWeather } from "../ts/forDistricts";
+import { forDistricts, type DataWeather } from "../ts/forDistricts";
 import { useCityArray } from "../../stores/item";
 import { getMyIpCity } from "./toGetIp";
 
 import { myPicChart, redrawPieValue } from "./initPie";
 
-import { ref } from "vue";
-import type { AxiosResponse } from "axios";
 
 export let myChart: echarts.ECharts;
 export async function thisInitMap(
   doc: HTMLElement | null,
-  clickCallback?: Function,
-  startClickCallback?: Function,
+  clickCallback?: (e: echarts.ECElementEvent) => void,
   resize: boolean = false
 ) {
   myChart = echarts.init(doc);
@@ -33,7 +29,7 @@ export async function thisInitMap(
   }
 
   // data 展示地图对应方块 value对应坐标 x y
-  let data = [
+  const data = [
     {
       name: useCityArray().localCityArray[0].name,
       value: useCityArray().localCityArray[0].center.split(","),
@@ -137,7 +133,9 @@ export async function thisInitMap(
           show: true,
           // 标点展示的值
           color: "#000000",
-          formatter(value: any) {
+          formatter(value: {
+            data: { name: string }
+          }) {
             return value.data.name;
           },
         },
@@ -150,9 +148,7 @@ export async function thisInitMap(
   }, resize);
   // 监听事件
   myChart.on("click", (e) => {
-    // 开始时触发回调
-    startClickCallback && startClickCallback();
-    let inmyChart = myChart;
+    //触发回调
     clickCallback && clickCallback(e)
 
   });
@@ -183,8 +179,8 @@ export function redrawValue(myChart: echarts.ECharts) {
 // 城市天气请求，一定要城市编码
 export const inGetWeather = (code: string) => {
   getWeather(code).then((res) => {
-    let weatherData = res.data.data as DataWeather;
-    let weatherLive = weatherData.lives;
+    const weatherData = res.data.data as DataWeather;
+    const weatherLive = weatherData.lives;
     useCityArray().addLocalWeather(weatherLive);
     // console.log(weatherLive);
     // 刷新饼图的数据

@@ -6,7 +6,7 @@ export function initPie(doc: HTMLElement | null) {
     myPicChart = echarts.init(doc)
 
     // 数据
-    let data = [
+    const data = [
         { value: useCityArray().localWeather[0]?.humidity_float || 0, name: '湿度' },
         { value: useCityArray().localWeather[0]?.temperature_float || 0, name: '温度' },
     ]

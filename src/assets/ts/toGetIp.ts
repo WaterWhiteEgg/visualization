@@ -5,11 +5,14 @@ import { getMyIp, getIpCity } from "../../network/city";
 
 export async function getMyIpCity() {
     try {
-        let ipResponse: AxiosResponse<{
+        const ipResponse: AxiosResponse<{
             data: string,
             message: string
             status: number
-        }, any> = await getMyIp();
+        }, {
+            message: string
+            status: number
+        }> = await getMyIp();
         //   console.log(ipResponse.data.data);
         let cityResponse: AxiosResponse<{
             data: {
@@ -21,7 +24,10 @@ export async function getMyIpCity() {
             },
             message: string
             status: number
-        }, any> = await getIpCity(ipResponse.data.data);
+        },  {
+            message: string
+            status: number
+        }> = await getIpCity(ipResponse.data.data);
         // console.log(cityResponse);
         // 有可能存在局域网/外网/没有等情况，所以本地ip找不到时找别人ip定位，还是找不到也没办法
         if (cityResponse.data.data.infocode === "10000") {

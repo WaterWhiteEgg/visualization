@@ -6,9 +6,9 @@ export function initLine(doc: HTMLElement | null) {
   myLineChart = echarts.init(doc);
 
   // 底部数据
-  let Xdata = useCityArray().localCityArray.map((item) => item.name);
+  const Xdata = useCityArray().localCityArray.map((item) => item.name);
   // 顶部数据
-  let Ydata = useCityArray().localCityArray.map((item) => item.adcode);
+  const Ydata = useCityArray().localCityArray.map((item) => item.adcode);
 
   myLineChart.setOption({
     xAxis: {

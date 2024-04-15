@@ -1,7 +1,6 @@
-let timer:  number | undefined;
-export function debounce(fun: Function, delay: number = 300) {
-  return function (this: any) {
-    var args = arguments;
+let timer: number | undefined;
+export function debounce(fun: () => void, delay: number = 300) {
+  return function(this: unknown, ...args: []) {
     if (timer) {
       clearTimeout(timer);
     }

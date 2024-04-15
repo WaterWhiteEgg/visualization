@@ -1,8 +1,7 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
 
-
-const loading = ref<HTMLElement>()
+const loading = ref<HTMLElement | null>(null)
 const speed = ref(1)
 const timer = ref(0)
 // 加载进度条
