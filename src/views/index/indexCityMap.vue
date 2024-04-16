@@ -1,13 +1,10 @@
 <script setup lang="ts">
 import { onMounted, ref, watch, type Ref } from "vue";
-import { getWeather } from "@/network/weather";
-import { getCitys, getMyIp, getIpCity } from "@/network/city";
+import { getCitys, } from "@/network/city";
 import { debounce } from "@/assets/ts/debounce";
 import {
   forDistricts,
   type City,
-  type Weather,
-  type DataWeather,
 } from "@/assets/ts/forDistricts";
 import { useCityArray } from "@/stores/item";
 import {
@@ -19,10 +16,7 @@ import {
 import { initPie, myPicChart } from "@/assets/ts/initPie";
 import { initLine, myLineChart, redrawLineValue } from "@/assets/ts/initLine";
 import "animate.css";
-const props = withDefaults(defineProps<{}>(), {});
-const emits = defineEmits<{
-  (e: "emit", i: void): void;
-}>();
+import echarts from "echarts";
 
 // 正则
 const chineseReg = /[^0-9\u4e00-\u9fa5]/g;
@@ -56,7 +50,7 @@ const isErrorCityText = ref(false);
 
 // 搜索城市编号
 const cityText = ref("");
-watch(cityText, (newVal, oldVal) => {
+watch(cityText, (newVal) => {
   // 防抖
   const fn = debounce(() => {
     // 加载中flag

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
 
 const loading = ref<HTMLElement | null>(null)
 const speed = ref(1)

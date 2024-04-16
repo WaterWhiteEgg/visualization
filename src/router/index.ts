@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 
-const HomeView = () => import("../views/index/index.vue");
-const HomeLogin = () => import("../views/login/login.vue");
+const HomeView = () => import("../views/index/indexCityMap.vue");
+const HomeLogin = () => import("../views/login/loginIndex.vue");
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -21,7 +21,5 @@ const router = createRouter({
     },
   ],
 });
-
-
 
 export default router;
