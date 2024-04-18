@@ -1,11 +1,8 @@
 <script setup lang="ts">
 import { onMounted, ref, watch, type Ref } from "vue";
-import { getCitys, } from "@/network/city";
+import { getCitys } from "@/network/city";
 import { debounce } from "@/assets/ts/debounce";
-import {
-  forDistricts,
-  type City,
-} from "@/assets/ts/forDistricts";
+import { forDistricts, type City } from "@/assets/ts/forDistricts";
 import { useCityArray } from "@/stores/item";
 import {
   thisInitMap,
@@ -16,7 +13,6 @@ import {
 import { initPie, myPicChart } from "@/assets/ts/initPie";
 import { initLine, myLineChart, redrawLineValue } from "@/assets/ts/initLine";
 import "animate.css";
-import echarts from "echarts";
 
 // 正则
 const chineseReg = /[^0-9\u4e00-\u9fa5]/g;
