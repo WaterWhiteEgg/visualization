@@ -32,7 +32,7 @@ app.use(cors(corsOptions));
 
 app.use(middleware);
 app.use(router);
-app.use("/db/", dbrouter);
+// app.use("/db/", dbrouter);
 
 app.listen(2000, () => {
   console.log("server open 127.0.0.1:2000");
