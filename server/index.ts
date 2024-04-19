@@ -9,7 +9,7 @@ const router = require("./router");
 const dbrouter = require("./dbrouter");
 
 const corsOptions = {
-  origin: "http://localhost:5173",
+  origin: "http://8.134.196.45",
   optionsSuccessStatus: 200,
 };
 import { expressjwt } from "express-jwt";
@@ -35,5 +35,5 @@ app.use(router);
 // app.use("/db/", dbrouter);
 
 app.listen(2000, () => {
-  console.log("server open 127.0.0.1:2000");
+  console.log("server open :2000");
 });
