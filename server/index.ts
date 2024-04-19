@@ -15,6 +15,7 @@ const corsOptions = {
 import { expressjwt } from "express-jwt";
 
 const app = express();
+app.use(cors());
 
 // 解析token
 app.use(
@@ -28,7 +29,6 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(cors(corsOptions));
 
 app.use(middleware);
 app.use(router);
