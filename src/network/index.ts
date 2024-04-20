@@ -11,7 +11,7 @@ type Option = {
 export const request = (option: Option) => {
   const net1 = axios.create({
     method: "get",
-    baseURL: "http://localhost:2000",
+    baseURL: "http://8.134.196.45:2000",
     timeout: 10000,
   });
   return net1(option);
@@ -19,7 +19,7 @@ export const request = (option: Option) => {
 export const postRequest = (option: Option) => {
   const net2 = axios.create({
     method: "post",
-    baseURL: "http://localhost:2000",
+    baseURL: "http://8.134.196.45:2000",
     timeout: 10000,
   });
   return net2(option);
