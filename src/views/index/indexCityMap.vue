@@ -125,8 +125,9 @@ const mapClick = (e: echarts.ECElementEvent) => {
       useCityArray().addLocalCityArray(forDistricts(res.data.data?.districts));
       // 同步小圆点,重新绘制标点
       redrawValue(myChart);
+      // 然后请求天气
+      inGetWeather(useCityArray()?.localCityArray[0]?.adcode);
     });
-    inGetWeather(useCityArray()?.localCityArray[0]?.adcode);
   }, 300);
   click();
 };
