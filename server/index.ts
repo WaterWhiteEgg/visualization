@@ -9,7 +9,7 @@ const router = require("./router");
 const dbrouter = require("./dbrouter");
 
 const corsOptions = {
-  origin: "http://8.134.196.45",
+  origin: ["http://8.134.196.45","http://localhost:5173"],
   optionsSuccessStatus: 200,
 };
 import { expressjwt } from "express-jwt";

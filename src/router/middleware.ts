@@ -23,7 +23,7 @@ router.beforeEach((_to, _from, next) => {
 });
 // 路由后
 router.afterEach((_to, _from, failure) => {
-    console.log(failure);
+    console.log(failure?"路由错误":"没有问题");
     loadingNode.component?.exposed?.endLoading()
 
 

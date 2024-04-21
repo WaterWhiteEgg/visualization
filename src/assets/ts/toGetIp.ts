@@ -13,7 +13,6 @@ export async function getMyIpCity() {
             message: string
             status: number
         }> = await getMyIp();
-        //   console.log(ipResponse.data.data);
         let cityResponse: AxiosResponse<{
             data: {
                 rectangle: string,
@@ -30,7 +29,11 @@ export async function getMyIpCity() {
         }> = await getIpCity(ipResponse.data.data);
         // console.log(cityResponse);
         // 有可能存在局域网/外网/没有等情况，所以本地ip找不到时找别人ip定位，还是找不到也没办法
+        console.log(ipResponse.data.data);
+        
         if (cityResponse.data.data.infocode === "10000") {
+            console.log("查询失败");
+            
             cityResponse = await getIpCity();
             return cityResponse.data.data
 

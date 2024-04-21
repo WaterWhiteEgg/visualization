@@ -1,6 +1,6 @@
 const express = require("express");
 import axios from "axios";
-import os from "os"
+import os from "os";
 import type { Router } from "express";
 import { key } from "./key";
 const router: Router = express.Router();
@@ -26,7 +26,6 @@ router.get("/weather", async (req, res) => {
 });
 
 router.get("/city", async (req, res) => {
-
   const result = await axios.get(
     "https://restapi.amap.com/v3/config/district?parameters",
     {
@@ -45,16 +44,12 @@ router.get("/city", async (req, res) => {
   });
 });
 router.get("/ipcity", async (req, res) => {
-
-  const result = await axios.get(
-    "https://restapi.amap.com/v3/ip",
-    {
-      params: {
-        key,
-        ip: req.query.ip,
-      },
-    }
-  );
+  const result = await axios.get("https://restapi.amap.com/v3/ip", {
+    params: {
+      key,
+      ip: req.query.ip,
+    },
+  });
 
   res.send({
     status: 0,
@@ -63,7 +58,6 @@ router.get("/ipcity", async (req, res) => {
   });
 });
 router.get("/myip", (req, res) => {
-
   const myIp = function () {
     let interfaces = os.networkInterfaces();
     for (let devName in interfaces) {
@@ -79,14 +73,13 @@ router.get("/myip", (req, res) => {
         }
       }
     }
-  }
+  };
   const ip = myIp();
   res.send({
     status: 0,
     message: "查询成功",
-    data: ip,
+    data: req.ip,
   });
 });
-
 
 module.exports = router;

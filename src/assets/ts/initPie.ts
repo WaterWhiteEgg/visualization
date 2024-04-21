@@ -67,8 +67,8 @@ export function redrawPieValue(myPicChart: echarts.ECharts) {
         series: [
             {
                 data: [
-                    { value: useCityArray().localWeather[0].humidity_float, name: '湿度' },
-                    { value: useCityArray().localWeather[0].temperature_float, name: '温度' },
+                    { value: useCityArray()?.localWeather&&useCityArray()?.localWeather[0].humidity_float, name: '湿度' },
+                    { value: useCityArray()?.localWeather&&useCityArray()?.localWeather[0]?.temperature_float, name: '温度' },
                 ]
             }
         ],
