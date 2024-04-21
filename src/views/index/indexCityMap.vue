@@ -159,7 +159,10 @@ watch(
     animate();
   }
 );
-// 观察bom
+// 天气没有内容时，返回未知
+const noWeatherText = (text: string | number) => {
+  return text?text:"未知";
+};
 </script>
 <template>
   <div class="view">
@@ -173,27 +176,27 @@ watch(
           >
             <div>
               <span>城市名</span>
-              {{ item.city }}
+              {{ noWeatherText(item.city) }}
             </div>
             <div>
               <span>天气状况</span>
-              {{ item.weather }}
+              {{ noWeatherText(item.weather)  }}
             </div>
             <div>
               <span>气温</span>
-              {{ item.temperature }}°
+              {{ noWeatherText(item.temperature)+"°" }}
             </div>
             <div>
               <span> 风力等级 </span>
-              {{ item.windpower }}
+              {{ noWeatherText(item.windpower) }}
             </div>
             <div>
               <span>湿度</span>
-              {{ item.humidity }}
+              {{ noWeatherText(item.humidity) }}
             </div>
             <div>
               <span> 更新时间 </span>
-              {{ item.reporttime }}
+              {{ noWeatherText(item.reporttime) }}
             </div>
           </div>
         </transition-group>
