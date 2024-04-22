@@ -159,10 +159,7 @@ watch(
     animate();
   }
 );
-// 天气没有内容时，返回未知
-const noWeatherText = (text: string | number) => {
-  return text?text:"未知";
-};
+// 观察bom
 </script>
 <template>
   <div class="view">
@@ -176,27 +173,27 @@ const noWeatherText = (text: string | number) => {
           >
             <div>
               <span>城市名</span>
-              {{ noWeatherText(item.city) }}
+              {{ item.city }}
             </div>
             <div>
               <span>天气状况</span>
-              {{ noWeatherText(item.weather)  }}
+              {{ item.weather }}
             </div>
             <div>
               <span>气温</span>
-              {{ noWeatherText(item.temperature)+"°" }}
+              {{ item.temperature }}°
             </div>
             <div>
               <span> 风力等级 </span>
-              {{ noWeatherText(item.windpower) }}
+              {{ item.windpower }}
             </div>
             <div>
               <span>湿度</span>
-              {{ noWeatherText(item.humidity) }}
+              {{ item.humidity }}
             </div>
             <div>
               <span> 更新时间 </span>
-              {{ noWeatherText(item.reporttime) }}
+              {{ item.reporttime }}
             </div>
           </div>
         </transition-group>
@@ -348,6 +345,7 @@ const noWeatherText = (text: string | number) => {
   position: relative;
   display: flex;
   height: 100vh;
+  width: 100vw;
   overflow: hidden;
   justify-content: center;
   /* background-image: url("./assets/big_pic/bg.jpg"); */
@@ -370,6 +368,10 @@ const noWeatherText = (text: string | number) => {
 .view::-webkit-scrollbar {
   width: 0;
   height: 0;
+  
+  /* 火狐兼容 */
+  -moz-appearance: none;
+  scrollbar-width: none;
 }
 
 .view_left {
@@ -466,6 +468,10 @@ const noWeatherText = (text: string | number) => {
 .view_center_search_view::-webkit-scrollbar {
   width: 0;
   height: 0;
+  
+  /* 火狐兼容 */
+  -moz-appearance: none;
+  scrollbar-width: none;
 }
 
 .view_center_search_view_item {

@@ -1,6 +1,14 @@
 <script setup lang="ts">
+import mainviewIndex from "./views/mainview/mainviewIndex.vue"
 </script>
 <template>
-  <router-view></router-view>
+  <div class="appview">
+    <mainviewIndex></mainviewIndex>
+    <router-view></router-view>
+  </div>
 </template>
-<style scoped></style>
+<style scoped>
+.appview{
+  display: flex;
+}
+</style>
