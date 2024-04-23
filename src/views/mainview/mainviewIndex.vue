@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-
-// 搜索栏数据
-const input = ref("");
+import indexList from "./child/indexList.vue"
+import indexSearch from "./child/indexSearch.vue"
 
 // 判断是否显示列表
 const isShowListFlag = ref(false);
@@ -13,35 +12,31 @@ const changeIsShowListFlag = (bool: boolean = !isShowListFlag.value) => {
 </script>
 <template>
   <div class="main">
-    <transition
-      :enter-active-class="isShowListFlag ? 'animated slideInLeft' : 'hidden'"
-      :leave-active-class="isShowListFlag ? '' : 'animated slideOutLeft'"
-    >
-      <div
-        class="main-button"
-        v-if="!isShowListFlag"
-        @click="changeIsShowListFlag()"
-      >
+    <transition :enter-active-class="isShowListFlag ? 'animated slideInLeft' : 'hidden'"
+      :leave-active-class="isShowListFlag ? '' : 'animated slideOutLeft'">
+      <div class="main-button" v-if="!isShowListFlag" @click="changeIsShowListFlag()">
         <el-icon size="30" color="#ffffffe3">
           <Expand />
         </el-icon>
       </div>
-      <div class="main-list" v-else @click="null">
+      <!-- 已阻止点击冒泡,所以只有点击没有事件的模块才能关闭 -->
+      <div class="main-list" v-else @click="changeIsShowListFlag(false)">
         <div class="main-list-head">
           <div class="main-list-head-title">
             <span>整体项目</span>
             <a href="https://github.com/WaterWhiteEgg?tab=repositories">
-              <el-icon><Link /></el-icon>
+              <el-icon>
+                <Link />
+              </el-icon>
             </a>
           </div>
+        </div>
+        <div class="main-list-body">
           <!-- 搜索栏 -->
-          <div>
-            <el-input
-              v-model="input"
-              style="width: 240px"
-              placeholder="Please input"
-            />
-          </div>
+          <indexSearch></indexSearch>
+          <!-- 列表栏 -->
+          <indexList @clickList="changeIsShowListFlag(false)"></indexList>
+
         </div>
       </div>
     </transition>
@@ -85,15 +80,19 @@ const changeIsShowListFlag = (bool: boolean = !isShowListFlag.value) => {
   scrollbar-width: none;
 }
 
-.main-list-head {
-}
+.main-list-head {}
 
 .main-list-head-title {
   display: flex;
   align-items: center;
   padding: 1vh 0 0 0.5vw;
 }
+
 .main-list-head-title a {
   display: flex;
+}
+
+.main-list-body {
+  margin: 0 1vw;
 }
 </style>
