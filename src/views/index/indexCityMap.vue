@@ -386,6 +386,7 @@ watch(
   height: 20vh;
   width: 20vw;
   min-width: 210px;
+  max-width: 250px;
   max-height: 140px;
   font-size: 0.8rem;
 }
