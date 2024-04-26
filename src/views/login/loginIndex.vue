@@ -1,54 +1,3 @@
-<template>
-  <div style="display: flex">
-    <h2>
-      注册你的账号
-    </h2>
-    <el-form ref="ruleFormRef" style="
-        position: absolute;
-        top: 50%; /* 将元素顶部定位到父容器中间位置 */
-        left: 50%; /* 将元素左侧定位到父容器中间位置 */
-        transform: translate(
-          -50%,
-          -50%
-        ); /* 利用transform平移来使元素完全垂直居中 */
-        margin: 20px; /* 外边距 */
-      " :model="ruleForm" :rules="rules" label-width="auto" class="demo-ruleForm" :size="formSize" status-icon>
-      <el-form-item label="用户名" prop="name">
-        <el-input v-model="ruleForm.name" />
-      </el-form-item>
-      <!-- 密码 -->
-      <el-form-item label="密码" style="position: relative" prop="password">
-        <el-input type="password" v-model="ruleForm.password" placeholder="输入新密码" show-password>
-        </el-input>
-      </el-form-item>
-
-      <el-form-item label="性别" prop="region">
-        <el-select v-model="ruleForm.region" placeholder="选择你的性别">
-          <el-option label="男" value="male" />
-          <el-option label="女" value="female" />
-          <el-option label="武装直升机" value="unknown" />
-        </el-select>
-      </el-form-item>
-
-      <el-form-item label="记住我的账户" prop="resource">
-        <el-radio-group v-model="ruleForm.resource">
-          <el-radio value="1">确实</el-radio>
-          <el-radio value="0">不要</el-radio>
-        </el-radio-group>
-      </el-form-item>
-      <el-form-item label="简介" prop="desc">
-        <el-input v-model="ruleForm.desc" type="textarea" />
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="submitForm(ruleFormRef)">
-          创建/登录
-        </el-button>
-        <el-button @click="resetForm(ruleFormRef)">重置</el-button>
-      </el-form-item>
-    </el-form>
-  </div>
-</template>
-
 <script lang="ts" setup>
 import { reactive, ref } from "vue";
 import type { FormInstance, FormRules } from "element-plus";
@@ -61,17 +10,19 @@ interface RuleForm {
   resource: string;
   desc: string;
 }
-
+// 配置表单大小
 const formSize = ref("default");
+// 表单数据
 const ruleFormRef = ref<FormInstance>();
+// 表单默认值
 const ruleForm = reactive<RuleForm>({
   name: "",
-  region: "male",
+  region: "男",
   password: "",
   resource: "1",
   desc: "",
 });
-
+// 表单规则
 const rules = reactive<FormRules<RuleForm>>({
   name: [
     { required: true, message: "请输入账户名", trigger: "blur" },
@@ -95,7 +46,6 @@ const rules = reactive<FormRules<RuleForm>>({
   ],
   region: [
     {
-      required: true,
       message: "",
       trigger: "change",
     },
@@ -111,19 +61,150 @@ const submitForm = async (formEl: FormInstance | undefined) => {
     if (valid) {
       commitUser(ruleForm).then((res) => {
         console.log(res);
-
-      })
+      });
       // console.log(JSON.stringify(ruleForm));
-
     } else {
       console.log("error submit!", fields);
     }
   });
 };
+// 游客登录
+const submitGuestForm = async (formEl: FormInstance | undefined) => {
+  if (!formEl) return;
+  await formEl.validate((valid, fields) => {
+    if (valid) {
+      commitUser(ruleForm).then((res) => {
+        console.log(res);
+      });
+    }
+    // 错误提示
+    else {
+      console.log("error submit!", fields);
+    }
+  });
+};
 
+// 重置输入
 const resetForm = (formEl: FormInstance | undefined) => {
   if (!formEl) return;
   formEl.resetFields();
 };
-
 </script>
+
+<template>
+  <el-form
+    ref="ruleFormRef"
+    :model="ruleForm"
+    :rules="rules"
+    label-width="auto"
+    class="form"
+    :size="formSize"
+    status-icon
+  >
+    <h3>登录/注册</h3>
+    <el-form-item label="用户名" prop="name">
+      <el-input v-model="ruleForm.name" />
+    </el-form-item>
+    <!-- 密码 -->
+    <el-form-item label="密码" style="position: relative" prop="password">
+      <el-input
+        type="password"
+        v-model="ruleForm.password"
+        placeholder="输入新密码"
+        show-password
+      >
+      </el-input>
+    </el-form-item>
+
+    <el-form-item label="性别" prop="region">
+      <el-select v-model="ruleForm.region" placeholder="选择你的性别">
+        <el-option label="男" value="0" />
+        <el-option label="女" value="1" />
+        <el-option label="武装直升机" value="2" />
+      </el-select>
+    </el-form-item>
+
+    <el-form-item label="记住我的账户" prop="resource">
+      <el-radio-group v-model="ruleForm.resource">
+        <el-radio value="1">确实</el-radio>
+        <el-radio value="0">不要</el-radio>
+      </el-radio-group>
+    </el-form-item>
+    <el-form-item label="简介" prop="desc">
+      <el-input v-model="ruleForm.desc" type="textarea" />
+    </el-form-item>
+    <el-form-item>
+      <el-button type="primary" @click="submitForm(ruleFormRef)">
+        创建/登录
+      </el-button>
+      <el-button
+        type="primary"
+        color="#707070"
+        @click="submitGuestForm(ruleFormRef)"
+      >
+        游客登录
+      </el-button>
+      <el-button @click="resetForm(ruleFormRef)">重置</el-button>
+    </el-form-item>
+  </el-form>
+</template>
+
+<style scoped>
+.form {
+  position: absolute;
+  top: 50%; /* 将元素顶部定位到父容器中间位置 */
+  left: 50%; /* 将元素左侧定位到父容器中间位置 */
+  padding: 20px; /* 外边距 */
+
+  transform: translate(-50%, -50%); /* 利用transform平移来使元素完全垂直居中 */
+  border-radius: 10px;
+
+  background-color: rgba(255, 255, 255, 0.5);
+
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+}
+
+.form::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url("https://source.unsplash.com/random") no-repeat center center /
+    cover;
+  opacity: 0.4; /* 调整这里的值来设置透明度 */
+  z-index: -1;
+}
+
+@media screen and (max-width: 969px) {
+  /* 手机 */
+  /* 类平板 */
+  .form {
+    position: relative;
+    top: 0; /* 将元素顶部定位到父容器中间位置 */
+    left: 0; /* 将元素左侧定位到父容器中间位置 */
+    padding: 20px; /* 外边距 */
+
+    transform: translate(0, 0); /* 利用transform平移来使元素完全垂直居中 */
+    border-radius: 0px;
+    background-color: rgba(255, 255, 255, 0.5);
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+  }
+  .form::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url("https://source.unsplash.com/random") no-repeat center
+      center / cover;
+    opacity: 0.4; /* 调整这里的值来设置透明度 */
+    z-index: -1;
+  }
+}
+</style>

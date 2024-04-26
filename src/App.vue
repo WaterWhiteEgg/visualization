@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import mainviewIndex from "./views/mainview/mainviewIndex.vue"
+import mainviewIndex from "./views/mainview/mainviewIndex.vue";
 </script>
 <template>
   <div class="appview">
@@ -8,7 +8,17 @@ import mainviewIndex from "./views/mainview/mainviewIndex.vue"
   </div>
 </template>
 <style scoped>
-.appview{
+.appview {
   display: flex;
+  height: 100vh;
+  width: 100vw;
+}
+
+@media screen and (max-width: 969px) {
+  /* 手机 */
+  /* 类平板 */
+  .appview {
+    flex-direction: column;
+  }
 }
 </style>

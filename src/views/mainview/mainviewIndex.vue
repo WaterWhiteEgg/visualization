@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import indexList from "./child/indexList.vue"
-import indexSearch from "./child/indexSearch.vue"
+import indexList from "./child/indexList.vue";
+import indexSearch from "./child/indexSearch.vue";
 
 // 判断是否显示列表
 const isShowListFlag = ref(false);
@@ -12,10 +12,16 @@ const changeIsShowListFlag = (bool: boolean = !isShowListFlag.value) => {
 </script>
 <template>
   <div class="main">
-    <transition :enter-active-class="isShowListFlag ? 'animated slideInLeft' : 'hidden'"
-      :leave-active-class="isShowListFlag ? '' : 'animated slideOutLeft'">
-      <div class="main-button" v-if="!isShowListFlag" @click="changeIsShowListFlag()">
-        <el-icon size="30" color="#ffffffe3">
+    <Transition
+      :enter-active-class="isShowListFlag ? 'animated slideInLeft' : 'hidden'"
+      :leave-active-class="isShowListFlag ? '' : 'animated slideOutLeft'"
+    >
+      <div
+        class="main-button"
+        v-if="!isShowListFlag"
+        @click="changeIsShowListFlag()"
+      >
+        <el-icon size="30" color="#ffffffe3" class="expand">
           <Expand />
         </el-icon>
       </div>
@@ -36,10 +42,9 @@ const changeIsShowListFlag = (bool: boolean = !isShowListFlag.value) => {
           <indexSearch></indexSearch>
           <!-- 列表栏 -->
           <indexList @clickList="changeIsShowListFlag(false)"></indexList>
-
         </div>
       </div>
-    </transition>
+    </Transition>
   </div>
 </template>
 <style scoped>
@@ -60,10 +65,13 @@ const changeIsShowListFlag = (bool: boolean = !isShowListFlag.value) => {
 }
 
 .main-button {
+  position: absolute;
   width: 30px;
+  cursor: pointer;
 }
 
 .main-list {
+  position: absolute;
   width: 20vw;
   margin-top: 0.5vh;
   height: 99.5vh;
@@ -80,7 +88,8 @@ const changeIsShowListFlag = (bool: boolean = !isShowListFlag.value) => {
   scrollbar-width: none;
 }
 
-.main-list-head {}
+.main-list-head {
+}
 
 .main-list-head-title {
   display: flex;
@@ -94,5 +103,33 @@ const changeIsShowListFlag = (bool: boolean = !isShowListFlag.value) => {
 
 .main-list-body {
   margin: 0 1vw;
+}
+
+@media screen and (max-width: 969px) {
+  /* 手机 */
+  /* 类平板 */
+  .expand{
+   
+  }
+
+  .main {
+    position: relative;
+    background-color: #beedffe0;
+  }
+
+  .main-button {
+    position: relative;
+    width: 30px;
+    cursor: pointer;
+  }
+
+  .main-list {
+    position: absolute;
+    margin: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: scroll;
+    background-color: #ffffff;
+  }
 }
 </style>
