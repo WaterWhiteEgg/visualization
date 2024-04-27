@@ -1,19 +1,16 @@
 <script lang="ts" setup>
 import { reactive, ref } from "vue";
-import { useRouter } from "vue-router";
 import type { FormInstance, FormRules } from "element-plus";
 import { commitUser } from "../../network/db";
 import {useRegister} from "../../stores/register"
 
 interface RuleForm {
   name: string;
-  region: string;
-  password: string;
-  resource: string;
-  desc: string;
+  againPassword: string;
+  email: string;
+  validate: string;
 }
-// router实例
-const router = useRouter();
+
 // 配置表单大小
 const formSize = ref("default");
 // 表单数据
@@ -21,43 +18,45 @@ const ruleFormRef = ref<FormInstance>();
 // 表单默认值
 const ruleForm = reactive<RuleForm>({
   name: "",
-  region: "男",
-  password: "",
-  resource: "1",
-  desc: "",
+  againPassword: "",
+  email: "",
+  validate: "邮箱验证",
 });
 // 表单规则
 const rules = reactive<FormRules<RuleForm>>({
   name: [
     { required: true, message: "请输入账户名", trigger: "blur" },
     {
+      min: 3,
+      max: 12,
       pattern: /^[^\s~!@#$%^&*()_+`\-={}[\]:;"'<>,.?/]+$/,
-      message: "存在特殊字符",
-      trigger: "blur",
-    },
-    {
-      pattern: /^\S{3,16}$/,
-      message: "你只能在3-16的长度范围里命名",
+      message: "请输入正确的账户名",
       trigger: "blur",
     },
   ],
-  password: [
+  againPassword: [
     { required: true, message: "请输入密码", trigger: "blur" },
     {
-      pattern:
-        /^(?=.*[0-9])(?=.*[a-zA-Z])[\da-zA-Z!@#$%^&*()\-+=\\\[\]{}|:;"'<>,.?\/]{6,18}$/,
-      message: "请输入6-18且是数字或字母的密码（可以有特殊符号，不允许空格）",
+      min: 6,
+      max: 18,
+      pattern: /^[a-zA-Z0-9]+$/,
+      message: "请输入6-18且的只能是数字或字母的密码",
       trigger: "blur",
     },
   ],
-  region: [
+  email: [
     {
-      message: "",
-      trigger: "change",
+      required: true,
+      message: "请输入邮箱",
+      trigger: "blur",
+    },
+    {
+    // 集成的邮箱验证规则
+      type: "email",
+      message: "请输入格式正确的邮箱",
+      trigger: ["blur", "change"],
     },
   ],
-
-  desc: [{ required: false, message: "填写你的简介", trigger: "blur" }],
 });
 
 // 注册提交，这个会验证规则
@@ -66,14 +65,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
   await formEl.validate((valid, fields) => {
     if (valid) {
       // 验证登录，若没有该账户则跳转注册
-
-      // 跳转注册
-        // 记录数据
-      useRegister().changeRegisterData(JSON.stringify(ruleForm))
-
-      router.push({
-        path: "/register",
-      });
+      console.log(JSON.stringify(ruleForm));
     }
     // 规则错误
     else {
@@ -105,6 +97,7 @@ const resetForm = (formEl: FormInstance | undefined) => {
 </script>
 
 <template>
+    {{ useRegister().registerData }}
   <el-form
     ref="ruleFormRef"
     :model="ruleForm"
@@ -114,48 +107,32 @@ const resetForm = (formEl: FormInstance | undefined) => {
     :size="formSize"
     status-icon
   >
-    <h3>登录/注册</h3>
+    <h3>注册</h3>
     <el-form-item label="用户名" prop="name">
       <el-input v-model="ruleForm.name" />
     </el-form-item>
     <!-- 密码 -->
-    <el-form-item label="密码" style="position: relative" prop="password">
+    <el-form-item label="密码" style="position: relative" prop="againPassword">
       <el-input
         type="password"
-        v-model="ruleForm.password"
-        placeholder="输入新密码"
+        v-model="ruleForm.againPassword"
+        placeholder="再次输入新密码"
         show-password
       >
       </el-input>
     </el-form-item>
-
-    <el-form-item label="性别" prop="region">
-      <el-select v-model="ruleForm.region" placeholder="选择你的性别">
-        <el-option label="男" value="男" />
-        <el-option label="女" value="女" />
-        <el-option label="武装直升机" value="武装直升机" />
+    <el-form-item label="验证方式">
+      <el-select v-model="ruleForm.validate" placeholder="选择验证方式">
+        <el-option label="邮箱验证" value="邮箱验证" />
+        <el-option label="手机认证" value="手机认证" />
       </el-select>
     </el-form-item>
-
-    <el-form-item label="记住我的账户" prop="resource">
-      <el-radio-group v-model="ruleForm.resource">
-        <el-radio value="1">确实</el-radio>
-        <el-radio value="0">不要</el-radio>
-      </el-radio-group>
-    </el-form-item>
-    <el-form-item label="简介" prop="desc">
-      <el-input v-model="ruleForm.desc" type="textarea" />
+    <el-form-item label="邮箱" prop="email">
+      <el-input v-model="ruleForm.email" />
     </el-form-item>
     <el-form-item>
       <el-button type="primary" @click="submitForm(ruleFormRef)">
-        创建/登录
-      </el-button>
-      <el-button
-        type="primary"
-        color="#707070"
-        @click="submitGuestForm(ruleFormRef)"
-      >
-        游客登录
+        创建
       </el-button>
       <el-button @click="resetForm(ruleFormRef)">重置</el-button>
     </el-form-item>
