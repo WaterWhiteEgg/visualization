@@ -3,7 +3,7 @@ import { reactive, ref } from "vue";
 import { useRouter } from "vue-router";
 import type { FormInstance, FormRules } from "element-plus";
 import { commitUser } from "../../network/db";
-import {useRegister} from "../../stores/register"
+import { useRegister } from "../../stores/register";
 
 interface RuleForm {
   name: string;
@@ -68,9 +68,8 @@ const submitForm = async (formEl: FormInstance | undefined) => {
       // 验证登录，若没有该账户则跳转注册
 
       // 跳转注册
-        // 记录数据
-      useRegister().changeRegisterData(JSON.stringify(ruleForm))
-
+      // 记录数据
+      useRegister().changeRegisterData(JSON.stringify(ruleForm));
       router.push({
         path: "/register",
       });

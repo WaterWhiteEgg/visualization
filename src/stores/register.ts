@@ -7,7 +7,7 @@ export const useRegister = defineStore(
     registerData: Ref<string>;
     changeRegisterData: (str: string) => void;
   } => {
-    const registerData = ref("");
+    const registerData = ref("{}");
     function changeRegisterData(str: string) {
       registerData.value = str;
     }

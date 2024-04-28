@@ -1,8 +1,18 @@
 <script lang="ts" setup>
-import { reactive, ref } from "vue";
+import { reactive, ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
 import type { FormInstance, FormRules } from "element-plus";
 import { commitUser } from "../../network/db";
-import {useRegister} from "../../stores/register"
+import { useRegister } from "../../stores/register";
+import { usePopup } from "../../stores/popup";
+
+const registerData = ref<{
+  name: string;
+  region: string;
+  password: string;
+  resource: string;
+  desc: string;
+}>({ name: "", region: "", password: "", resource: "", desc: "" });
 
 interface RuleForm {
   name: string;
@@ -10,6 +20,18 @@ interface RuleForm {
   email: string;
   validate: string;
 }
+// router实例
+const router = useRouter();
+
+// 获得注册前的json数据
+onMounted(() => {
+  registerData.value = JSON.parse(useRegister().registerData);
+  // 没有数据则跳转
+  if (Object.keys(registerData.value).length === 0) {
+    usePopup().openPopup("未填写数据");
+    router.push("/login");
+  }
+});
 
 // 配置表单大小
 const formSize = ref("default");
@@ -17,7 +39,7 @@ const formSize = ref("default");
 const ruleFormRef = ref<FormInstance>();
 // 表单默认值
 const ruleForm = reactive<RuleForm>({
-  name: "",
+  name: registerData.value.name,
   againPassword: "",
   email: "",
   validate: "邮箱验证",
@@ -35,7 +57,7 @@ const rules = reactive<FormRules<RuleForm>>({
     },
   ],
   againPassword: [
-    { required: true, message: "请输入密码", trigger: "blur" },
+    { required: true, message: "请再次输入密码", trigger: "blur" },
     {
       min: 6,
       max: 18,
@@ -51,7 +73,7 @@ const rules = reactive<FormRules<RuleForm>>({
       trigger: "blur",
     },
     {
-    // 集成的邮箱验证规则
+      // 集成的邮箱验证规则
       type: "email",
       message: "请输入格式正确的邮箱",
       trigger: ["blur", "change"],
@@ -89,15 +111,14 @@ const submitGuestForm = async (formEl: FormInstance | undefined) => {
   });
 };
 
-// 重置输入
+// 重置登录状态
 const resetForm = (formEl: FormInstance | undefined) => {
-  if (!formEl) return;
-  formEl.resetFields();
+  useRegister().changeRegisterData("");
+  // router.push("/login");
 };
 </script>
 
 <template>
-    {{ useRegister().registerData }}
   <el-form
     ref="ruleFormRef"
     :model="ruleForm"
@@ -112,7 +133,11 @@ const resetForm = (formEl: FormInstance | undefined) => {
       <el-input v-model="ruleForm.name" />
     </el-form-item>
     <!-- 密码 -->
-    <el-form-item label="密码" style="position: relative" prop="againPassword">
+    <el-form-item
+      label="再次密码"
+      style="position: relative"
+      prop="againPassword"
+    >
       <el-input
         type="password"
         v-model="ruleForm.againPassword"
@@ -134,7 +159,7 @@ const resetForm = (formEl: FormInstance | undefined) => {
       <el-button type="primary" @click="submitForm(ruleFormRef)">
         创建
       </el-button>
-      <el-button @click="resetForm(ruleFormRef)">重置</el-button>
+      <el-button @click="resetForm(ruleFormRef)">重新填写</el-button>
     </el-form-item>
   </el-form>
 </template>
