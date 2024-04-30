@@ -27,10 +27,10 @@ export async function getMyIpCity() {
         },  {
             message: string
             status: number
-        }> = await getIpCity(ipResponse.data.data);
+        }> = await getIpCity("120.230.134.227");
         // console.log(cityResponse);
         // 有可能存在局域网/外网/没有等情况，所以本地ip找不到时找别人ip定位，还是找不到也没办法
-        console.log(ipResponse.data.data);
+        console.log(cityResponse);
         
         if (cityResponse.data.data.infocode === "10000") {
             console.log("未查询到你的ip地址方位");
