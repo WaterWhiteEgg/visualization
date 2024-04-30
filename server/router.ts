@@ -58,28 +58,28 @@ router.get("/ipcity", async (req, res) => {
   });
 });
 router.get("/myip", (req, res) => {
-  const myIp = function () {
-    let interfaces = os.networkInterfaces();
-    for (let devName in interfaces) {
-      let iface = interfaces[devName];
-      for (let i = 0; i < iface!.length; i++) {
-        let alias = iface![i];
-        if (
-          alias.family === "IPv4" &&
-          alias.address !== "127.0.0.1" &&
-          !alias.internal
-        ) {
-          return alias.address;
-        }
-      }
-    }
-  };
-  const ip = myIp();
-  res.send({
-    status: 0,
-    message: "查询成功",
-    data: req.ip,
-  });
+  // 查询ipv4的正则
+  const ipv4Regex = /((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.|$)){4}/ // 定义IPv4地址的正则表达式
+  //  检查是否是回环地址
+  if (req.ip === "::1") {
+    res.send({
+      status: 1,
+      message: "回环地址",
+      data: "127.0.0.1",
+    });
+
+  }
+  // 从ipv6提取ipv4
+  else {
+    const match = ipv4Regex.exec(req.ip as string); // 使用正则表达式匹配IPv4地址部分
+    const ipv4 = match ? match[0] : null; // 如果匹配成功，则获取IPv4地址，否则为null
+    console.log(req.ip); // 输出IPv4地址部分
+    res.send({
+      status: 0,
+      message: "查询成功",
+      data: ipv4,
+    });
+  }
 });
 
 module.exports = router;
