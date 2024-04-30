@@ -102,7 +102,7 @@ const rules = reactive<FormRules<RuleForm>>({
       trigger: ["blur", "change"],
     },
     {
-      pattern: /^[\w-\.]+@(qq|163|gmail)\.com$/,
+      pattern: /^[\w\-\.]+@(qq|163|gmail)\.com$/,
       message: "请输入格式支持的邮箱，如qq，163，gmail.com",
       trigger: ["blur", "change"],
     }
