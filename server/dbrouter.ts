@@ -1,5 +1,5 @@
 import type { Router } from "express";
-import { SECRET_KEY } from "./key"
+import { MYSECRET_KEY } from "./key"
 import jwt from 'jsonwebtoken'
 
 const connection = require("./dbmain")

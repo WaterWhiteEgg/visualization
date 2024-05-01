@@ -20,8 +20,10 @@ export async function thisInitMap(
   // 检测useCityArray，若没有任何初始化值则将本地ip定位
   if (useCityArray().localCityArray.length === 0) {
     const cityIpObj = await getMyIpCity();
+    
     // 定位后找数据，要进行异步等待
-    await getCitys(cityIpObj?.adcode as string).then((res) => {
+    await getCitys(cityIpObj?.adcode as string ).then((res) => {
+      
       useCityArray().addLocalCityArray(forDistricts(res.data.data?.districts));
     });
     // 同时请求天气,天气不需要与地图数据绑定，可以非异步等待回调

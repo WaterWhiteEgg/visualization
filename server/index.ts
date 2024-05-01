@@ -1,7 +1,7 @@
 // index.ts
 import express from "express";
 import cors from "cors";
-import { SECRET_KEY } from "./key";
+import { MYSECRET_KEY } from "./key";
 
 const { middleware } = require("./middleware");
 
@@ -20,7 +20,7 @@ app.use(cors());
 // 解析token
 app.use(
   expressjwt({
-    secret: SECRET_KEY,
+    secret: MYSECRET_KEY,
     algorithms: ["HS256"], // 使用何种加密算法解析
   }).unless({ path: [/^\/*/] }) // 登录页无需校验
 );

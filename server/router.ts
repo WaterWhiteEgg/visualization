@@ -2,7 +2,8 @@ const express = require("express");
 import axios from "axios";
 import os from "os";
 import type { Router } from "express";
-import { key } from "./key";
+import { MYkey } from "./key";
+import { IPkey ,key} from "./realdata/key";
 const router: Router = express.Router();
 
 router.get("/weather", async (req, res) => {
@@ -43,9 +44,23 @@ router.get("/city", async (req, res) => {
     data: result.data,
   });
 });
+router.get("/ipcity", async (req, res) => {
+  const result = await axios.get("http://apis.juhe.cn/ip/ipNewV3", {
+    params: {
+      key: IPkey,
+      ip: req.query.ip,
+    },
+  });
+
+  res.send({
+    status: 0,
+    message: "查询成功",
+    data: result.data,
+  });
+});
 router.get("/myip", (req, res) => {
   // 查询ipv4的正则
-  const ipv4Regex = /((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.|$)){4}/ // 定义IPv4地址的正则表达式
+  const ipv4Regex = /((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.|$)){4}/; // 定义IPv4地址的正则表达式
   //  检查是否是回环地址
   if (req.ip === "::1") {
     res.send({
@@ -53,7 +68,6 @@ router.get("/myip", (req, res) => {
       message: "回环地址",
       data: "127.0.0.1",
     });
-
   }
   // 从ipv6提取ipv4
   else {
