@@ -43,20 +43,6 @@ router.get("/city", async (req, res) => {
     data: result.data,
   });
 });
-router.get("/ipcity", async (req, res) => {
-  const result = await axios.get("https://restapi.amap.com/v3/ip", {
-    params: {
-      key,
-      ip: req.query.ip,
-    },
-  });
-
-  res.send({
-    status: 0,
-    message: "查询成功",
-    data: result.data,
-  });
-});
 router.get("/myip", (req, res) => {
   // 查询ipv4的正则
   const ipv4Regex = /((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.|$)){4}/ // 定义IPv4地址的正则表达式
