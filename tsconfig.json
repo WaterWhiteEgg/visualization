@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "types": ["vite/client", "@types/node"]
+    "types": ["vite/client", "node"]
   },
   "files": [],
   "references": [

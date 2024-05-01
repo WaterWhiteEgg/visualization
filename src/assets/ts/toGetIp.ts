@@ -4,49 +4,45 @@ import type { AxiosResponse } from "axios";
 import { getMyIp, getIpCity } from "../../network/city";
 
 export async function getMyIpCity() {
-    try {
-        const ipResponse: AxiosResponse<{
-            data: string,
-            message: string
-            status: number
-        }, {
-            message: string
-            status: number
-        }> = await getMyIp();
-        
-        let cityResponse: AxiosResponse<{
-            data: {
-                rectangle: string,
-                city: string,
-                adcode: string,
-                infocode: string,
-                province: string
-            },
-            message: string
-            status: number
-        },  {
-            message: string
-            status: number
-        }> = await getIpCity("120.230.134.227");
-        // console.log(cityResponse);
-        // 有可能存在局域网/外网/没有等情况，所以本地ip找不到时找别人ip定位，还是找不到也没办法
-        console.log(cityResponse);
-        
-        if (cityResponse.data.data.infocode === "10000") {
-            console.log("未查询到你的ip地址方位");
-            // 查询不到的话就直接不提供ip，查询服务器地址的
-            cityResponse = await getIpCity();
-            return cityResponse.data.data
+  try {
+    const ipResponse: AxiosResponse<
+      {
+        data: string;
+        message: string;
+        status: number;
+      },
+      {
+        message: string;
+        status: number;
+      }
+    > = await getMyIp();
 
-        } 
-        // 查询成功直接返回
-        else {
-            return cityResponse.data.data;
+    let cityResponse: AxiosResponse<{
+      status: string;
+      info: string;
+      infocode: string;
+      province: unknown[];
+      city: unknown[];
+      rectangle: unknown[];
+      statusText: string;
+    }> = await getIpCity(ipResponse.data.data);
+    // console.log(cityResponse);
+    // 有可能存在局域网/外网/没有等情况，所以本地ip找不到时找别人ip定位，还是找不到也没办法
+    console.log(cityResponse);
 
-        }
+    if (cityResponse.data.infocode === "10000") {
+      console.log("未查询到你的ip地址方位");
+      // 查询不到的话就直接不提供ip，查询用户地址的我也不知道怎么提供了反而查不到
+      cityResponse = await getIpCity();
+    console.log(cityResponse);
 
-    } catch (error) {
-        console.error(error);
+      return cityResponse.data;
     }
+    // 查询成功直接返回
+    else {
+      return cityResponse.data;
+    }
+  } catch (error) {
+    console.error(error);
+  }
 }
-
