@@ -1,15 +1,9 @@
 import axios from "axios";
-<<<<<<< HEAD
+
 // 高德，聚何ip，api
 import { key } from "./realData/key";
 
-=======
-<<<<<<< HEAD
-import { key ,IPkey} from "./realData/key";
-=======
-import { key } from "./realData/key";
->>>>>>> 5c096eb58e3b7e43a3cc109d6e2e0226dddf650f
->>>>>>> b766fc1b056958159bb1623e5da9cc01f3a90636
+
 type Option = {
   url: string;
   params?: object;
@@ -52,20 +46,3 @@ export const lbs_amap_request = (option: Option) => {
   });
   return net3(option);
 };
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-
-export const juhe_request = (option: Option) => {
-  const net4 = axios.create({
-    baseURL: "http://apis.juhe.cn/ip/ipNewV3",
-    params: {
-      key:IPkey,
-    },
-    timeout: 10000,
-  });
-  return net4(option);
-};
-=======
->>>>>>> 5c096eb58e3b7e43a3cc109d6e2e0226dddf650f
->>>>>>> b766fc1b056958159bb1623e5da9cc01f3a90636
