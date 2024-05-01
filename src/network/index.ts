@@ -1,5 +1,9 @@
 import axios from "axios";
+<<<<<<< HEAD
 import { key ,IPkey} from "./realData/key";
+=======
+import { key } from "./realData/key";
+>>>>>>> 5c096eb58e3b7e43a3cc109d6e2e0226dddf650f
 type Option = {
   url: string;
   params?: object;
@@ -44,6 +48,7 @@ export const lbs_amap_request = (option: Option) => {
   });
   return net3(option);
 };
+<<<<<<< HEAD
 
 export const juhe_request = (option: Option) => {
   const net4 = axios.create({
@@ -55,3 +60,5 @@ export const juhe_request = (option: Option) => {
   });
   return net4(option);
 };
+=======
+>>>>>>> 5c096eb58e3b7e43a3cc109d6e2e0226dddf650f
