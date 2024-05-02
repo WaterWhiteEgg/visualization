@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref, watch, type Ref } from "vue";
+import { type ECElementEvent } from "echarts";
 import { getCitys } from "@/network/city";
 import { debounce } from "@/assets/ts/debounce";
 import { forDistricts, type City } from "@/assets/ts/forDistricts";
@@ -111,7 +112,7 @@ const redrawData = () => {
 };
 
 // 地图点击回调
-const mapClick = (e: echarts.ECElementEvent) => {
+const mapClick = (e: ECElementEvent) => {
   // 准备搜索
   isGetCitysFinally.value = false;
   // 点击地图块
@@ -368,7 +369,7 @@ watch(
 .view::-webkit-scrollbar {
   width: 0;
   height: 0;
-  
+
   /* 火狐兼容 */
   -moz-appearance: none;
   scrollbar-width: none;
@@ -469,7 +470,7 @@ watch(
 .view_center_search_view::-webkit-scrollbar {
   width: 0;
   height: 0;
-  
+
   /* 火狐兼容 */
   -moz-appearance: none;
   scrollbar-width: none;

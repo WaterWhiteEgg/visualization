@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import {  ref } from "vue";
 import indexList from "./child/indexList.vue";
 import indexSearch from "./child/indexSearch.vue";
 

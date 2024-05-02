@@ -18,7 +18,7 @@ export async function thisInitMap(
 
   // 检测useCityArray，若没有任何初始化值则将本地ip定位
   if (useCityArray().localCityArray.length === 0) {
-    let keywords = await getMyIpCity();
+    const keywords = await getMyIpCity();
 
     // console.log(cityIpObj?.result?.City);
 

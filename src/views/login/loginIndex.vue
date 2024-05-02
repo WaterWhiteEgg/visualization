@@ -45,7 +45,7 @@ const rules = reactive<FormRules<RuleForm>>({
     { required: true, message: "请输入密码", trigger: "blur" },
     {
       pattern:
-        /^(?=.*[0-9])(?=.*[a-zA-Z])[\da-zA-Z!@#$%^&*()\-+=\\\[\]{}|:;"'<>,.?\/]{6,18}$/,
+        /^(?=.*[0-9])(?=.*[a-zA-Z])[\da-zA-Z!@#$%^&*()\-+=\\[\]{}|:;"'<>,.?/]{6,18}$/,
       message: "请输入6-18位数字或字母，不能有空格",
       trigger: "blur",
     },
@@ -162,8 +162,7 @@ const resetForm = (formEl: FormInstance | undefined) => {
 </template>
 
 <style scoped>
-
-:deep() .el-form-item__error{
+:deep() .el-form-item__error {
   background-color: #fff;
 }
 .form {

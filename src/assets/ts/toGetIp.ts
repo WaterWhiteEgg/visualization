@@ -56,7 +56,7 @@ export async function getMyIpCity() {
     // 判断get_ip_city_lbs_amap是否获取的是空的
     if (cityResponse.data.infocode === "10000") {
       // 这是另一个需要处理跨域的接口，50/天,太少了，所以考虑哪怕高德接口搜不出来也算了
-      let otherCityResponse: OtherCityResponse = await getIpCity(
+      const otherCityResponse: OtherCityResponse = await getIpCity(
         ipResponse.data.data
       );
       // console.log(otherCityResponse);
