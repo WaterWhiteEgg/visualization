@@ -224,7 +224,7 @@ const resetForm = () => {
       <el-button type="primary" @click="submitForm(ruleFormRef)">
         创建
       </el-button>
-      <el-button @click="resetForm(ruleFormRef)">重新填写</el-button>
+      <el-button @click="resetForm()">重新填写</el-button>
     </el-form-item>
   </el-form>
 </template>
