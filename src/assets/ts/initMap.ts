@@ -20,8 +20,8 @@ export async function thisInitMap(
   if (useCityArray().localCityArray.length === 0) {
     let cityIpObj = await getMyIpCity();
     let keywords = "";
-    keywords = cityIpObj?.adcode ? cityIpObj?.adcode : cityIpObj?.City;
-    console.log(keywords);
+    keywords = cityIpObj?.adcode ? cityIpObj?.adcode : cityIpObj?.result?.City;
+    console.log(cityIpObj);
 
     // 定位后找数据，要进行异步等待
     await getCitys(keywords).then((res) => {
