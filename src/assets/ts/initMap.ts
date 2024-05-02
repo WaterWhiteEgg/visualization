@@ -21,6 +21,7 @@ export async function thisInitMap(
     let cityIpObj = await getMyIpCity();
     let keywords = "";
     keywords = cityIpObj?.adcode ? cityIpObj?.adcode : cityIpObj?.City;
+    console.log(keywords);
 
     // 定位后找数据，要进行异步等待
     await getCitys(keywords).then((res) => {
