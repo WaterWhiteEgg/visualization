@@ -18,17 +18,16 @@ export async function thisInitMap(
 
   // 检测useCityArray，若没有任何初始化值则将本地ip定位
   if (useCityArray().localCityArray.length === 0) {
-    let cityIpObj = await getMyIpCity();
-    let keywords = "";
-    keywords = cityIpObj?.adcode ? cityIpObj?.adcode : cityIpObj?.result?.City;
+    let keywords = await getMyIpCity();
+
     // console.log(cityIpObj?.result?.City);
 
     // 定位后找数据，要进行异步等待
-    await getCitys(keywords).then((res) => {
+    await getCitys(keywords as string).then((res) => {
       useCityArray().addLocalCityArray(forDistricts(res.data.data?.districts));
     });
     // 同时请求天气,天气不需要与地图数据绑定，可以非异步等待回调
-    inGetWeather(keywords);
+    inGetWeather(keywords as string);
   }
 
   // data 展示地图对应方块 value对应坐标 x y
