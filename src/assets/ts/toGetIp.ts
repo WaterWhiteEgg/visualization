@@ -42,8 +42,9 @@ export async function getMyIpCity() {
         // 查询不到的话就直接不提供ip，查询用户地址的我也不知道怎么提供了反而查不到
         cityResponse = await get_ip_city_lbs_amap();
         return cityResponse.data;
+      } else {
+        return otherCityResponse.data;
       }
-      return otherCityResponse.data;
     }
     // 查询成功直接返回
     else {
