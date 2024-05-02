@@ -15,7 +15,7 @@ export const getMyIp = () => {
   });
 };
 
-export const getIpCity = (ip?: string) => {
+export const getIpCity = (ip: string) => {
   return request({
     url: "/ipcity",
     params: {
