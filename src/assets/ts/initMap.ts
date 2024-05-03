@@ -156,7 +156,7 @@ export async function thisInitMap(
   });
 }
 // 同步小圆点,重新绘制标点
-export function redrawValue(myChart: echarts.ECharts) {
+export function redrawValue(myChart: echarts.ECharts) {  
   myChart.setOption({
     series: [
       {

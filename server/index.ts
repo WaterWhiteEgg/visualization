@@ -7,9 +7,10 @@ const { middleware } = require("./middleware");
 
 const router = require("./router");
 const dbrouter = require("./dbrouter");
+const weatherRouter = require("./weather");
 
 const corsOptions = {
-  origin: ["http://8.134.196.45","http://localhost:5173"],
+  origin: ["http://8.134.196.45", "http://localhost:5173"],
   optionsSuccessStatus: 200,
 };
 import { expressjwt } from "express-jwt";
@@ -29,9 +30,9 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-
 app.use(middleware);
 app.use(router);
+app.use(weatherRouter);
 // app.use("/db/", dbrouter);
 
 app.listen(2000, () => {

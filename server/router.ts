@@ -1,30 +1,10 @@
 const express = require("express");
 import axios from "axios";
-import os from "os";
 import type { Router } from "express";
 import { MYkey } from "./key";
-import { IPkey ,key} from "./realdata/key";
+import { IPkey, key } from "./realdata/key";
 const router: Router = express.Router();
 
-router.get("/weather", async (req, res) => {
-  // console.log(req.query);
-  const result = await axios.get(
-    "https://restapi.amap.com/v3/weather/weatherInfo",
-    {
-      params: {
-        key,
-        city: req.query.city,
-      },
-    }
-  );
-  //   console.log(result.data);
-
-  res.send({
-    status: 0,
-    message: "查询成功",
-    data: result.data,
-  });
-});
 
 router.get("/city", async (req, res) => {
   const result = await axios.get(
