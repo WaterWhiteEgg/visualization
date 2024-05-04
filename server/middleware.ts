@@ -4,5 +4,4 @@
 //   next();
 // };
 
-module.exports.middleware = middleware;
 export {};

@@ -1,7 +1,7 @@
 import express from "express";
 import type { Router } from "express";
 import axios from "axios";
-import {  key } from "./realdata/key";
+import { key } from "./realdata/key";
 
 const weatherRouter: Router = express.Router();
 
@@ -25,6 +25,5 @@ weatherRouter.get("/weather", async (req, res) => {
   });
 });
 
-
 // https://devapi.qweather.com/v7/weather/7d?key==114.34,30.54
-module.exports = weatherRouter;
+export default weatherRouter;

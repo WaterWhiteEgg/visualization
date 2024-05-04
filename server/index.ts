@@ -3,7 +3,7 @@ import express from "express";
 import cors from "cors";
 import { MYSECRET_KEY } from "./key";
 
-import { middleware } from "./middleware";
+import {  } from "./middleware";
 
 import router from "./router";
 // import dbrouter from "./dbrouter";
@@ -30,7 +30,7 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(middleware);
+// app.use(middleware);
 app.use(router);
 app.use(weatherRouter);
 // app.use("/db/", dbrouter);
