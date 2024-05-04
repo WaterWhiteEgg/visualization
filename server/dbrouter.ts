@@ -1,10 +1,10 @@
-import type { Router } from "express";
-import { MYSECRET_KEY } from "./key"
-import jwt from 'jsonwebtoken'
+// import type { Router } from "express";
+// import { MYSECRET_KEY } from "./key"
+// import jwt from 'jsonwebtoken'
 
-const connection = require("./dbmain")
+// const connection = require("./dbmain")
 
-const dbrouter: Router = require("./router");
+// const dbrouter: Router = require("./router");
 
 // dbrouter.post("/commit", async (req, res) => {
 

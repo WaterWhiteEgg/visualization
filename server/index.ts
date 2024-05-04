@@ -3,11 +3,11 @@ import express from "express";
 import cors from "cors";
 import { MYSECRET_KEY } from "./key";
 
-const { middleware } = require("./middleware");
+import { middleware } from "./middleware";
 
-const router = require("./router");
-const dbrouter = require("./dbrouter");
-const weatherRouter = require("./weather");
+import router from "./router";
+// import dbrouter from "./dbrouter";
+import weatherRouter from "./weather";
 
 const corsOptions = {
   origin: ["http://8.134.196.45", "http://localhost:5173"],
@@ -16,7 +16,7 @@ const corsOptions = {
 import { expressjwt } from "express-jwt";
 
 const app = express();
-app.use(cors());
+app.use(cors(corsOptions));
 
 // 解析token
 app.use(

@@ -1,7 +1,7 @@
-const express = require("express");
+import express from "express";
 import type { Router } from "express";
 import axios from "axios";
-import { IPkey, key } from "./realdata/key";
+import {  key } from "./realdata/key";
 
 const weatherRouter: Router = express.Router();
 
