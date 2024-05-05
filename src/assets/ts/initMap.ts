@@ -177,7 +177,7 @@ export function redrawValue(myChart: echarts.ECharts) {
       },
     ],
   });
-}
+} 
 // 城市天气请求，一定要城市编码
 export const inGetWeather = (code: string) => {
   getWeather(code).then((res) => {

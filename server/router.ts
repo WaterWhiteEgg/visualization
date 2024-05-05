@@ -1,8 +1,8 @@
 import express from "express";
 import axios from "axios";
 import type { Router } from "express";
-// import { MYkey } from "./key";
-import { IPkey, key } from "./realdata/key";
+// import { MYkey } from "./key.ts";
+import { IPkey, key } from "./realdata/key.ts";
 const router: Router = express.Router();
 
 router.get("/city", async (req, res) => {
