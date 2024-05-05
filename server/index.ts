@@ -1,13 +1,13 @@
 // index.ts
 import express from "express";
 import cors from "cors";
-import { MYSECRET_KEY } from "./key.ts";
+import { MYSECRET_KEY } from "./key";
 
-import {  } from "./middleware.ts";
+import {  } from "./middleware";
 
-import router from "./router.ts";
+import router from "./router";
 // import dbrouter from "./dbrouter";
-import weatherRouter from "./weather.ts";
+import weatherRouter from "./weather";
 
 const corsOptions = {
   origin: ["http://8.134.196.45", "http://localhost:5173"],
