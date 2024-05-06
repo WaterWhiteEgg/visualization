@@ -8,9 +8,9 @@ import {  } from "./middleware";
 import router from "./router";
 // import dbrouter from "./dbrouter";
 import weatherRouter from "./weather";
-
+// , "http://localhost:5173"
 const corsOptions = {
-  origin: ["http://8.134.196.45", "http://localhost:5173"],
+  origin: ["http://8.134.196.45"],
   optionsSuccessStatus: 200,
 };
 import { expressjwt } from "express-jwt";
@@ -36,5 +36,7 @@ app.use(weatherRouter);
 // app.use("/db/", dbrouter);
 
 app.listen(2000, () => {
+  console.log(process.env.NODE_ENV);
+  
   console.log("server open :2000");
 });

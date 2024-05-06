@@ -1,5 +1,5 @@
 import { fileURLToPath, URL } from 'node:url'
-
+import ConditionalCompile from "vite-plugin-conditional-compiler";
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 
@@ -7,6 +7,7 @@ import vue from '@vitejs/plugin-vue'
 export default defineConfig({
   plugins: [
     vue(),
+    ConditionalCompile()
     
   ],
   resolve: {

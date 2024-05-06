@@ -1,9 +1,15 @@
 import axios from "axios";
+import { useRegister } from "../stores/register"
 
-// 高德，聚何ip，api
-import { key } from "./realData/key";
+// 高德，聚何ip，api,仅在生产模式编译
 
-
+// #v-ifdef PROD
+const { key } = await import("./realdata/key");
+// #v-endif
+// 仅在生产模式编译
+// #v-ifdef DEV
+import { inkey } from "./key";
+// #v-endif
 type Option = {
   url: string;
   params?: object;
@@ -14,7 +20,7 @@ type Option = {
 };
 // 默认的请求地址
 const baseURL =
-  import.meta.env.MODE === "development"
+  useRegister().isDevelopmentMode
     ? "http://localhost:2000"
     : "http://8.134.196.45:2000";
 
@@ -40,7 +46,8 @@ export const lbs_amap_request = (option: Option) => {
   const net3 = axios.create({
     baseURL: "https://restapi.amap.com/v3",
     params: {
-      key,
+      key: useRegister().isDevelopmentMode ? inkey : key
+
     },
     timeout: 10000,
   });
