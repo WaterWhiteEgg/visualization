@@ -1,16 +1,19 @@
 import express from "express";
 import axios from "axios";
 import type { Router } from "express";
-// import { MYkey } from "./key.ts";
+import { MYkey, MYIPkey } from "./key";
 import { IPkey, key } from "./realdata/key";
 const router: Router = express.Router();
+
+// 判断是否是开发环境
+const isDEV = process.env.NODE_ENV === 'development'
 
 router.get("/city", async (req, res) => {
   const result = await axios.get(
     "https://restapi.amap.com/v3/config/district?parameters",
     {
       params: {
-        key,
+        key: isDEV ? MYkey : key,
         keywords: req.query.keywords,
       },
     }
@@ -26,7 +29,7 @@ router.get("/city", async (req, res) => {
 router.get("/ipcity", async (req, res) => {
   const result = await axios.get("http://apis.juhe.cn/ip/ipNewV3", {
     params: {
-      key: IPkey,
+      key: isDEV ? MYIPkey : IPkey,
       ip: req.query.ip,
     },
   });
