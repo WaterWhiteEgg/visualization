@@ -1,5 +1,5 @@
 import * as echarts from "echarts";
-import "../js/china";
+import "./chinaMapData";
 import { getCitys } from "../../network/city";
 import { getWeather } from "../../network/weather";
 import { forDistricts, type DataWeather } from "../ts/forDistricts";

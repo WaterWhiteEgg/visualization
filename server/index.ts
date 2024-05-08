@@ -1,23 +1,25 @@
 // index.ts
 import express from "express";
 import cors from "cors";
-import { MYSECRET_KEY,isDEV } from "./key";
+import { type CorsOptions } from "cors";
+import { MYSECRET_KEY, isDEV } from "./key";
 import { SECRET_KEY } from "./realdata/key";
 
-import { } from "./middleware";
+import {} from "./middleware";
 
 import router from "./router";
 // import dbrouter from "./dbrouter";
 import weatherRouter from "./weather";
 // , "http://localhost:5173"
 
-
-// 判断是否是开发环境
-
-const corsOptions = {
-  origin: ["http://8.134.196.45"],
+const corsOptions: CorsOptions = {
+  origin: [],
   optionsSuccessStatus: 200,
 };
+// 判断是否是开发环境
+corsOptions.origin = isDEV
+  ? ["http://localhost:5173"]
+  : ["http://8.134.196.45"];
 import { expressjwt } from "express-jwt";
 
 const app = express();
