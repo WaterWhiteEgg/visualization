@@ -10,7 +10,6 @@ import {} from "./middleware";
 import router from "./router";
 // import dbrouter from "./dbrouter";
 import weatherRouter from "./weather";
-// , "http://localhost:5173"
 
 const corsOptions: CorsOptions = {
   origin: [],

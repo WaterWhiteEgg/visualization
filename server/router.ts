@@ -3,10 +3,9 @@ import axios from "axios";
 import type { Router } from "express";
 import { MYkey, MYIPkey } from "./key";
 import { IPkey, key } from "./realdata/key";
+import { isDEV } from "./key";
 const router: Router = express.Router();
 
-// 判断是否是开发环境
-const isDEV = process.env.NODE_ENV === 'development'
 
 router.get("/city", async (req, res) => {
   const result = await axios.get(
@@ -27,6 +26,7 @@ router.get("/city", async (req, res) => {
   });
 });
 router.get("/ipcity", async (req, res) => {
+  
   const result = await axios.get("http://apis.juhe.cn/ip/ipNewV3", {
     params: {
       key: isDEV ? MYIPkey : IPkey,

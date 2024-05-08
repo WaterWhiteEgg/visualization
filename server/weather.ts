@@ -1,10 +1,12 @@
 import express from "express";
 import type { Router } from "express";
 import axios from "axios";
-import { key } from "./realdata/key";
-import { MYkey,isDEV } from "./key"
-const weatherRouter: Router = express.Router();
 
+// 用commonjs方式来引入key，当生产模式时才会找这个key，缺少文件不报错
+const key = require("./realdata/key");
+
+import { MYkey, isDEV } from "./key";
+const weatherRouter: Router = express.Router();
 
 weatherRouter.get("/weather", async (req, res) => {
   // console.log(req.query);

@@ -59,16 +59,16 @@ export async function getMyIpCity() {
       const otherCityResponse: OtherCityResponse = await getIpCity(
         ipResponse.data.data
       );
-      // console.log(otherCityResponse);
+      console.log(otherCityResponse);
       // 查询另一个接口的内容
-      if (otherCityResponse?.data?.data.result.City === "") {
+      if (otherCityResponse?.data?.data?.result?.City === "") {
         console.log("无法解析" + ipResponse.data.data + " ？ip地址");
         // 查询不到的话就直接不提供ip
         cityResponse = await get_ip_city_lbs_amap();
         return cityResponse.data.adcode;
         // return otherCityResponse.data.data;
       } else {
-        return otherCityResponse.data.data.result.City;
+        return otherCityResponse?.data?.data?.result?.City;
       }
     }
     // 查询成功直接返回
