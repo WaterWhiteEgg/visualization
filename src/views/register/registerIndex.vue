@@ -4,14 +4,13 @@ import { useRouter } from "vue-router";
 import type { FormInstance, FormRules } from "element-plus";
 import { useRegister } from "../../stores/register";
 import { usePopup } from "../../stores/popup";
+import { commitUser } from "../../network/db";
 
 const registerData = ref<{
   name: string;
-  region: string;
   password: string;
   resource: string;
-  desc: string;
-}>({ name: "", region: "", password: "", resource: "", desc: "" });
+}>({ name: "", password: "", resource: "" });
 
 interface RuleForm {
   name: string;
@@ -21,6 +20,8 @@ interface RuleForm {
   emailCode: string;
   phone: null | number;
   phoneCode: null | number;
+  region: string;
+  desc: "";
 }
 // router实例
 const router = useRouter();
@@ -62,6 +63,8 @@ const ruleForm = reactive<RuleForm>({
   emailCode: "",
   phone: null,
   phoneCode: null,
+  region: "0",
+  desc: "",
 });
 // 表单规则
 const rules = reactive<FormRules<RuleForm>>({
@@ -97,7 +100,7 @@ const rules = reactive<FormRules<RuleForm>>({
       trigger: ["blur", "change"],
     },
     {
-      pattern:/^[\w-.]+@(qq|163|gmail)\.com$/,
+      pattern: /^[\w-.]+@(qq|163|gmail)\.com$/,
       message: "请输入格式支持的邮箱，如qq，163，gmail.com",
       trigger: ["blur", "change"],
     },
@@ -138,6 +141,13 @@ const rules = reactive<FormRules<RuleForm>>({
       trigger: ["blur", "change"],
     },
   ],
+  region: [
+    {
+      message: "",
+      trigger: "change",
+    },
+  ],
+  desc: [{ required: false, message: "填写你的简介", trigger: "blur" }],
 });
 
 // 注册提交，这个会验证规则
@@ -145,8 +155,8 @@ const submitForm = async (formEl: FormInstance | undefined) => {
   if (!formEl) return;
   await formEl.validate((valid, fields) => {
     if (valid) {
-      // 验证登录，若没有该账户则跳转注册
-      console.log(JSON.stringify(ruleForm));
+      console.log(ruleForm);
+      commitUser(ruleForm);
     }
     // 规则错误
     else {
@@ -154,7 +164,6 @@ const submitForm = async (formEl: FormInstance | undefined) => {
     }
   });
 };
-
 
 // 重置登录状态
 const resetForm = () => {
@@ -220,6 +229,17 @@ const resetForm = () => {
       </el-form-item>
     </div>
 
+    <el-form-item label="性别" prop="region">
+      <el-select v-model="ruleForm.region" placeholder="选择你的性别">
+        <el-option label="男" value="0" />
+        <el-option label="女" value="1" />
+        <el-option label="武装直升机" value="2" />
+      </el-select>
+    </el-form-item>
+
+    <el-form-item label="简介" prop="desc">
+      <el-input v-model="ruleForm.desc" type="textarea" />
+    </el-form-item>
     <el-form-item>
       <el-button type="primary" @click="submitForm(ruleFormRef)">
         创建

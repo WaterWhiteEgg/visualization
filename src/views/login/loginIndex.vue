@@ -7,10 +7,8 @@ import { useRegister } from "../../stores/register";
 
 interface RuleForm {
   name: string;
-  region: string;
   password: string;
   resource: string;
-  desc: string;
 }
 // router实例
 const router = useRouter();
@@ -21,10 +19,8 @@ const ruleFormRef = ref<FormInstance>();
 // 表单默认值
 const ruleForm = reactive<RuleForm>({
   name: "",
-  region: "男",
   password: "",
   resource: "1",
-  desc: "",
 });
 // 表单规则
 const rules = reactive<FormRules<RuleForm>>({
@@ -50,19 +46,12 @@ const rules = reactive<FormRules<RuleForm>>({
       trigger: "blur",
     },
   ],
-  region: [
-    {
-      message: "",
-      trigger: "change",
-    },
-  ],
-
-  desc: [{ required: false, message: "填写你的简介", trigger: "blur" }],
 });
 
 // 注册提交，这个会验证规则
 const submitForm = async (formEl: FormInstance | undefined) => {
   if (!formEl) return;
+
   await formEl.validate((valid, fields) => {
     if (valid) {
       // 验证登录，若没有该账户则跳转注册
@@ -128,23 +117,13 @@ const resetForm = (formEl: FormInstance | undefined) => {
       </el-input>
     </el-form-item>
 
-    <el-form-item label="性别" prop="region">
-      <el-select v-model="ruleForm.region" placeholder="选择你的性别">
-        <el-option label="男" value="男" />
-        <el-option label="女" value="女" />
-        <el-option label="武装直升机" value="武装直升机" />
-      </el-select>
-    </el-form-item>
-
     <el-form-item label="记住我的账户" prop="resource">
       <el-radio-group v-model="ruleForm.resource">
         <el-radio value="1">确实</el-radio>
         <el-radio value="0">不要</el-radio>
       </el-radio-group>
     </el-form-item>
-    <el-form-item label="简介" prop="desc">
-      <el-input v-model="ruleForm.desc" type="textarea" />
-    </el-form-item>
+
     <el-form-item>
       <el-button type="primary" @click="submitForm(ruleFormRef)">
         创建/登录

@@ -24,7 +24,6 @@ export const getIpCity = (ip: string) => {
   });
 };
 
-
 export const get_ip_city_lbs_amap = (ip?: string) => {
   return lbs_amap_request({
     url: "/ip",
@@ -33,3 +32,4 @@ export const get_ip_city_lbs_amap = (ip?: string) => {
     },
   });
 };
+

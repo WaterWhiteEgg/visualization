@@ -8,7 +8,7 @@ import { SECRET_KEY } from "./realdata/key";
 import {} from "./middleware";
 
 import router from "./router";
-// import dbrouter from "./dbrouter";
+import loginComponent from "./login_component";
 import weatherRouter from "./weather";
 
 const corsOptions: CorsOptions = {
@@ -20,6 +20,7 @@ corsOptions.origin = isDEV
   ? ["http://localhost:5173"]
   : ["http://8.134.196.45"];
 import { expressjwt } from "express-jwt";
+
 
 const app = express();
 app.use(cors(corsOptions));
@@ -39,7 +40,7 @@ app.use(express.urlencoded({ extended: true }));
 // app.use(middleware);
 app.use(router);
 app.use(weatherRouter);
-// app.use("/db/", dbrouter);
+app.use("/db/", loginComponent);
 
 app.listen(2000, () => {
   console.log("mode is " + process.env.NODE_ENV);
