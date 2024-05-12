@@ -5,7 +5,7 @@ import { type CorsOptions } from "cors";
 import { MYSECRET_KEY, isDEV } from "./key";
 import { SECRET_KEY } from "./realdata/key";
 
-import {} from "./middleware";
+import { error } from "./middleware/error";
 
 import router from "./router";
 import loginComponent from "./login_component";
@@ -21,8 +21,8 @@ corsOptions.origin = isDEV
   : ["http://8.134.196.45"];
 import { expressjwt } from "express-jwt";
 
-
 const app = express();
+app.use(error);
 app.use(cors(corsOptions));
 
 // 解析token

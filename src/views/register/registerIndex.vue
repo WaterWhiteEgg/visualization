@@ -97,12 +97,12 @@ const rules = reactive<FormRules<RuleForm>>({
       // 集成的邮箱验证规则
       type: "email",
       message: "请输入格式正确的邮箱",
-      trigger: ["blur", "change"],
+      trigger: ["blur"],
     },
     {
       pattern: /^[\w-.]+@(qq|163|gmail)\.com$/,
       message: "请输入格式支持的邮箱，如qq，163，gmail.com",
-      trigger: ["blur", "change"],
+      trigger: ["blur"],
     },
   ],
   emailCode: [
@@ -114,7 +114,7 @@ const rules = reactive<FormRules<RuleForm>>({
     {
       pattern: /^[a-zA-Z0-9]{8}$/,
       message: "请输入格式正确的邮箱验证码",
-      trigger: ["blur", "change"],
+      trigger: ["blur"],
     },
   ],
   phone: [
@@ -155,8 +155,13 @@ const submitForm = async (formEl: FormInstance | undefined) => {
   if (!formEl) return;
   await formEl.validate((valid, fields) => {
     if (valid) {
-      console.log(ruleForm);
-      commitUser(ruleForm);
+      // 验证通过提交，整合所有提交的数据
+      const mergedForm = {
+        ...registerData.value,
+        ...ruleForm,
+      };
+      console.log(mergedForm);
+      commitUser(mergedForm);
     }
     // 规则错误
     else {

@@ -3,7 +3,6 @@ import { SECRET_KEY } from "./realdata/key";
 import jwt from "jsonwebtoken";
 import express from "express";
 import connection from "./dbmain";
-import { QueryError } from "mysql2";
 
 const router = express.Router();
 // 哪个环境决定使用哪个环境的key
@@ -41,14 +40,18 @@ router.post("/register", async (req, res) => {
   try {
     id = await selectId();
   } catch (error) {
-    console.error("Database error:", error);
-    return res.status(500).json({ error: "注册失败，服务器的问题！" });
+    id = "未查询到id";
+    res.cc(error as Error);
   }
 
   // 生成token
   let token: string;
   const expiresIn = resource === "1" ? "720h" : "60s";
-  token = jwt.sign({ user: { name } }, secret_key, { expiresIn });
+  token = jwt.sign(
+    { user: { name }, user_id: { id }, status: { resource } },
+    secret_key,
+    { expiresIn }
+  );
 
   // 注册sql语句
   const set = `INSERT INTO ${table_name} (username,user_id, password, status,gender,descs,token) VALUES (?,?,?,?,?,?,?)`;
@@ -59,8 +62,7 @@ router.post("/register", async (req, res) => {
     function (err, results, fields) {
       // 登录错误处理
       if (err) {
-        console.error("Database error:", err);
-        return res.status(500).json({ error: "注册失败，服务器的问题！" });
+        return res.cc(err);
       }
 
       res.send({
