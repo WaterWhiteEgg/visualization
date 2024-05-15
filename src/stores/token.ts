@@ -6,12 +6,17 @@ export const useToken = defineStore(
   (): {
     token: Ref<string>;
     changeToken: (str: string) => void;
+    isDevelopmentMode: Ref<boolean>;
   } => {
-    const token = ref("1");
+    // 用户的token
+    const token = ref("");
+    // 切换用户token数据
     function changeToken(str: string) {
       token.value = str;
     }
-    return { token, changeToken };
+    // 判断测试模式
+    const isDevelopmentMode = ref(import.meta.env.MODE === "development");
+    return { token, changeToken, isDevelopmentMode };
   },
   {
     persist: true,

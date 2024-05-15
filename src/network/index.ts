@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useRegister } from "../stores/register";
+import { useToken } from "../stores/token";
 
 // 高德，聚何ip，api,仅在生产模式编译
 import { key } from "./realdata/key";
@@ -13,7 +14,7 @@ type Option = {
   data?: object | string;
 };
 // 默认的请求地址
-const baseURL = useRegister().isDevelopmentMode
+const baseURL = useToken().isDevelopmentMode
   ? "http://localhost:2000"
   : "http://8.134.196.45:2000";
 

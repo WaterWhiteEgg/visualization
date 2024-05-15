@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { reactive, ref } from "vue";
+import { reactive, ref, onMounted, type Ref } from "vue";
 import { useRouter } from "vue-router";
 import type { FormInstance, FormRules } from "element-plus";
 import { commitUser } from "../../network/db";
@@ -10,6 +10,14 @@ interface RuleForm {
   password: string;
   resource: string;
 }
+// 使用webapi获取用户数据
+const userAgent: Ref<string> = ref("");
+onMounted(() => {
+  userAgent.value = navigator.userAgent;
+  // 全局保存
+  useRegister().changeUserAgent(JSON.stringify({ userAgent: userAgent.value }));
+});
+
 // router实例
 const router = useRouter();
 // 配置表单大小

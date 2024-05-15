@@ -155,10 +155,11 @@ const submitForm = async (formEl: FormInstance | undefined) => {
   if (!formEl) return;
   await formEl.validate((valid, fields) => {
     if (valid) {
-      // 验证通过提交，整合所有提交的数据
+      // 验证通过提交，整合所有需要提交的数据
       const mergedForm = {
         ...registerData.value,
         ...ruleForm,
+        ...{ user_agent: useRegister().userAgent },
       };
       console.log(mergedForm);
       commitUser(mergedForm);

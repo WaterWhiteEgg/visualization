@@ -4,15 +4,29 @@ import { defineStore } from "pinia";
 export const useRegister = defineStore(
   "register",
   (): {
-    isDevelopmentMode: Ref<boolean>
     registerData: Ref<string>;
     changeRegisterData: (str: string) => void;
+    userAgent: Ref<string>;
+    changeUserAgent: (str: string) => void;
   } => {
+    // 用户注册时的数据
     const registerData = ref("{}");
-    const isDevelopmentMode = ref(import.meta.env.MODE === "development")
+    // 用户浏览器等信息
+    const userAgent = ref("{}");
+    function changeUserAgent(str: string) {
+      userAgent.value = str;
+    }
+
+    // 切换registerData数据
     function changeRegisterData(str: string) {
       registerData.value = str;
     }
-    return { registerData, changeRegisterData, isDevelopmentMode };
+
+    return {
+      registerData,
+      changeRegisterData,
+      userAgent,
+      changeUserAgent,
+    };
   }
 );

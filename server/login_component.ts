@@ -16,7 +16,10 @@ type RuleRegisterForm = {
   againPassword: string;
   resource: string;
   desc: string;
+  user_agent: string;
 };
+
+
 type RuleLoginForm = {
   user_id: string;
   name: string;
@@ -30,9 +33,9 @@ type RuleLoginForm = {
 
 router.post("/register", async (req, res) => {
   // 数据打印查看
-  console.log(req.body);
+  // console.log(req.body);
   // 解构获取的数据
-  const { name, againPassword, resource, desc, region }: RuleRegisterForm =
+  const { name, againPassword, resource, desc, region,user_agent }: RuleRegisterForm =
     req.body;
 
   // 查询下一个唯一id
@@ -53,12 +56,16 @@ router.post("/register", async (req, res) => {
     { expiresIn }
   );
 
+  // 用户的网络信息
+  const other_security = JSON.stringify({
+    ip: req.ip,
+  });
   // 注册sql语句
-  const set = `INSERT INTO ${table_name} (username,user_id, password, status,gender,descs,token) VALUES (?,?,?,?,?,?,?)`;
+  const set = `INSERT INTO ${table_name} (username,user_id, password, status,gender,descs,token,other_security,user_agent) VALUES (?,?,?,?,?,?,?,?,?)`;
 
   connection.query(
     set,
-    [name, id, againPassword, resource, region, desc, token],
+    [name, id, againPassword, resource, region, desc, token, other_security,user_agent],
     function (err, results, fields) {
       // 登录错误处理
       if (err) {
