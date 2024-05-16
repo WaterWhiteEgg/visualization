@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {  ref } from "vue";
+import { ref } from "vue";
 import indexList from "./child/indexList.vue";
 import indexSearch from "./child/indexSearch.vue";
 
@@ -108,8 +108,7 @@ const changeIsShowListFlag = (bool: boolean = !isShowListFlag.value) => {
 @media screen and (max-width: 969px) {
   /* 手机 */
   /* 类平板 */
-  .expand{
-   
+  .expand {
   }
 
   .main {

@@ -19,7 +19,6 @@ type RuleRegisterForm = {
   user_agent: string;
 };
 
-
 type RuleLoginForm = {
   user_id: string;
   name: string;
@@ -35,8 +34,14 @@ router.post("/register", async (req, res) => {
   // 数据打印查看
   // console.log(req.body);
   // 解构获取的数据
-  const { name, againPassword, resource, desc, region,user_agent }: RuleRegisterForm =
-    req.body;
+  const {
+    name,
+    againPassword,
+    resource,
+    desc,
+    region,
+    user_agent,
+  }: RuleRegisterForm = req.body;
 
   // 查询下一个唯一id
   let id: string;
@@ -60,12 +65,25 @@ router.post("/register", async (req, res) => {
   const other_security = JSON.stringify({
     ip: req.ip,
   });
+  // 用户的其他信息
+  const other_Information = JSON.stringify({});
   // 注册sql语句
-  const set = `INSERT INTO ${table_name} (username,user_id, password, status,gender,descs,token,other_security,user_agent) VALUES (?,?,?,?,?,?,?,?,?)`;
+  const set = `INSERT INTO ${table_name} (username,user_id, password, status,gender,descs,token,other_security,user_agent,other_Information) VALUES (?,?,?,?,?,?,?,?,?,?)`;
 
   connection.query(
     set,
-    [name, id, againPassword, resource, region, desc, token, other_security,user_agent],
+    [
+      name,
+      id,
+      againPassword,
+      resource,
+      region,
+      desc,
+      token,
+      other_security,
+      user_agent,
+      other_Information,
+    ],
     function (err, results, fields) {
       // 登录错误处理
       if (err) {

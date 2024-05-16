@@ -13,6 +13,7 @@ import {
 } from "@/assets/ts/initMap";
 import { initPie, myPicChart } from "@/assets/ts/initPie";
 import { initLine, myLineChart, redrawLineValue } from "@/assets/ts/initLine";
+import { changeAnimation } from "../../assets/ts/child/echartsAnimationFlag";
 import "animate.css";
 
 // 正则
@@ -29,9 +30,24 @@ onMounted(() => {
 });
 // 屏幕大小改变触发事件
 const thisInnerWidth = ref(window.innerWidth);
-const handleResize = () => {
+// thisInnerWidth.value <= 969
+const isInnerWidthLess969 = ref(false);
+
+const handleResize = (e: UIEvent) => {
+  // console.log((e.target as Window).innerWidth);
+
   let resize = debounce(() => {
-    thisInnerWidth.value = window.innerWidth;
+    // 获取屏幕宽度
+    thisInnerWidth.value = (e.target as Window).innerWidth;
+    isInnerWidthLess969.value = thisInnerWidth.value <= 969;
+    // console.log(isInnerWidthLess969.value);
+
+    // 类似媒体查询要操作的事，低于这个值应该做的事，这个值是小于pc，类平板以下的
+    if (isInnerWidthLess969) {
+      changeAnimation(myChart, false);
+      changeAnimation(myPicChart, false);
+      changeAnimation(myLineChart, false);
+    }
     myChart.resize();
     myPicChart.resize();
     myLineChart.resize();
@@ -153,9 +169,11 @@ watch(
   () => {
     // 改变时刷新图标数据
     redrawLineValue(myLineChart);
-    isHaddenBgc.value = true;
+    // 手机端不执行
+    isInnerWidthLess969.value ? null : (isHaddenBgc.value = true);
     const animate = debounce(() => {
-      isHaddenBgc.value = false;
+      // 手机端不执行
+      isInnerWidthLess969.value ? null : (isHaddenBgc.value = false);
     }, 500);
     animate();
   }
@@ -327,8 +345,8 @@ watch(
   }
 }
 .animated {
-  animation-duration: 0.5s !important;
   /* 任何过度持续时间加快 */
+  animation-duration: 0.5s !important;
 }
 
 /* 背景隐藏 */
@@ -339,7 +357,7 @@ watch(
 
 /* 高度最大屏幕 */
 .hig {
-  height: 100vh !important;
+  height: 100% !important;
 }
 
 .view {
@@ -572,6 +590,10 @@ watch(
   /* 手机 */
   /* 类平板 */
   /* 取消宽度调整 */
+  .animated {
+    /* 取消任何过度持续时间 */
+    animation-duration: 0s !important;
+  }
   .hig {
     height: 100% !important;
   }

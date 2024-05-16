@@ -26,7 +26,7 @@ export function initLine(doc: HTMLElement | null) {
     yAxis: {
       type: "value",
       min: "dataMin",
-      max:"dataMax",
+      max: "dataMax",
       scale: true,
     },
     label: {
