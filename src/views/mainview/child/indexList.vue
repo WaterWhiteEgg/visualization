@@ -1,25 +1,22 @@
-  
 <script lang="ts" setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref } from "vue";
+import { useRouter } from "vue-router";
 
 const emits = defineEmits<{
-  (e: 'clickList'): void
-}>()
+  (e: "clickList"): void;
+}>();
 // 实例路由
-const router = useRouter()
-import listLeft from "./list/listLeft.vue"
+const router = useRouter();
+import listLeft from "./list/listLeft.vue";
 // 列表活跃index
-const activeName = ref('1')
+const activeName = ref("1");
 // 切换路由并发送emit
 const toRouter = (str: string) => {
-
-  router.push(str)
+  router.push(str);
 
   // 发送点击完毕请求
-  emits("clickList")
-
-}
+  emits("clickList");
+};
 </script>
 
 <template>
@@ -27,12 +24,13 @@ const toRouter = (str: string) => {
     <el-collapse v-model="activeName" accordion>
       <el-collapse-item title="用户管理" name="1">
         <listLeft @click="toRouter('/login')">
-          <template #title>登录/注册</template>
+          <template #title
+            >登录/注册 <span style="color: red"> (*beta)</span></template
+          >
         </listLeft>
         <div>
           <div class="collapse-item-desc">
-         登录后会保存你的数据，同时才能开放一些功能的使用。
-
+            登录后会保存你的数据，同时才能开放一些功能的使用。
           </div>
         </div>
       </el-collapse-item>
@@ -74,9 +72,8 @@ const toRouter = (str: string) => {
   </div>
 </template>
 
-
 <style scoped>
-.collapse-item-desc{
+.collapse-item-desc {
   color: #9d9d9d;
 }
 </style>
