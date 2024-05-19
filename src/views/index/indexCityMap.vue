@@ -4,6 +4,7 @@ import { type ECElementEvent } from "echarts";
 import { getCitys } from "@/network/city";
 import { debounce } from "@/assets/ts/debounce";
 import { forDistricts, type City } from "@/assets/ts/forDistricts";
+import { useSearchItem } from "@/stores/mapSearch";
 import { useCityArray } from "@/stores/item";
 import {
   thisInitMap,
@@ -14,17 +15,15 @@ import {
 import { initPie, myPicChart } from "@/assets/ts/initPie";
 import { initLine, myLineChart, redrawLineValue } from "@/assets/ts/initLine";
 import { changeAnimation } from "../../assets/ts/child/echartsAnimationFlag";
-import "animate.css";
 
-// 正则
-const chineseReg = /[^0-9\u4e00-\u9fa5]/g;
+import mapOfLeft from "./child/mapOfLeft.vue";
+import mapSearch from "./child/mapSearch.vue";
+
+import "animate.css";
 
 // 加载化地图配置
 onMounted(() => {
   thisInitMap(document.getElementById("china"), mapClick);
-  initPie(document.querySelector(".view_left_pie"));
-  initLine(document.querySelector(".view_left_line"));
-
   // 注册监听屏幕大小的事件
   window.addEventListener("resize", handleResize);
 });
@@ -33,6 +32,7 @@ const thisInnerWidth = ref(window.innerWidth);
 // thisInnerWidth.value <= 969
 const isInnerWidthLess969 = ref(false);
 
+// 注册监听屏幕大小的函数
 const handleResize = (e: UIEvent) => {
   // console.log((e.target as Window).innerWidth);
 
@@ -55,60 +55,11 @@ const handleResize = (e: UIEvent) => {
   resize();
 };
 
-// 加载getCitys的flag
-const isGetCitysFinally = ref(true);
-
-// 表示错误的输入的flag
-const isErrorCityText = ref(false);
-
-// 搜索城市编号
-const cityText = ref("");
-watch(cityText, (newVal) => {
-  // 防抖
-  const fn = debounce(() => {
-    // 加载中flag
-    isGetCitysFinally.value = false;
-    // 判断是否是中文且有内容
-    if (!chineseReg.test(newVal.trim()) && newVal.trim() !== "") {
-      getCitys(newVal.trim())
-        .then((res) => {
-          // 获得内容数组
-          // console.log(res);
-          cityArray.value = forDistricts(res.data.data?.districts as City[]);
-        })
-        // 加载完成后提示
-        .finally(() => {
-          // 加载完flag
-          isGetCitysFinally.value = true;
-          // 观察有没有内容，没有就报错
-          if (cityArray.value.length === 0) {
-            isErrorCityText.value = true;
-          } else {
-            isErrorCityText.value = false;
-            // 同步刷新数据
-            redrawData();
-          }
-        });
-    }
-    // 不满足条件，提示问题
-    else {
-      // 隐藏flag
-      isGetCitysFinally.value = true;
-      // 提示
-      isErrorCityText.value = true;
-    }
-  }, 500);
-
-  // 执行上面的方法
-  fn();
-});
-
-const cityArray: Ref<City[]> = ref([]);
-
 // 清除CityText的值，等于关闭搜索
 const clearCityText = () => {
-  cityText.value = "";
+  useSearchItem().changeCityText("");
 };
+
 // 选择了某个城市触发
 const ChooseCityWeather = (item: City) => {
   // console.log(item);
@@ -118,24 +69,16 @@ const ChooseCityWeather = (item: City) => {
   inGetWeather(item.adcode);
 };
 
-// 同步数据以及刷新地图
-const redrawData = () => {
-  // 将数据同步表格
-
-  useCityArray().addLocalCityArray(cityArray.value);
-  // 刷新地图的标点
-  redrawValue(myChart);
-};
-
 // 地图点击回调
 const mapClick = (e: ECElementEvent) => {
   // 准备搜索
-  isGetCitysFinally.value = false;
+  useSearchItem().changeIsGetCitysFinally(false);
   // 点击地图块
   let click = debounce(() => {
     // 清除cityText
     clearCityText();
-    isGetCitysFinally.value = true;
+    useSearchItem().changeIsGetCitysFinally(true);
+
     // 请求天气以及城市数据
     getCitys(e.name).then((res) => {
       // 赋值给全局
@@ -151,13 +94,7 @@ const mapClick = (e: ECElementEvent) => {
 // 选择城市切换名字
 const ChooseCity = (name: string) => {
   // 放值到cityText
-  cityText.value = name;
-};
-// 判断焦点flag
-const isFocus = ref(false);
-// 切换焦点flag
-const changeFocus = (Boolean: boolean) => {
-  isFocus.value = Boolean;
+  useSearchItem().changeCityText(name);
 };
 
 // 观察useCityArray().localCityArray
@@ -182,105 +119,16 @@ watch(
 </script>
 <template>
   <div class="view">
-    <div class="view_left">
-      <div class="view_left_weather animated fadeInDown">
-        <transition-group enter-active-class="animated rotateInDownLeft">
-          <div
-            class="view_left_weather_item"
-            v-for="(item, index) in useCityArray().localWeather"
-            :key="item.adcode + index"
-          >
-            <div>
-              <span>城市名</span>
-              {{ item.city }}
-            </div>
-            <div>
-              <span>天气状况</span>
-              {{ item.weather }}
-            </div>
-            <div>
-              <span>气温</span>
-              {{ item.temperature }}°
-            </div>
-            <div>
-              <span> 风力等级 </span>
-              {{ item.windpower }}
-            </div>
-            <div>
-              <span>湿度</span>
-              {{ item.humidity }}
-            </div>
-            <div>
-              <span> 更新时间 </span>
-              {{ item.reporttime }}
-            </div>
-          </div>
-        </transition-group>
-      </div>
-      <div class="view_left_pie"></div>
-      <div class="view_left_line"></div>
-    </div>
     <!-- 地图绘制 -->
+    <mapOfLeft></mapOfLeft>
     <div
       id="china"
       style="width: 100vw; height: 60vh; position: absolute; bottom: 20vh"
     ></div>
     <div class="view_center">
-      <div class="view_center_search">
-        <div style="color: #fff" v-show="!isGetCitysFinally">加载中</div>
-        <div class="view_center_search_input">
-          <input
-            type="text"
-            placeholder="搜索"
-            v-model="cityText"
-            @focus="changeFocus(true)"
-          />
-          <span
-            class="view_center_search_input_close"
-            v-show="isFocus"
-            @click="clearCityText(), changeFocus(false)"
-          >
-            <el-icon>
-              <Close />
-            </el-icon>
-          </span>
-        </div>
-        <div class="view_center_search_view" v-if="isFocus">
-          <div v-show="!isGetCitysFinally">
-            {{ "加载中。。。" }}
-          </div>
-          <div
-            v-show="
-              cityArray.length === 0 && isErrorCityText && isGetCitysFinally
-            "
-          >
-            {{
-              `请遵循以下规则查找：
-            只支持单个关键词语搜索关键词支持:行政区名称、城市编码、邮件编码
-            例如，搜索省份（例如山东），能够显示市（例如济南），区（例如历下区）,若你频繁看到提示，可能输入的关键词有误或网络错误`
-            }}
-          </div>
-          <div v-if="isGetCitysFinally">
-            <div
-              class="view_center_search_view_item"
-              v-for="(item, index) in cityArray"
-              :key="item.adcode + index"
-              @click="ChooseCityWeather(item), changeFocus(false)"
-            >
-              <div class="view_center_search_view_item_index">
-                {{ index + 1 }}
-              </div>
-              <div class="view_center_search_view_item_name">
-                {{ item.name }}
-              </div>
-              <div class="view_center_search_view_item_adcode">
-                {{ item.adcode }}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <mapSearch @chooseCityWeather="ChooseCityWeather"></mapSearch>
     </div>
+
     <div class="view_right">
       <div
         class="view_right_table animated fadeInDown"
@@ -393,140 +241,8 @@ watch(
   scrollbar-width: none;
 }
 
-.view_left {
-  flex: 1;
-  margin-top: 10vh;
-  margin-left: 2vw;
-}
-
-.view_left_weather {
-  display: flex;
-  position: relative;
-  height: 20vh;
-  width: 20vw;
-  min-width: 210px;
-  max-width: 250px;
-  max-height: 140px;
-  font-size: 0.8rem;
-}
-
-.view_left_weather_item {
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.view_left_weather_item div {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 5vw;
-  width: 5vw;
-  min-height: 70px;
-  min-width: 70px;
-  overflow: hidden;
-  border: 0.2px solid #ffffff6b;
-  color: #fff;
-  background-color: #1100ff65;
-  backdrop-filter: blur(10px);
-  /* 添加模糊效果 */
-}
-
-.view_left_pie {
-  margin-top: 5vh;
-  width: 20vw;
-  height: 30vh;
-  z-index: 99999;
-}
-
-.view_left_line {
-  position: absolute;
-  width: 40vw;
-  height: 35vh;
-  z-index: 9999;
-}
-
 .view .view_center {
   flex: 2;
-}
-
-.view_center_search {
-}
-
-.view_center_search_input {
-  position: relative;
-  display: flex;
-}
-
-.view_center_search_input input {
-  min-height: 2.5vw;
-  width: 100%;
-  font-size: 1rem;
-  border: 0px;
-  border-radius: 2rem;
-
-  transition: all 0.5s;
-}
-
-.view_center_search_input_close {
-  display: block;
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.view_center_search_view {
-  position: relative;
-  height: 40vh;
-  overflow: scroll;
-  background-color: #f0f8ff;
-  z-index: 9999;
-}
-
-/* 隐藏滚动条 */
-.view_center_search_view::-webkit-scrollbar {
-  width: 0;
-  height: 0;
-
-  /* 火狐兼容 */
-  -moz-appearance: none;
-  scrollbar-width: none;
-}
-
-.view_center_search_view_item {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.view_center_search_view_item div {
-  box-sizing: border-box;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 4vh;
-  min-height: 20px;
-  border: 0.5px dotted #8299ff;
-}
-
-.view_center_search_view_item .view_center_search_view_item_index {
-  flex: 0.5;
-  color: #0021dd;
-}
-
-.view_center_search_view_item .view_center_search_view_item_name {
-  flex: 3;
-  font-weight: 900;
-  white-space: nowrap;
-  /* 保证文本在一行内显示 */
-  overflow: hidden;
-  /* 隐藏溢出的内容 */
-  text-overflow: ellipsis;
-  /* 文字溢出显示省略号 */
-}
-
-.view_center_search_view_item .view_center_search_view_item_adcode {
 }
 
 .view_right {
@@ -608,62 +324,6 @@ watch(
   .view::before {
     animation: anim1 0s;
     background: none;
-  }
-
-  .view_left {
-    margin: 0;
-    /* 提供绝对定位的视窗 */
-    padding-bottom: 40vh;
-  }
-
-  .view_left_weather {
-    max-width: none;
-    max-height: none;
-    min-height: 0;
-    min-width: 0;
-    width: 100vw;
-    height: 18vh;
-
-    margin: 0;
-    align-items: start;
-    justify-content: start;
-    overflow: scroll;
-  }
-
-  /* 隐藏滚动条 */
-  .view_left_weather::-webkit-scrollbar {
-    width: 0;
-    height: 0;
-  }
-
-  .view_left_weather_item {
-    max-width: none;
-    max-height: none;
-    min-height: 0;
-    min-width: 0;
-    align-items: start;
-    justify-content: start;
-  }
-
-  .view_left_weather_item div {
-    max-width: none;
-    max-height: none;
-    min-height: 40px;
-    min-width: 0;
-    width: 50vw;
-    height: 6vh;
-  }
-
-  .view_left_pie {
-    margin-top: 0;
-    width: 100vw;
-    height: 40vh;
-  }
-
-  .view_left_line {
-    margin-top: 0;
-    width: 100vw;
-    height: 40vh;
   }
 
   .view_center {
