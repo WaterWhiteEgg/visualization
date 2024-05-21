@@ -40,6 +40,7 @@ export async function thisInitMap(
 
   myChart.setOption(
     {
+      animation: true,
       geo: {
         map: "china",
         aspectScale: 0.8,
@@ -156,7 +157,7 @@ export async function thisInitMap(
   });
 }
 // 同步小圆点,重新绘制标点
-export function redrawValue(myChart: echarts.ECharts) {  
+export function redrawValue(myChart: echarts.ECharts) {
   myChart.setOption({
     series: [
       {
@@ -177,7 +178,7 @@ export function redrawValue(myChart: echarts.ECharts) {
       },
     ],
   });
-} 
+}
 // 城市天气请求，一定要城市编码
 export const inGetWeather = (code: string) => {
   getWeather(code).then((res) => {

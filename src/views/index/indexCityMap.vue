@@ -18,7 +18,7 @@ import { changeAnimation } from "../../assets/ts/child/echartsAnimationFlag";
 
 import mapOfLeft from "./child/mapOfLeft.vue";
 import mapSearch from "./child/mapSearch.vue";
-
+import mapOfRight from "./child/mapOfRight.vue";
 import "animate.css";
 
 // 加载化地图配置
@@ -26,6 +26,7 @@ onMounted(() => {
   thisInitMap(document.getElementById("china"), mapClick);
   // 注册监听屏幕大小的事件
   window.addEventListener("resize", handleResize);
+  
 });
 // 屏幕大小改变触发事件
 const thisInnerWidth = ref(window.innerWidth);
@@ -43,7 +44,10 @@ const handleResize = (e: UIEvent) => {
     // console.log(isInnerWidthLess969.value);
 
     // 类似媒体查询要操作的事，低于这个值应该做的事，这个值是小于pc，类平板以下的
-    if (isInnerWidthLess969) {
+    console.log(isInnerWidthLess969.value);
+
+    if (isInnerWidthLess969.value) {
+      
       changeAnimation(myChart, false);
       changeAnimation(myPicChart, false);
       changeAnimation(myLineChart, false);
@@ -130,43 +134,7 @@ watch(
     </div>
 
     <div class="view_right">
-      <div
-        class="view_right_table animated fadeInDown"
-        :class="{ hig: isHaddenBgc }"
-      >
-        <table :class="{ 'bgc-hid': isHaddenBgc }">
-          <tr>
-            <th>顺序</th>
-            <th>城市编号</th>
-            <th>名称</th>
-            <th>城市编码</th>
-            <th>等级</th>
-          </tr>
-          <TransitionGroup
-            enter-active-class="animated fadeInRight"
-            leave-active-class="animated fadeOutLeft"
-            tag="tbody"
-          >
-            <tr
-              v-for="(item, index) in useCityArray().localCityArray"
-              :key="item.adcode + index"
-            >
-              <td style="text-align: center">{{ index + 1 }}</td>
-              <td>
-                {{ item.citycode?.length === 0 ? "无编号" : item.citycode }}
-              </td>
-              <td
-                class="view_right_table_tdname"
-                @click="ChooseCityWeather(item)"
-              >
-                {{ item.name }}
-              </td>
-              <td>{{ item.adcode }}</td>
-              <td>{{ item.level }}</td>
-            </tr>
-          </TransitionGroup>
-        </table>
-      </div>
+        <mapOfRight :isHaddenBgc="isHaddenBgc" @chooseCityWeather="ChooseCityWeather"></mapOfRight>
     </div>
   </div>
 </template>
@@ -250,58 +218,6 @@ watch(
   flex: 1;
 }
 
-.view_right_table {
-  display: flex;
-  justify-content: right;
-  height: 50vh;
-  margin-top: 10vh;
-  transition: 0.5s all;
-  overflow: scroll;
-}
-
-/* 隐藏滚动条 */
-.view_right_table::-webkit-scrollbar {
-  width: 0;
-  height: 0;
-}
-
-.view_right_table table {
-  height: 8vh;
-  width: 20vw;
-
-  transition: 0.5s all;
-
-  background-color: #877eff;
-  color: #ffffff;
-}
-
-.view_right_table tr {
-  background-color: rgb(0, 0, 0);
-}
-
-.view_right_table th {
-  color: rgb(206, 248, 255);
-}
-
-.view_right_table th,
-.view_right_table td {
-  max-width: 6vw;
-  white-space: nowrap;
-  /* 保证文本在一行内显示 */
-  overflow: hidden;
-  /* 隐藏溢出的内容 */
-  text-overflow: ellipsis;
-  /* 文字溢出显示省略号 */
-}
-
-.view_right_table td:hover {
-  color: #72bbff;
-}
-
-.view_right_table_tdname {
-  cursor: pointer;
-}
-
 @media screen and (max-width: 969px) {
   /* 手机 */
   /* 类平板 */
@@ -332,26 +248,10 @@ watch(
     order: -99;
   }
 
-  .view_center_search input {
-    height: 5vh;
-    min-height: 20px;
-    border-radius: 0;
-    background-color: #beedffe0;
-  }
-
-  .view_center_search {
-  }
-
+ 
   .view_right {
   }
 
-  .view_right_table {
-    margin: 0;
-  }
-
-  .view_right_table table {
-    width: 100vw;
-  }
 }
 
 @media screen and (min-width: 970px) {

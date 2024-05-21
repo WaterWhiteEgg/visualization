@@ -18,7 +18,7 @@ export function initPie(doc: HTMLElement | null) {
   ];
 
   myPicChart.setOption({
-    animation: false,
+    animation: true,
     tooltip: {
       trigger: "item",
     },

@@ -1,7 +1,7 @@
 import * as echarts from "echarts";
 import { useCityArray } from "../../stores/item";
 export let myLineChart: echarts.ECharts;
-// 饼图绘制
+// 线图绘制
 export function initLine(doc: HTMLElement | null) {
   myLineChart = echarts.init(doc);
 
@@ -11,6 +11,7 @@ export function initLine(doc: HTMLElement | null) {
   const Ydata = useCityArray().localCityArray.map((item) => item.adcode);
 
   myLineChart.setOption({
+    animation: true,
     xAxis: {
       type: "category",
       data: Xdata,

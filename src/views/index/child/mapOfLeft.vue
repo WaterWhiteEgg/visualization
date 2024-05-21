@@ -64,6 +64,10 @@ onMounted(() => {
   </div>
 </template>
 <style scoped>
+.animated {
+  /* 任何过度持续时间加快 */
+  animation-duration: 0.5s !important;
+}
 .view_left {
   flex: 1;
   margin-top: 10vh;

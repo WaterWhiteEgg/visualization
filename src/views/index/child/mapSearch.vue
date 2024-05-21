@@ -100,18 +100,9 @@ const ChooseCityWeather = (item: City) => {
       加载中
     </div>
     <div class="view_center_search_input">
-      <input
-        type="text"
-        placeholder="搜索"
-        :value="useSearchItem().cityText"
-        @focus="changeFocus(true)"
-        @input="changeInput"
-      />
-      <span
-        class="view_center_search_input_close"
-        v-show="isFocus"
-        @click="closeSearch"
-      >
+      <input type="text" placeholder="搜索" :value="useSearchItem().cityText" @focus="changeFocus(true)"
+        @input="changeInput" />
+      <span class="view_center_search_input_close" v-show="isFocus" @click="closeSearch">
         <el-icon>
           <Close />
         </el-icon>
@@ -121,27 +112,20 @@ const ChooseCityWeather = (item: City) => {
       <div v-show="!useSearchItem().isGetCitysFinally">
         {{ "加载中。。。" }}
       </div>
-      <div
-        v-show="
-          (useSearchItem().cityText.length === 0 &&
-            useSearchItem().isErrorCityText &&
-            useSearchItem().isGetCitysFinally) ||
-          searchCityArray.length === 0
-        "
-      >
+      <div v-show="(useSearchItem().cityText.length === 0 &&
+          useSearchItem().isErrorCityText &&
+          useSearchItem().isGetCitysFinally) ||
+        searchCityArray.length === 0
+        ">
         {{
           `请遵循以下规则查找：
-            只支持单个关键词语搜索关键词支持:行政区名称、城市编码、邮件编码
-            例如，搜索省份（例如山东），能够显示市（例如济南），区（例如历下区）,若你频繁看到提示，可能输入的关键词有误或网络错误`
+        只支持单个关键词语搜索关键词支持:行政区名称、城市编码、邮件编码
+        例如，搜索省份（例如山东），能够显示市（例如济南），区（例如历下区）,若你频繁看到提示，可能输入的关键词有误或网络错误`
         }}
       </div>
       <div v-if="useSearchItem().isGetCitysFinally">
-        <div
-          class="view_center_search_view_item"
-          v-for="(item, index) in searchCityArray"
-          :key="item.adcode + index"
-          @click="ChooseCityWeather(item), changeFocus(false)"
-        >
+        <div class="view_center_search_view_item" v-for="(item, index) in searchCityArray" :key="item.adcode + index"
+          @click="ChooseCityWeather(item), changeFocus(false)">
           <div class="view_center_search_view_item_index">
             {{ index + 1 }}
           </div>
@@ -157,8 +141,7 @@ const ChooseCityWeather = (item: City) => {
   </div>
 </template>
 <style scoped>
-.view_center_search {
-}
+.view_center_search {}
 
 .view_center_search_input {
   position: relative;
@@ -231,8 +214,26 @@ const ChooseCityWeather = (item: City) => {
   /* 隐藏溢出的内容 */
   text-overflow: ellipsis;
   /* 文字溢出显示省略号 */
+  cursor: pointer;
 }
+.view_center_search_view_item .view_center_search_view_item_name:hover{
+  color: #0021dd;
+}
+.view_center_search_view_item .view_center_search_view_item_adcode {}
 
-.view_center_search_view_item .view_center_search_view_item_adcode {
+@media screen and (max-width: 969px) {
+
+  /* 手机 */
+  /* 类平板 */
+  /* 取消宽度调整 */
+  .view_center_search input {
+    height: 5vh;
+    min-height: 20px;
+    border-radius: 0;
+    background-color: #beedffe0;
+  }
+
+  .view_center_search {}
+
 }
 </style>

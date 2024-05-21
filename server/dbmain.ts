@@ -24,7 +24,7 @@ let connection = isDEV
     })
   : mysqlCreate(CONNECTION);
 
-console.log(connection);
+// console.log(connection);
 
 connection.connect();
 
