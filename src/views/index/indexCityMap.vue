@@ -24,14 +24,22 @@ import "animate.css";
 // 加载化地图配置
 onMounted(() => {
   thisInitMap(document.getElementById("china"), mapClick);
-  // 注册监听屏幕大小的事件
-  window.addEventListener("resize", handleResize);
-  
 });
-// 屏幕大小改变触发事件
+
+// 屏幕大小
 const thisInnerWidth = ref(window.innerWidth);
-// thisInnerWidth.value <= 969
+// thisInnerWidth.value <= 969 的判断flag
 const isInnerWidthLess969 = ref(false);
+
+// 注册监听屏幕大小的事件
+onMounted(() => {
+  window.addEventListener("resize", handleResize);
+  // console.log(thisInnerWidth.value);
+  // 检测屏幕宽度
+  isInnerWidthLess969.value = thisInnerWidth.value <= 969;
+  // 仅关闭或开启动画
+  resizeAndChangeAnimation(isInnerWidthLess969.value, false);
+});
 
 // 注册监听屏幕大小的函数
 const handleResize = (e: UIEvent) => {
@@ -44,19 +52,27 @@ const handleResize = (e: UIEvent) => {
     // console.log(isInnerWidthLess969.value);
 
     // 类似媒体查询要操作的事，低于这个值应该做的事，这个值是小于pc，类平板以下的
-    console.log(isInnerWidthLess969.value);
+    resizeAndChangeAnimation(isInnerWidthLess969.value);
+  }, 300);
+  resize();
+};
 
-    if (isInnerWidthLess969.value) {
-      
-      changeAnimation(myChart, false);
-      changeAnimation(myPicChart, false);
-      changeAnimation(myLineChart, false);
-    }
+// 图表的动画开关以及刷新
+const resizeAndChangeAnimation = (
+  isWidth: boolean,
+  isResize: boolean = true
+) => {
+  // 图表的动画开关，决定宽少于969时动画关闭
+  changeAnimation(myChart, !isWidth);
+  changeAnimation(myPicChart, !isWidth);
+  changeAnimation(myLineChart, !isWidth);
+
+  // 询问决定重新检查大小这些图表
+  if (isResize) {
     myChart.resize();
     myPicChart.resize();
     myLineChart.resize();
-  }, 300);
-  resize();
+  }
 };
 
 // 清除CityText的值，等于关闭搜索
@@ -110,11 +126,17 @@ watch(
   () => {
     // 改变时刷新图标数据
     redrawLineValue(myLineChart);
+
+    console.log(isInnerWidthLess969.value);
     // 手机端不执行
-    isInnerWidthLess969.value ? null : (isHaddenBgc.value = true);
+    if (!isInnerWidthLess969.value) {
+      isHaddenBgc.value = true;
+    }
     const animate = debounce(() => {
       // 手机端不执行
-      isInnerWidthLess969.value ? null : (isHaddenBgc.value = false);
+      if (!isInnerWidthLess969.value) {
+        isHaddenBgc.value = false;
+      }
     }, 500);
     animate();
   }
@@ -134,7 +156,10 @@ watch(
     </div>
 
     <div class="view_right">
-        <mapOfRight :isHaddenBgc="isHaddenBgc" @chooseCityWeather="ChooseCityWeather"></mapOfRight>
+      <mapOfRight
+        :isHaddenBgc="isHaddenBgc"
+        @chooseCityWeather="ChooseCityWeather"
+      ></mapOfRight>
     </div>
   </div>
 </template>
@@ -248,10 +273,8 @@ watch(
     order: -99;
   }
 
- 
   .view_right {
   }
-
 }
 
 @media screen and (min-width: 970px) {
