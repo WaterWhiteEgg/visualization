@@ -9,7 +9,9 @@
     "dev-linux": "export NODE_ENV=development && ts-node ./index.ts",
     "dev-mac": "export NODE_ENV=development && ts-node ./index.ts",
     "build": "npx tsc -p ./tsconfig.json",
-    "lint": "eslint . --ext .ts"
+    "lint": "eslint . --ext .ts",
+    "restart": "pm2 restart ecosystem.config.js --env production",
+    "log": "pm2 log"
   },
   "keywords": [],
   "author": "",

@@ -121,19 +121,25 @@ async function selectId(): Promise<string> {
   });
 }
 
-// // 登录
-// router.post("/login", async (req, res) => {
-//   // console.log(req.body);
-//   const { name, password, resource, user_id }: RuleLoginForm = req.body;
-//   let set = `SELECT  ${table_name}(username, password, status,gender,descs) VALUES ('${name}', '${password}', '${resource}')`;
-//   connection.query(set, [], function (err, results, fields) {
-//     console.log(err);
-//     res.send({
-//       status: 0,
-//       message: "登录成功",
-//     });
-//     res.end(); // 结束响应
-//   });
-// });
+// // 用户名登录
+router.post("/login", async (req, res) => {
+  console.log(req.body);
+  const { name, password, resource, user_id }: RuleLoginForm = req.body;
+  // 查询name是用户名时找不找到，在查询是用户id时找不找到
+  let set = `SELECT * 
+  FROM ${table_name} 
+  WHERE username = ? 
+  OR user_id = ? 
+  LIMIT 1;`;
+  connection.query(set, [name, name], function (err, results, fields) {
+    console.log(results,fields);
+    
+    res.send({
+      status: 0,
+      message: "登录成功",
+    });
+    res.end(); // 结束响应
+  });
+});
 
 export default router;
