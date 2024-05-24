@@ -3,6 +3,7 @@ import { SECRET_KEY } from "./realdata/key";
 import jwt from "jsonwebtoken";
 import express from "express";
 import connection from "./dbmain";
+import { QueryResult } from "mysql2";
 
 const router = express.Router();
 // 哪个环境决定使用哪个环境的key
@@ -25,6 +26,28 @@ type RuleLoginForm = {
   password: string;
   resource: string;
 };
+
+export interface User {
+  id: number;
+  username: string;
+  password: string;
+  status: number;
+  descs: string;
+  gender: number;
+  user_id: string;
+  is_guest: number;
+  email: string;
+  phone_number: string;
+  registration_time: string;
+  last_time: string;
+  login_count: number;
+  is_active: number;
+  is_admin: number;
+  other_Information: string;
+  other_security: string;
+  user_agent: string;
+  token: string;
+}
 
 // 注册
 
@@ -65,8 +88,10 @@ router.post("/register", async (req, res) => {
   const other_security = JSON.stringify({
     ip: req.ip,
   });
+
   // 用户的其他信息
   const other_Information = JSON.stringify({});
+
   // 注册sql语句
   const set = `INSERT INTO ${table_name} (username,user_id, password, status,gender,descs,token,other_security,user_agent,other_Information) VALUES (?,?,?,?,?,?,?,?,?,?)`;
 
@@ -123,23 +148,77 @@ async function selectId(): Promise<string> {
 
 // // 用户名登录
 router.post("/login", async (req, res) => {
-  console.log(req.body);
-  const { name, password, resource, user_id }: RuleLoginForm = req.body;
-  // 查询name是用户名时找不找到，在查询是用户id时找不找到
-  let set = `SELECT * 
-  FROM ${table_name} 
-  WHERE username = ? 
-  OR user_id = ? 
-  LIMIT 1;`;
-  connection.query(set, [name, name], function (err, results, fields) {
-    console.log(results,fields);
-    
-    res.send({
-      status: 0,
-      message: "登录成功",
-    });
-    res.end(); // 结束响应
+  // console.log(req.body);
+  // 登录里的name有可能是user_id 也有可能是用户名
+
+  const { name, password, resource }: RuleLoginForm = req.body;
+  // 查询用户名
+  let nameObj: SelectUsernameAndIdResolve | null = null;
+  try {
+    nameObj = await selectUsernameAndId(name);
+  } catch (error) {
+    res.cc(error as Error);
+  }
+
+  console.log(nameObj);
+
+  res.send({
+    status: 0,
+    message: "登录成功",
   });
+  res.end(); // 结束响应
 });
+
+// 验证用户名/用户id
+router.post("/username", async (req, res) => {
+  // console.log(req.body);
+  // 登录里的name有可能是user_id 也有可能是用户名
+  const { name, password, resource }: RuleLoginForm = req.body;
+});
+
+// 验证用户名/用户id的处理resolve名
+interface SelectUsernameAndIdResolve {
+  results: QueryResult;
+  length: number;
+  status: number;
+  message: string;
+}
+// 验证用户名/用户id的处理函数
+function selectUsernameAndId(name: string) {
+  return new Promise(
+    (resolve: (value: SelectUsernameAndIdResolve) => void, reject) => {
+      // 查询name是用户名时找不找到后，再查询是用户id找不找到
+      let set = `SELECT * 
+      FROM ${table_name} 
+      WHERE username = ? 
+      OR user_id = ? 
+      LIMIT 1;`;
+
+      connection.query(set, [name, name], function (err, results, fields) {
+        // 登录错误处理
+        if (err) {
+          reject(err);
+        }
+        // console.log((results as User[]).length);
+        // 如果长度为1则找到，0则未找到
+        if ((results as User[]).length) {
+          resolve({
+            results,
+            length: (results as User[]).length,
+            status: 0,
+            message: `找到了${(results as User[]).length}个用户`,
+          });
+        } else {
+          resolve({
+            results,
+            length: (results as User[]).length,
+            status: 1,
+            message: "未找到用户名",
+          });
+        }
+      });
+    }
+  );
+}
 
 export default router;
