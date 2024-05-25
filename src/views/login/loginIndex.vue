@@ -2,7 +2,7 @@
 import { reactive, ref, onMounted, type Ref } from "vue";
 import { useRouter } from "vue-router";
 import type { FormInstance, FormRules } from "element-plus";
-import { commitUser ,loginUser} from "../../network/db";
+import { commitUser, loginUser } from "../../network/db";
 import { useRegister } from "../../stores/register";
 
 interface RuleForm {
@@ -159,10 +159,16 @@ const justSubmitForm = async (formEl: FormInstance | undefined) => {
 // 游客登录
 const submitGuestForm = async (formEl: FormInstance | undefined) => {
   if (!formEl) return;
-  await formEl.validate((valid, fields) => {
+  await formEl.validate(async (valid, fields) => {
     if (valid) {
       // 测试登录
-      loginUser(ruleForm)
+      const loginForm = {
+        ...ruleForm,
+        ...{ user_agent: useRegister().userAgent },
+      };
+      let res = await loginUser(loginForm);
+      console.log(res);
+
       // commitUser(ruleForm).then((res) => {
       //   console.log(res);
       // });
@@ -201,7 +207,7 @@ const resetForm = (formEl: FormInstance | undefined) => {
     </el-form-item>
 
     <div v-if="ruleForm.validate === '用户名登录'">
-      <el-form-item label="用户名" prop="name" >
+      <el-form-item label="用户名" prop="name">
         <el-input v-model="ruleForm.name" placeholder="输入用户名/用户id" />
       </el-form-item>
       <!-- 密码 -->

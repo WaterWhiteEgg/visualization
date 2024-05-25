@@ -5,7 +5,8 @@ export const commitUser = (json: object) => {
         url: "/db/register",
         data: json
     });
-};export const loginUser = (json: object) => {
+};
+export const loginUser = (json: object) => {
     return postRequest({
         url: "/db/login",
         data: json
