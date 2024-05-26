@@ -161,6 +161,8 @@ const submitForm = async (formEl: FormInstance | undefined) => {
         ...ruleForm,
         ...{ user_agent: useRegister().userAgent },
       };
+      // 加密密码
+      mergedForm.againPassword;
       console.log(mergedForm);
       commitUser(mergedForm);
     }

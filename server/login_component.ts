@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import express from "express";
 import connection from "./dbmain";
 import { QueryResult } from "mysql2";
-
+import bcrypt from "bcrypt";
 const router = express.Router();
 // 哪个环境决定使用哪个环境的key
 let secret_key = isDEV ? MYSECRET_KEY : SECRET_KEY;
@@ -85,6 +85,7 @@ router.post("/register", async (req, res) => {
   } catch (error) {
     id = "未查询到id";
     res.cc(error as Error);
+    res.end();
   }
 
   // 生成token
@@ -94,6 +95,9 @@ router.post("/register", async (req, res) => {
   // 用户的其他信息
   const other_Information = createOtherInformation();
 
+  // 生成加密过的密码
+  let hashPassword = await bcrypt.hash(againPassword, 10);
+
   // 注册sql语句
   const set = `INSERT INTO ${table_name} (username,user_id, password, status,gender,descs,token,other_security,user_agent,other_Information) VALUES (?,?,?,?,?,?,?,?,?,?)`;
 
@@ -102,7 +106,7 @@ router.post("/register", async (req, res) => {
     [
       name,
       id,
-      againPassword,
+      hashPassword,
       resource,
       region,
       desc,
@@ -119,7 +123,7 @@ router.post("/register", async (req, res) => {
 
       res.send({
         status: 0,
-        message: "插入成功",
+        message: "注册成功",
         token,
       });
       res.end(); // 结束响应
@@ -133,8 +137,8 @@ function createSecurity(ip?: string) {
   });
 }
 // 创建一个用户的其他信息
-function createOtherInformation() {
-  return JSON.stringify({});
+function createOtherInformation(obj: object = {}) {
+  return JSON.stringify(obj);
 }
 
 // 获取token
@@ -184,14 +188,21 @@ router.post("/login", async (req, res) => {
   }
   // 如果长度不为一则有问题，不允许登录
   if (nameOfObj?.length !== 1) {
-    res.send({
-      status: 1,
-      message: "登录失败，找不到具体用户",
-    });
+    res.cc("登录失败，找不到具体用户");
   }
   // 长度为一时
   else {
-    // 也就是成功这时候要额外提供token，并更新用户信息
+    // 也就是寻找成功，这时候要验证密码
+    let isOk = await bcrypt.compare(
+      password,
+      (nameOfObj.results as User[])[0].password
+    );
+    // 密码错误时
+    if (!isOk) {
+      res.cc("密码错误");
+    }
+
+    // 额外提供token，并更新用户信息
     // 生成token
     let token = generateToken({ name, resource });
 
@@ -218,12 +229,11 @@ router.post("/login", async (req, res) => {
       // 结束响应
       res.end();
     }
+
     // 判断用户信息是否更改成功
     if (updateUserRes?.status) {
-      res.send({
-        status: updateUserRes.status,
-        message: updateUserRes.message,
-      });
+      // 错误处理
+      res.cc(updateUserRes.message);
     }
     // 更新用户数据成功
     else {
