@@ -2,8 +2,11 @@
 import { reactive, ref, onMounted, type Ref } from "vue";
 import { useRouter } from "vue-router";
 import type { FormInstance, FormRules } from "element-plus";
-import { commitUser, loginUser } from "../../network/db";
+import { commitUser, loginUser, findUsername } from "../../network/db";
 import { useRegister } from "../../stores/register";
+import { debounce } from "@/assets/ts/debounce";
+import type { AxiosResponse } from "axios";
+
 
 interface RuleForm {
   name: string;
@@ -40,6 +43,36 @@ const ruleForm = reactive<RuleForm>({
   phone: null,
   phoneCode: null,
 });
+
+// 寻找用户名
+const useFindUsername = async (
+  rule: any,
+  value: any,
+  callback: any
+) => {
+  const findUsernameForm = {
+    ...ruleForm,
+  };
+  let res = debounce<
+    Promise<
+      AxiosResponse<{
+        status: number;
+      }>
+    >
+  >(async () => {
+    return await findUsername(findUsernameForm);
+  });
+  // 网络请求
+  let findUsernameRes = await res();
+  // console.log(findUsernameRes);
+
+  if (findUsernameRes.data.status) {
+    callback(new Error("用户名已存在"));
+  } else {
+    callback();
+  }
+};
+
 // 表单规则
 const rules = reactive<FormRules<RuleForm>>({
   name: [
@@ -52,6 +85,17 @@ const rules = reactive<FormRules<RuleForm>>({
     {
       pattern: /^\S{3,16}$/,
       message: "你只能在3-16的长度范围里命名",
+      trigger: "blur",
+    },
+    // 自定义校验规则
+    {
+      validator: useFindUsername as unknown as (
+        rule: any,
+        value: any,
+        callback: (error?: string | Error) => void,
+        source: any,
+        options: any
+      ) => void,
       trigger: "blur",
     },
   ],

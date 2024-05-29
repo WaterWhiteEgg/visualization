@@ -126,7 +126,9 @@ router.post("/register", async (req, res) => {
         message: "注册成功",
         token,
       });
-      res.end(); // 结束响应
+
+      // 结束响应
+      res.end();
     }
   );
 });
@@ -183,12 +185,13 @@ router.post("/login", async (req, res) => {
     nameOfObj = await selectUsernameAndId(name);
   } catch (error) {
     res.cc(error as Error);
-    // 结束响应
-    res.end();
   }
   // 如果长度不为一则有问题，不允许登录
   if (nameOfObj?.length !== 1) {
-    res.cc("登录失败，找不到具体用户");
+    res.send({
+      status: 1,
+      message:"登录失败，找不到具体用户",
+    });
   }
   // 长度为一时
   else {
@@ -199,49 +202,55 @@ router.post("/login", async (req, res) => {
     );
     // 密码错误时
     if (!isOk) {
-      res.cc("密码错误");
-    }
-
-    // 额外提供token，并更新用户信息
-    // 生成token
-    let token = generateToken({ name, resource });
-
-    // 更新该用户的信息
-    // 首先是获取一些寻找用户时记录的信息
-    const { user_id, login_count } = (nameOfObj.results as User[])[0];
-
-    // 更新用户信息
-    let updateUserRes: {
-      message: string;
-      status: number;
-    } | null = null;
-
-    try {
-      updateUserRes = await updateUser(
-        user_id,
-        token,
-        login_count,
-        user_agent,
-        req.ip
-      );
-    } catch (error) {
-      res.cc(error as Error);
-      // 结束响应
-      res.end();
-    }
-
-    // 判断用户信息是否更改成功
-    if (updateUserRes?.status) {
-      // 错误处理
-      res.cc(updateUserRes.message);
-    }
-    // 更新用户数据成功
-    else {
       res.send({
-        status: 0,
-        token,
-        message: "登录成功",
+        status: 1,
+        message: "密码错误",
       });
+    }
+    // 密码验证成功执行下一步
+    else {
+      // 额外提供token，并更新用户信息
+      // 生成token
+      let token = generateToken({ name, resource });
+
+      // 更新该用户的信息
+      // 首先是获取一些寻找用户时记录的信息
+      const { user_id, login_count } = (nameOfObj.results as User[])[0];
+
+      // 更新用户信息
+      let updateUserRes: {
+        message: string;
+        status: number;
+      } | null = null;
+
+      try {
+        updateUserRes = await updateUser(
+          user_id,
+          token,
+          login_count,
+          user_agent,
+          req.ip
+        );
+      } catch (error) {
+        res.cc(error as Error);
+      }
+
+      // 判断用户信息是否更改成功
+      if (updateUserRes?.status) {
+        // 错误处理
+        res.send({
+          status: 1,
+          message: updateUserRes.message,
+        });
+      }
+      // 更新用户数据成功
+      else {
+        res.send({
+          status: 0,
+          token,
+          message: "登录成功",
+        });
+      }
     }
   }
 
@@ -308,7 +317,30 @@ function updateUser(
 router.post("/username", async (req, res) => {
   // console.log(req.body);
   // 登录里的name有可能是user_id 也有可能是用户名
-  const { name, password, resource }: RuleLoginForm = req.body;
+  const { name }: RuleLoginForm = req.body;
+  // 查询用户名
+  let nameOfObj: SelectUsernameAndIdResolve | null = null;
+  // 查询selectUsernameAndId有没有内容
+  try {
+    nameOfObj = await selectUsernameAndId(name);
+  } catch (error) {
+    res.cc(error as Error);
+  }
+
+  // 如果长度小于一则没有问题，大于一则有重复的用户
+  if (nameOfObj?.length && nameOfObj.length >= 1) {
+    res.send({
+      status: 1,
+      message: "重复的用户名",
+    });
+  }
+  // 为空的情况
+  else {
+    res.send({
+      status: 0,
+      message: "未查找到重复的用户名",
+    });
+  }
 });
 
 // 验证用户名/用户id的处理resolve名

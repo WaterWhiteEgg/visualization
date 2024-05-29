@@ -36,19 +36,14 @@ onMounted(() => {
   }
   // 有数据就赋值
   else {
+    // 将之前获取的name更新到这里的表单
     ruleForm.name = registerData.value.name;
 
-    // 更新规则
-    rules.againPassword = [
-      { required: true, message: "请再次输入密码", trigger: "blur" },
-      {
-        pattern: new RegExp("^" + registerData.value.password + "$"),
-        message: "与上一个密码不重复",
-        trigger: "blur",
-      },
-    ];
+   
   }
 });
+
+
 
 // 配置表单大小
 const formSize = ref("default");
@@ -66,6 +61,19 @@ const ruleForm = reactive<RuleForm>({
   region: "0",
   desc: "",
 });
+
+// 再次判断密码
+const findAgainPassword =( rule: any,
+  value: any,
+  callback: any)=>{
+    // 判断密码是否重复
+    if(registerData.value.password !== ruleForm.againPassword){
+      callback(new Error("与上一个密码不相符"))
+    }else{
+      callback()
+    }
+  
+}
 // 表单规则
 const rules = reactive<FormRules<RuleForm>>({
   name: [
@@ -86,6 +94,18 @@ const rules = reactive<FormRules<RuleForm>>({
       message: "请输入6-18位数字或字母，不能有空格",
       trigger: "blur",
     },
+     // 自定义校验规则
+     {
+      validator: findAgainPassword as unknown as (
+        rule: any,
+        value: any,
+        callback: (error?: string | Error) => void,
+        source: any,
+        options: any
+      ) => void,
+      trigger: "blur",
+    },
+  
   ],
   email: [
     {
