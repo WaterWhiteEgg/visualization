@@ -7,9 +7,9 @@ import { QueryResult } from "mysql2";
 import bcrypt from "bcrypt";
 const router = express.Router();
 // 哪个环境决定使用哪个环境的key
-let secret_key = isDEV ? MYSECRET_KEY : SECRET_KEY;
+const secret_key = isDEV ? MYSECRET_KEY : SECRET_KEY;
 // 表名
-let table_name = "_user";
+const table_name = "_user";
 
 type RuleRegisterForm = {
   name: string;
@@ -89,14 +89,14 @@ router.post("/register", async (req, res) => {
   }
 
   // 生成token
-  let token = generateToken({ name, resource });
+  const token = generateToken({ name, resource });
   // 用户的网络信息
   const other_security = createSecurity(req.ip);
   // 用户的其他信息
   const other_Information = createOtherInformation();
 
   // 生成加密过的密码
-  let hashPassword = await bcrypt.hash(againPassword, 10);
+  const hashPassword = await bcrypt.hash(againPassword, 10);
 
   // 注册sql语句
   const set = `INSERT INTO ${table_name} (username,user_id, password, status,gender,descs,token,other_security,user_agent,other_Information) VALUES (?,?,?,?,?,?,?,?,?,?)`;
@@ -115,7 +115,7 @@ router.post("/register", async (req, res) => {
       user_agent,
       other_Information,
     ],
-    function (err, results, fields) {
+    function (err) {
       // 登录错误处理
       if (err) {
         return res.cc(err);
@@ -147,7 +147,7 @@ function createOtherInformation(obj: object = {}) {
 function generateToken(item: { name: string; resource: string }) {
   const { name, resource } = item;
   const expiresIn = resource === "1" ? "720h" : "60s";
-  let token = jwt.sign({ user: { name }, status: { resource } }, secret_key, {
+  const token = jwt.sign({ user: { name }, status: { resource } }, secret_key, {
     expiresIn,
   });
   return token;
@@ -158,7 +158,7 @@ async function selectId(): Promise<string> {
   const getId = `SELECT AUTO_INCREMENT AS id FROM information_schema.tables WHERE table_name = '${table_name}' AND table_schema = DATABASE()`;
 
   return new Promise((resolve, reject) => {
-    connection.query(getId, function (err, results, fields) {
+    connection.query(getId, function (err, results) {
       // 登录错误处理
       if (err) {
         reject(err);
@@ -196,7 +196,7 @@ router.post("/login", async (req, res) => {
   // 长度为一时
   else {
     // 也就是寻找成功，这时候要验证密码
-    let isOk = await bcrypt.compare(
+    const isOk = await bcrypt.compare(
       password,
       (nameOfObj.results as User[])[0].password
     );
@@ -211,7 +211,7 @@ router.post("/login", async (req, res) => {
     else {
       // 额外提供token，并更新用户信息
       // 生成token
-      let token = generateToken({ name, resource });
+      const token = generateToken({ name, resource });
 
       // 更新该用户的信息
       // 首先是获取一些寻找用户时记录的信息
@@ -288,7 +288,7 @@ function updateUser(
         other_Information,
         user_id,
       ],
-      function (err, results, fields) {
+      function (err, results) {
         // 登录错误处理
         if (err) {
           reject(err);
@@ -355,13 +355,13 @@ function selectUsernameAndId(name: string) {
   return new Promise(
     (resolve: (value: SelectUsernameAndIdResolve) => void, reject) => {
       // 查询name是用户名时找不找到后，再查询是用户id找不找到
-      let set = `SELECT * 
+      const set = `SELECT * 
       FROM ${table_name} 
       WHERE username = ? 
       OR user_id = ? 
       LIMIT 1;`;
 
-      connection.query(set, [name, name], function (err, results, fields) {
+      connection.query(set, [name, name], function (err, results) {
         // 登录错误处理
         if (err) {
           reject(err);

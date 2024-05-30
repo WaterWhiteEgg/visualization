@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, watch, type Ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { type ECElementEvent } from "echarts";
 import { getCitys } from "@/network/city";
 import { debounce } from "@/assets/ts/debounce";
@@ -12,8 +12,8 @@ import {
   redrawValue,
   inGetWeather,
 } from "@/assets/ts/initMap";
-import { initPie, myPicChart } from "@/assets/ts/initPie";
-import { initLine, myLineChart, redrawLineValue } from "@/assets/ts/initLine";
+import {  myPicChart } from "@/assets/ts/initPie";
+import {  myLineChart, redrawLineValue } from "@/assets/ts/initLine";
 import { changeAnimation } from "../../assets/ts/child/echartsAnimationFlag";
 
 import mapOfLeft from "./child/mapOfLeft.vue";

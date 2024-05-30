@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
-import { initPie, myPicChart } from "@/assets/ts/initPie";
-import { initLine, myLineChart, redrawLineValue } from "@/assets/ts/initLine";
-import { inGetWeather } from "@/assets/ts/initMap";
+import {  onMounted } from "vue";
+import { initPie } from "@/assets/ts/initPie";
+import { initLine } from "@/assets/ts/initLine";
 import { useCityArray } from "@/stores/item";
 
 // const props = withDefaults(

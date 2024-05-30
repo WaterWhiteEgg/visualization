@@ -18,7 +18,7 @@ const rightChooseCityWeather = (item: City) => {
 <template>
   <div
     class="view_right_table animated fadeInDown"
-    :class="{ hig: isHaddenBgc }"
+    :class="{ hig:props.isHaddenBgc }"
   >
     <table :class="{ 'bgc-hid': isHaddenBgc }">
       <tr>

@@ -1,9 +1,9 @@
 let timer: number | undefined;
 export function debounce<T>(
-  fun: (...args: any) => T,
+  fun: (...args: unknown[]) => T,
   delay: number = 300
 ) {
-  return function (this: unknown, ...args: any[]): Promise<T> {
+  return function (this: unknown, ...args: unknown[]): Promise<T> {
     if (timer) {
       clearTimeout(timer);
     }

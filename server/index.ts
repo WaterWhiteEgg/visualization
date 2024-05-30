@@ -30,7 +30,7 @@ app.use(
   expressjwt({
     secret: isDEV ? MYSECRET_KEY : SECRET_KEY,
     algorithms: ["HS256"], // 使用何种加密算法解析
-  }).unless({ path: [/^\/*/] }) // 登录页无需校验
+  }).unless({ path: [/^\/db\/*/, "/weather", "/city", "/ipcity", "/myip"] }) // 登录页无需校验
 );
 
 // 解析post的两个中间件

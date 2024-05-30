@@ -2,11 +2,10 @@
 import { reactive, ref, onMounted, type Ref } from "vue";
 import { useRouter } from "vue-router";
 import type { FormInstance, FormRules } from "element-plus";
-import { commitUser, loginUser, findUsername } from "../../network/db";
+import { loginUser, findUsername } from "../../network/db";
 import { useRegister } from "../../stores/register";
 import { debounce } from "@/assets/ts/debounce";
 import type { AxiosResponse } from "axios";
-
 
 interface RuleForm {
   name: string;
@@ -46,9 +45,9 @@ const ruleForm = reactive<RuleForm>({
 
 // 寻找用户名
 const useFindUsername = async (
-  rule: any,
-  value: any,
-  callback: any
+  rule: unknown,
+  value: unknown,
+  callback: (Error?: Error) => void
 ) => {
   const findUsernameForm = {
     ...ruleForm,
@@ -90,11 +89,11 @@ const rules = reactive<FormRules<RuleForm>>({
     // 自定义校验规则
     {
       validator: useFindUsername as unknown as (
-        rule: any,
-        value: any,
+        rule: unknown,
+        value: unknown,
         callback: (error?: string | Error) => void,
-        source: any,
-        options: any
+        source: unknown,
+        options: unknown
       ) => void,
       trigger: "blur",
     },

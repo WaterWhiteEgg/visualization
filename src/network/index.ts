@@ -1,10 +1,9 @@
 import axios from "axios";
-import { useRegister } from "../stores/register";
 import { useToken } from "../stores/token";
 
 // 高德，聚何ip，api,仅在生产模式编译
 import { key } from "./realdata/key";
-import { inkey } from "./key";
+// import { inkey } from "./key";
 type Option = {
   url: string;
   params?: object;
