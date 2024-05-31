@@ -18,8 +18,8 @@ interface RuleForm {
   email: string;
   validate: string;
   emailCode: string;
-  phone: null | number;
-  phoneCode: null | number;
+  phone: null | string;
+  phoneCode: null | string;
   region: string;
   desc: string;
 }
@@ -52,8 +52,8 @@ const ruleForm = reactive<RuleForm>({
   email: "",
   validate: "邮箱验证",
   emailCode: "",
-  phone: null,
-  phoneCode: null,
+  phone: "",
+  phoneCode: "",
   region: "0",
   desc: "",
 });
@@ -70,7 +70,7 @@ const findAgainPassword = (rule: unknown, value: unknown, callback: (Error?:Erro
 // 表单规则
 const rules = reactive<FormRules<RuleForm>>({
   name: [
-    { required: true, message: "请输入账户名", trigger: "blur" },
+    { required: false, message: "请输入账户名", trigger: "blur" },
     {
       min: 3,
       max: 12,
@@ -80,7 +80,7 @@ const rules = reactive<FormRules<RuleForm>>({
     },
   ],
   againPassword: [
-    { required: true, message: "请再次输入密码", trigger: "blur" },
+    { required: true, message: "请再-次输入密码", trigger: "blur" },
     {
       pattern:
         /^(?=.*[0-9])(?=.*[a-zA-Z])[\da-zA-Z!@#$%^&*()+=\\[\]{}|:;"'<>,.?/]{6,18}$/,
@@ -153,12 +153,6 @@ const rules = reactive<FormRules<RuleForm>>({
       trigger: ["blur", "change"],
     },
   ],
-  region: [
-    {
-      message: "",
-      trigger: "change",
-    },
-  ],
   desc: [{ required: false, message: "填写你的简介", trigger: "blur" }],
 });
 
@@ -176,7 +170,12 @@ const submitForm = async (formEl: FormInstance | undefined) => {
       // 加密密码
       mergedForm.againPassword;
       console.log(mergedForm);
-      commitUser(mergedForm);
+      commitUser(mergedForm).then((res)=>{
+        console.log(res);
+      }).catch((err)=>{
+        console.log(err);
+        
+      })
     }
     // 规则错误
     else {

@@ -5,6 +5,10 @@ import express from "express";
 import connection from "./dbmain";
 import { QueryResult } from "mysql2";
 import bcrypt from "bcrypt";
+// 表单验证
+import expressJoi from "@escook/express-joi";
+import { VdRegister } from "./middleware/validationForm";
+
 const router = express.Router();
 // 哪个环境决定使用哪个环境的key
 const secret_key = isDEV ? MYSECRET_KEY : SECRET_KEY;
@@ -65,9 +69,8 @@ export interface User {
 
 // 关于性别：数据库表现是男为0，女为1，其他为2
 
-router.post("/register", async (req, res) => {
-  // 数据打印查看
-  // console.log(req.body);
+router.post("/register",expressJoi(VdRegister) , async (req, res) => {
+ 
   // 解构获取的数据
   const {
     name,
@@ -190,7 +193,7 @@ router.post("/login", async (req, res) => {
   if (nameOfObj?.length !== 1) {
     res.send({
       status: 1,
-      message:"登录失败，找不到具体用户",
+      message: "登录失败，找不到具体用户",
     });
   }
   // 长度为一时
