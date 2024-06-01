@@ -1,10 +1,13 @@
 <script lang="ts" setup>
+import { debounce } from "@/assets/ts/debounce";
+import type { AxiosResponse } from "axios";
 import { reactive, ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import type { FormInstance, FormRules } from "element-plus";
 import { useRegister } from "../../stores/register";
 import { usePopup } from "../../stores/popup";
 import { commitUser } from "../../network/db";
+import { findUsername } from "../../network/db";
 
 const registerData = ref<{
   name: string;
@@ -58,8 +61,15 @@ const ruleForm = reactive<RuleForm>({
   desc: "",
 });
 
+
+// 表单规则
+
 // 再次判断密码
-const findAgainPassword = (rule: unknown, value: unknown, callback: (Error?:Error)=>void) => {
+const findAgainPassword = (
+  rule: unknown,
+  value: unknown,
+  callback: (Error?: Error) => void
+) => {
   // 判断密码是否重复
   if (registerData.value.password !== ruleForm.againPassword) {
     callback(new Error("与上一个密码不相符"));
@@ -67,7 +77,36 @@ const findAgainPassword = (rule: unknown, value: unknown, callback: (Error?:Erro
     callback();
   }
 };
-// 表单规则
+// 寻找用户名
+const useFindUsername = async (
+  rule: unknown,
+  value: unknown,
+  callback: (Error?: Error) => void
+) => {
+  const findUsernameForm = {
+    ...ruleForm,
+  };
+  let res = debounce<
+    Promise<
+      AxiosResponse<{
+        status: number;
+      }>
+    >
+  >(async () => {
+    return await findUsername(findUsernameForm);
+  });
+  // 网络请求
+  let findUsernameRes = await res();
+  // console.log(findUsernameRes);
+
+  if (findUsernameRes.data.status) {
+    callback(new Error("用户名已存在"));
+  } else {
+    callback();
+  }
+};
+
+// 表单
 const rules = reactive<FormRules<RuleForm>>({
   name: [
     { required: false, message: "请输入账户名", trigger: "blur" },
@@ -76,6 +115,17 @@ const rules = reactive<FormRules<RuleForm>>({
       max: 12,
       pattern: /^[^\s~!@#$%^&*()_+`\-={}[\]:;"'<>,.?/]+$/,
       message: "请输入正确的账户名",
+      trigger: "blur",
+    },
+    // 自定义校验规则
+    {
+      validator: useFindUsername as unknown as (
+        rule: unknown,
+        value: unknown,
+        callback: (error?: string | Error) => void,
+        source: unknown,
+        options: unknown
+      ) => void,
       trigger: "blur",
     },
   ],
@@ -168,14 +218,14 @@ const submitForm = async (formEl: FormInstance | undefined) => {
         ...{ user_agent: useRegister().userAgent },
       };
       // 加密密码
-      mergedForm.againPassword;
       console.log(mergedForm);
-      commitUser(mergedForm).then((res)=>{
-        console.log(res);
-      }).catch((err)=>{
-        console.log(err);
-        
-      })
+      commitUser(mergedForm)
+        .then((res) => {
+          console.log(res);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     }
     // 规则错误
     else {

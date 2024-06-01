@@ -7,7 +7,7 @@ import { QueryResult } from "mysql2";
 import bcrypt from "bcrypt";
 // 表单验证
 import expressJoi from "@escook/express-joi";
-import { VdRegister } from "./middleware/validationForm";
+import { VdRegister, VdLogin, VdUsername } from "./middleware/validationForm";
 
 const router = express.Router();
 // 哪个环境决定使用哪个环境的key
@@ -16,12 +16,18 @@ const secret_key = isDEV ? MYSECRET_KEY : SECRET_KEY;
 const table_name = "_user";
 
 type RuleRegisterForm = {
-  name: string;
-  region: string;
-  againPassword: string;
-  resource: string;
-  desc: string;
   user_agent: string;
+  name: string;
+  againPassword: string;
+  email: string;
+  validate: string;
+  emailCode: string;
+  phone: null | string;
+  phoneCode: null | string;
+  region: string;
+  desc: string;
+  password: string;
+  resource: string;
 };
 
 type RuleLoginForm = {
@@ -69,8 +75,7 @@ export interface User {
 
 // 关于性别：数据库表现是男为0，女为1，其他为2
 
-router.post("/register",expressJoi(VdRegister) , async (req, res) => {
- 
+router.post("/register", expressJoi(VdRegister), async (req, res) => {
   // 解构获取的数据
   const {
     name,
@@ -80,6 +85,8 @@ router.post("/register",expressJoi(VdRegister) , async (req, res) => {
     region,
     user_agent,
   }: RuleRegisterForm = req.body;
+
+  console.log(req.body);
 
   // 查询下一个唯一id
   let id: string;
@@ -158,7 +165,7 @@ function generateToken(item: { name: string; resource: string }) {
 
 // 查询下一个可用的自增ID
 async function selectId(): Promise<string> {
-  const getId = `SELECT AUTO_INCREMENT AS id FROM information_schema.tables WHERE table_name = '${table_name}' AND table_schema = DATABASE()`;
+  const getId = `SELECT MAX(id) AS id FROM ${table_name}`;
 
   return new Promise((resolve, reject) => {
     connection.query(getId, function (err, results) {
@@ -168,15 +175,18 @@ async function selectId(): Promise<string> {
         return;
       }
       // 获取id
+
       const TSres = results as { id: number }[];
-      resolve(`w${10000 + TSres[0].id}`);
+      // console.log(TSres);
+      // 决定user_id格式，w+10000+自增id下一个数字
+      resolve(`w${10000 + TSres[0].id + 1}`);
       // console.log(id);
     });
   });
 }
 
 // 用户名登录
-router.post("/login", async (req, res) => {
+router.post("/login", expressJoi(VdLogin), async (req, res) => {
   // console.log(req.body);
   // 登录里的name有可能是user_id 也有可能是用户名
 
@@ -317,7 +327,7 @@ function updateUser(
 }
 
 // 验证用户名/用户id
-router.post("/username", async (req, res) => {
+router.post("/username", expressJoi(VdUsername), async (req, res) => {
   // console.log(req.body);
   // 登录里的name有可能是user_id 也有可能是用户名
   const { name }: RuleLoginForm = req.body;
