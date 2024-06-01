@@ -84,6 +84,10 @@ router.post("/register", expressJoi(VdRegister), async (req, res) => {
     desc,
     region,
     user_agent,
+    email,
+    emailCode,
+    phone,
+    phoneCode,
   }: RuleRegisterForm = req.body;
 
   console.log(req.body);

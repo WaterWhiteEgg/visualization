@@ -1,6 +1,8 @@
 import { postRequest } from "./index";
 
 export const commitUser = (json: object) => {
+  console.log(json);
+  
   return postRequest({
     url: "/db/register",
     data: json,

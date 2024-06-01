@@ -10,7 +10,7 @@ const name = Joi.string()
   .regex(/^[^\s~!@#$%^&*()_+`\-={}[\]:;"'<>,.?/]+$/)
   .required();
 
-  const password = Joi.string()
+const password = Joi.string()
   .min(6)
   .max(18)
   .regex(
@@ -29,12 +29,22 @@ const againPassword = Joi.string()
 const email = Joi.string()
   .email()
   .regex(/^[\w-.]+@(qq|163|gmail)\.com$/);
+const emailCanNull = Joi.string().allow("");
 
 const emailCode = Joi.string().regex(/^[a-zA-Z0-9]{8}$/);
+const emailCodeCanNull = Joi.string()
+  .regex(/^[a-zA-Z0-9]{8}$/)
+  .allow("");
 
 const phone = Joi.string().regex(/^1[3-9]\d{9}$/);
+const phoneCanNull = Joi.string()
+  .regex(/^1[3-9]\d{9}$/)
+  .allow("");
 
 const phoneCode = Joi.string().regex(/^\d{6}$/);
+const phoneCodeCanNull = Joi.string()
+  .regex(/^\d{6}$/)
+  .allow("");
 
 const resource = Joi.string().allow("");
 
@@ -51,11 +61,13 @@ export const VdRegister = {
     resource,
     user_agent,
     desc,
-    region
-    
+    region,
+    email: emailCanNull,
+    emailCode: emailCodeCanNull,
+    phone: phoneCanNull,
+    phoneCode: phoneCodeCanNull,
   },
 };
-
 
 // 登录表单验证
 export const VdLogin = {
@@ -63,10 +75,9 @@ export const VdLogin = {
     name,
     password,
     resource,
-    user_agent,    
+    user_agent,
   },
 };
-
 
 // 用户名验证
 export const VdUsername = {
@@ -74,4 +85,3 @@ export const VdUsername = {
     name,
   },
 };
-
