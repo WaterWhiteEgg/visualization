@@ -61,7 +61,6 @@ const ruleForm = reactive<RuleForm>({
   desc: "",
 });
 
-
 // 表单规则
 
 // 再次判断密码
@@ -109,14 +108,18 @@ const useFindUsername = async (
 // 表单
 const rules = reactive<FormRules<RuleForm>>({
   name: [
-    { required: false, message: "请输入账户名", trigger: "blur" },
+    { required: true, message: "请输入账户名", trigger: "blur" },
     {
-      min: 3,
-      max: 12,
       pattern: /^[^\s~!@#$%^&*()_+`\-={}[\]:;"'<>,.?/]+$/,
-      message: "请输入正确的账户名",
+      message: "存在特殊字符",
       trigger: "blur",
     },
+    {
+      pattern: /^\S{3,16}$/,
+      message: "你只能在3-16的长度范围里命名",
+      trigger: "blur",
+    },
+
     // 自定义校验规则
     {
       validator: useFindUsername as unknown as (
