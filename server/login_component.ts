@@ -8,7 +8,7 @@ import bcrypt from "bcrypt";
 // 表单验证
 import expressJoi from "@escook/express-joi";
 import { VdRegister, VdLogin, VdUsername } from "./middleware/validationForm";
-
+import { verifyEmail } from "./email/emailRouter";
 const router = express.Router();
 // 哪个环境决定使用哪个环境的key
 const secret_key = isDEV ? MYSECRET_KEY : SECRET_KEY;
@@ -88,9 +88,13 @@ router.post("/register", expressJoi(VdRegister), async (req, res) => {
     emailCode,
     phone,
     phoneCode,
+    validate,
   }: RuleRegisterForm = req.body;
 
-  console.log(req.body);
+  // console.log(req.body);
+  // 验证登录方式，且验证是否通过
+
+  switchLogin(validate, { email });
 
   // 查询下一个唯一id
   let id: string;
@@ -165,6 +169,26 @@ function generateToken(item: { name: string; resource: string }) {
     expiresIn,
   });
   return token;
+}
+
+// 查询使用什么登录/注册账号
+function switchLogin(validate: string, data: { email?: string }) {
+  switch (validate) {
+    case "邮箱验证":
+      verifyEmail(data.email || "").then((res)=>{console.log(res);
+      }).catch((err)=>{console.log(err);
+      })
+      break;
+    case "手机认证":
+      console.log("手机认证不支持");
+
+      break;
+
+    default:
+      console.log("账户登录");
+      break;
+  }
+
 }
 
 // 查询下一个可用的自增ID
