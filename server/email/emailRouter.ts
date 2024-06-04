@@ -28,6 +28,8 @@ export function verifyEmail(userEmail: string) {
       //   没有问题则返回成功
       if (saveEmail === userEmail) {
         resolve({ status: 0, email: saveEmail, message: "验证成功" });
+      }else{
+        reject({ status: 1, error:"未知错误。。。难道还能数据不一样的？" });
       }
     } catch (error) {
       // 处理/验证失败
