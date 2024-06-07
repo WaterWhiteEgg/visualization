@@ -49,6 +49,7 @@ export interface ResultSetHeader {
   changedRows: number;
 }
 
+// 数据库列表数据
 export interface User {
   id: number;
   username: string;
@@ -94,7 +95,7 @@ router.post("/register", expressJoi(VdRegister), async (req, res) => {
   // console.log(req.body);
   // 验证登录方式，且验证是否通过
 
-  switchLogin(validate, { email });
+  const validateRes = await switchLogin(validate, { email });
 
   // 查询下一个唯一id
   let id: string;
@@ -173,11 +174,18 @@ function generateToken(item: { name: string; resource: string }) {
 
 // 查询使用什么登录/注册账号
 function switchLogin(validate: string, data: { email?: string }) {
+  let inValidateRes: object = { status: 1, message: "没有处理结果" };
   switch (validate) {
     case "邮箱验证":
-      verifyEmail(data.email || "").then((res)=>{console.log(res);
-      }).catch((err)=>{console.log(err);
-      })
+      verifyEmail(data.email || "")
+        .then((res) => {
+          inValidateRes = res as object;
+          return inValidateRes;
+        })
+        .catch((err) => {
+          console.log(err);
+          return err;
+        });
       break;
     case "手机认证":
       console.log("手机认证不支持");
@@ -188,7 +196,6 @@ function switchLogin(validate: string, data: { email?: string }) {
       console.log("账户登录");
       break;
   }
-
 }
 
 // 查询下一个可用的自增ID
