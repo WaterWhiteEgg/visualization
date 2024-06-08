@@ -39,4 +39,5 @@ export function verifyEmail(userEmail: string) {
   });
 }
 
+
 export default router;

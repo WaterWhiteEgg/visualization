@@ -3,6 +3,7 @@ import { SECRET_KEY } from "./realdata/key";
 import jwt from "jsonwebtoken";
 import express from "express";
 import connection from "./dbmain";
+import CLIENT from "./redis/index";
 import { QueryResult } from "mysql2";
 import bcrypt from "bcrypt";
 // 表单验证
@@ -14,7 +15,15 @@ const router = express.Router();
 const secret_key = isDEV ? MYSECRET_KEY : SECRET_KEY;
 // 表名
 const table_name = "_user";
+async function a() {
+  // 测试
+  console.log(CLIENT);
 
+  await CLIENT.set("key", "2222");
+  const value = await CLIENT.get("key");
+  console.log(value);
+}
+a()
 type RuleRegisterForm = {
   user_agent: string;
   name: string;
