@@ -26,13 +26,13 @@ export const againPassword = Joi.string()
   )
   .required();
 
-export const email = Joi.string()
+export const emailJoi = Joi.string()
   .email()
   .regex(/^[\w-.]+@(qq|163|gmail)\.com$/);
-export const emailCanNull = Joi.string().allow("");
+export const emailJoiCanNull = Joi.string().allow("");
 
-export const emailCode = Joi.string().regex(/^[a-zA-Z0-9]{8}$/);
-export const emailCodeCanNull = Joi.string()
+export const emailCodeJoi = Joi.string().regex(/^[a-zA-Z0-9]{8}$/);
+export const emailCodeJoiCanNull = Joi.string()
   .regex(/^[a-zA-Z0-9]{8}$/)
   .allow("");
 
@@ -65,8 +65,8 @@ export const VdRegister = {
     user_agent,
     desc,
     region,
-    email: emailCanNull,
-    emailCode: emailCodeCanNull,
+    email: emailJoiCanNull,
+    emailCode: emailCodeJoiCanNull,
     phone: phoneCanNull,
     phoneCode: phoneCodeCanNull,
     validate,
@@ -92,5 +92,5 @@ export const VdUsername = {
 
 // 邮箱验证，非body传入数据
 export const VdEmailNoBody = {
-  email,
+  emailJoi,
 };

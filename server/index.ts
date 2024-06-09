@@ -10,6 +10,7 @@ import { error } from "./middleware/error";
 import router from "./router";
 import loginComponent from "./login_component";
 import weatherRouter from "./weather";
+import emailRouter from "./email/emailRouter";
 
 const corsOptions: CorsOptions = {
   origin: [],
@@ -30,7 +31,7 @@ app.use(
   expressjwt({
     secret: isDEV ? MYSECRET_KEY : SECRET_KEY,
     algorithms: ["HS256"], // 使用何种加密算法解析
-  }).unless({ path: [/^\/db\/*/, "/weather", "/city", "/ipcity", "/myip"] }) // 登录页无需校验
+  }).unless({ path: [/^\/db\/*/,/^\/email\/*/, "/weather", "/city", "/ipcity", "/myip"] }) // 登录页无需校验
 );
 
 // 解析post的两个中间件
@@ -41,6 +42,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(router);
 app.use(weatherRouter);
 app.use("/db/", loginComponent);
+app.use("/email/", emailRouter);
 
 app.listen(2000, () => {
   console.log("mode is " + process.env.NODE_ENV);
