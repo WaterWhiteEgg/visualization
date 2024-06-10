@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import express from "express";
-import Joi, { Err } from "joi";
+import Joi from "joi";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
 // 表单验证
@@ -45,8 +45,8 @@ function generateRandomCode(length: number, math: boolean = false) {
 
     // 长度实在不够就加一个随机值
     if (hexString.length < length) {
-      let min = Math.pow(10, length - 1); // 最小值为 10^(length-1)
-      let max = Math.pow(10, length) - 1; // 最大值为 10^length - 1
+      const min = Math.pow(10, length - 1); // 最小值为 10^(length-1)
+      const max = Math.pow(10, length) - 1; // 最大值为 10^length - 1
       // 包括最大值和最小值
       hexString =
         hexString +
@@ -70,7 +70,7 @@ export function sendEmailCode(email: string, code: string) {
   };
 
   // 发送验证码
-  transporter.sendMail(mailOptions, (error, info) => {
+  transporter.sendMail(mailOptions, (error) => {
     if (error) {
       // 报错
       console.log(error);
@@ -92,15 +92,19 @@ export function sendEmailCode(email: string, code: string) {
 // 验证邮箱格式函数
 // allowUnknown - 如果为 true，则允许对象包含被忽略的未知键。 默认为 false。 // abortEarly - 当为真时，停止对第一个错误的验证，否则返回找到的所有错误。 默认为  true。
 export function verifyEmail(userEmail: string) {
-  return new Promise(async (resolve, reject) => {
+  return new Promise((resolve, reject) => {
     try {
-      const saveEmail = await emailJoi.validateAsync(userEmail);
-      //   没有问题则返回成功
-      if (saveEmail === userEmail) {
-        resolve({ status: 0, email: saveEmail, message: "验证成功" });
-      } else {
-        reject({ status: 1, error: "未知错误。。。难道还能数据不一样的？" });
-      }
+      let saveEmail: string;
+      // 验证
+      emailJoi.validateAsync(userEmail).then((res) => {
+        saveEmail = res;
+        //   没有问题则返回成功
+        if (saveEmail === userEmail) {
+          resolve({ status: 0, email: saveEmail, message: "验证成功" });
+        } else {
+          reject({ status: 1, error: "未知错误。。。难道还能数据不一样的？" });
+        }
+      });
     } catch (error) {
       // 处理/验证失败
       //   console.log(error);

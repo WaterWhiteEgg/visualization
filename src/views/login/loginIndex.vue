@@ -2,7 +2,7 @@
 import { reactive, ref, onMounted, type Ref } from "vue";
 import { useRouter } from "vue-router";
 import type { FormInstance, FormRules } from "element-plus";
-import { loginUser, findUsername } from "../../network/db";
+import { loginUser } from "../../network/db";
 import { useRegister } from "../../stores/register";
 
 

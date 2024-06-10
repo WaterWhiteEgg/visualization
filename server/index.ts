@@ -7,9 +7,9 @@ import { SECRET_KEY } from "./realdata/key";
 
 import { error } from "./middleware/error";
 
-import router from "./router";
-import loginComponent from "./login_component";
-import weatherRouter from "./weather";
+import router from "./router/router";
+import loginComponent from "./login_component/login_component";
+import weatherRouter from "./router/weather";
 import emailRouter from "./email/emailRouter";
 
 const corsOptions: CorsOptions = {

@@ -1,7 +1,7 @@
 // 初始化仓库,输入你的mysql所在的服务器地址，注册的用户名，密码，使用的数据库
 import mysql from "mysql2";
-import CONNECTION from "./realdata/realOption";
-import { isDEV } from "./key";
+import CONNECTION from "../realdata/realOption";
+import { isDEV } from "../key";
 
 // 创建数据库链接
 function mysqlCreate(option: {
@@ -25,7 +25,12 @@ const connection = isDEV
 
 // console.log(connection);
 
-
 connection.connect();
+
+// 监听错误事件
+connection.on("error", (err) => {
+  console.error(err);
+  console.log("mysql 数据库系统连接失败，请检查错误详情");
+});
 
 export default connection;

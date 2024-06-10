@@ -2,8 +2,8 @@ import express from "express";
 import type { Router } from "express";
 import axios from "axios";
 
-import { key } from "./realdata/key";
-import { MYkey, isDEV } from "./key";
+import { key } from "../realdata/key";
+import { MYkey, isDEV } from "../key";
 const weatherRouter: Router = express.Router();
 
 weatherRouter.get("/weather", async (req, res) => {

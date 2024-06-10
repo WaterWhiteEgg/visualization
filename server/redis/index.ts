@@ -8,8 +8,10 @@ const doCreateClient = () => {
     // 错误处理
     client.on("error", (err) => {
       console.log(err);
+      console.log("redis 缓存系统启动失败，请检查错误详情");
+      client.quit();
       // 在异步函数中抛出异常
-      throw new Error(err);
+      // throw new Error(err);
     });
 
     // 开启
@@ -19,7 +21,7 @@ const doCreateClient = () => {
 
     return client;
   } catch (err) {
-    console.error("发生错误：", err);
+    console.error("创建redis时发生错误：", err);
 
     // 可以根据实际情况进行错误处理
     return err as never

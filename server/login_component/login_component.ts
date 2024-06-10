@@ -1,29 +1,21 @@
-import { MYSECRET_KEY, isDEV } from "./key";
-import { SECRET_KEY } from "./realdata/key";
+import { MYSECRET_KEY, isDEV } from "../key";
+import { SECRET_KEY } from "../realdata/key";
 import jwt from "jsonwebtoken";
 import express from "express";
-import connection from "./dbmain";
-import CLIENT from "./redis/index";
+import connection from "../db/dbmain";
+// import CLIENT from "../redis/index";
 import { QueryResult } from "mysql2";
 import bcrypt from "bcrypt";
 // 表单验证
 import expressJoi from "@escook/express-joi";
-import { VdRegister, VdLogin, VdUsername } from "./middleware/validationForm";
-import { verifyEmail } from "./email/emailRouter";
+import { VdRegister, VdLogin, VdUsername } from "../middleware/validationForm";
+import { verifyEmail } from "../email/emailRouter";
 const router = express.Router();
 // 哪个环境决定使用哪个环境的key
 const secret_key = isDEV ? MYSECRET_KEY : SECRET_KEY;
 // 表名
 const table_name = "_user";
-async function a() {
-  // 测试
-  console.log(CLIENT);
 
-  await CLIENT.set("key", "2222");
-  const value = await CLIENT.get("key");
-  console.log(value);
-}
-a()
 type RuleRegisterForm = {
   user_agent: string;
   name: string;

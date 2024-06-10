@@ -1,9 +1,9 @@
 import express from "express";
 import axios from "axios";
 import type { Router } from "express";
-import { MYkey, MYIPkey } from "./key";
-import { IPkey, key } from "./realdata/key";
-import { isDEV } from "./key";
+import { MYkey, MYIPkey } from "../key";
+import { IPkey, key } from "../realdata/key";
+import { isDEV } from "../key";
 const router: Router = express.Router();
 
 
