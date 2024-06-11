@@ -91,5 +91,11 @@ export const VdUsername = {
 
 // 邮箱验证，非body传入数据
 export const VdEmailNoBody = {
-  emailJoi,
+  email: emailJoi,
+};
+// 邮箱验证
+export const VdEmail = {
+  body: {
+    email: emailJoi,
+  },
 };

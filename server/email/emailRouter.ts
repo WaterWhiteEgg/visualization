@@ -3,30 +3,50 @@ import express from "express";
 import Joi from "joi";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
+
+import CLIENT from "../redis/index";
+
 // 表单验证
 import expressJoi from "@escook/express-joi";
 // 邮箱验证
 import { transporter, useQQEmail } from "./index";
-import { emailJoi } from "../middleware/validationForm";
+import { emailJoi, VdEmail } from "../middleware/validationForm";
+import { ResRej } from "../middleware/middleware";
 const router = express.Router();
 
 // 发送验证码
-router.post("/emailCode", async (req, res) => {
+router.post("/emailCode", expressJoi(VdEmail), async (req, res) => {
   // 收集数据
   const { email }: { email: string } = req.body;
   // 生成随机验证码
   const code = generateRandomCode(8);
-  console.log(code);
+  // console.log(code);
 
   // 发送验证码
+  let sendEmailCodeRes = { status: 1, message: "没有数据" };
   try {
-    sendEmailCode(email, code);
+    sendEmailCodeRes = await sendEmailCode(email, code);
   } catch (error) {
     // 错误处理
     res.cc(error as Error);
   }
+  // 如果status显示有问题
+  if (sendEmailCodeRes.status) {
+    res.cc(sendEmailCodeRes.message);
+  }
 
-  res.send({});
+  // 储存到resis并维持5分钟
+
+  try {
+    await CLIENT.setEx(email, 300, code);
+  } catch (error) {
+    res.cc(error as string);
+  }
+
+  res.send({
+    status: 0,
+    message: "建立成功",
+  });
 });
 
 // 随机生成验证码
@@ -60,32 +80,34 @@ function generateRandomCode(length: number, math: boolean = false) {
 }
 
 // 发送验证码处理函数
-export function sendEmailCode(email: string, code: string) {
+export function sendEmailCode(email: string, code: string): Promise<ResRej> {
   // 创建信息表单
   const mailOptions = {
     from: useQQEmail, // 发件人邮箱地址
     to: email, // 收件人邮箱地址
     subject: "（可视化天气向你）发送验证码", // 邮件主题
-    text: `你的验证码是 ${code}. 请在5分钟内进行验证，如果没有请求过，请忽略`, // 邮件正文
+    text: `你的验证码是 ${code} 请在5分钟内进行验证，网络可能存在一定延时，如果没有请求过，请忽略`, // 邮件正文
   };
 
   // 发送验证码
-  transporter.sendMail(mailOptions, (error) => {
-    if (error) {
-      // 报错
-      console.log(error);
-      Promise.reject({
-        status: 1,
-        message: "邮箱验证失败",
-      });
-    }
-    // 成功发送
-    else {
-      Promise.resolve({
-        status: 0,
-        message: "邮箱验证成功",
-      });
-    }
+  return new Promise((resolve, reject) => {
+    transporter.sendMail(mailOptions, (error) => {
+      if (error) {
+        // 报错
+        console.log(error);
+        reject({
+          status: 1,
+          message: "邮箱验证失败",
+        });
+      }
+      // 成功发送
+      else {
+        resolve({
+          status: 0,
+          message: "邮箱验证成功",
+        });
+      }
+    });
   });
 }
 

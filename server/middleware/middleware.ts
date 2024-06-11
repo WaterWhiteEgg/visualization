@@ -4,4 +4,10 @@
 //   next();
 // };
 
+// 默认res，req格式
+export type ResRej = {
+  status: 0 | 1;
+  message: string;
+};
+
 export {};
