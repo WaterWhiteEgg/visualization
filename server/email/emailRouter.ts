@@ -43,6 +43,8 @@ router.post("/emailCode", expressJoi(VdEmail), async (req, res) => {
     res.cc(error as string);
   }
 
+  console.log("q");
+  
   res.send({
     status: 0,
     message: "建立成功",

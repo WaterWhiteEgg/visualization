@@ -70,17 +70,39 @@ body {
     Inter,
     -apple-system,
     BlinkMacSystemFont,
-    'Segoe UI',
+    "Segoe UI",
     Roboto,
     Oxygen,
     Ubuntu,
     Cantarell,
-    'Fira Sans',
-    'Droid Sans',
-    'Helvetica Neue',
+    "Fira Sans",
+    "Droid Sans",
+    "Helvetica Neue",
     sans-serif;
   font-size: 15px;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* 默认按钮样式 */
+button {
+  padding: 1vh 2vw; /* 内边距 */
+  margin: 0 1vw;
+  border: none; /* 去掉默认边框 */
+  font-size:1rem; /* 字体大小 */
+
+  background-color: #ffffff; /* 背景色 */
+  color: #787878; /* 文字颜色 */
+  border-radius: 35px; /* 圆角 */
+  box-shadow: 1px 4px 4px rgba(0, 0, 0, 0.1); /* 阴影效果 */
+  cursor: pointer; /* 鼠标指针样式 */
+  transition:
+    background-color 0.3s ease,
+    box-shadow 0.3s ease; /* 动画过渡 */
+}
+
+button:hover {
+  background-color: #ebebeb; /* 悬停背景色 */
+  box-shadow: 1px 4px 6px rgba(0, 0, 0, 0.2); /* 悬停阴影效果 */
 }

@@ -5,7 +5,6 @@ import type { FormInstance, FormRules } from "element-plus";
 import { loginUser } from "../../network/db";
 import { useRegister } from "../../stores/register";
 
-
 interface RuleForm {
   name: string;
   password: string;
@@ -42,8 +41,6 @@ const ruleForm = reactive<RuleForm>({
   phoneCode: null,
 });
 
-
-
 // 表单规则
 const rules = reactive<FormRules<RuleForm>>({
   name: [
@@ -58,7 +55,6 @@ const rules = reactive<FormRules<RuleForm>>({
       message: "你只能在3-16的长度范围里命名",
       trigger: "blur",
     },
-
   ],
   password: [
     { required: true, message: "请输入密码", trigger: "blur" },
@@ -240,6 +236,7 @@ const resetForm = (formEl: FormInstance | undefined) => {
           show-password
         >
         </el-input>
+        <button class="code_input_button">获取验证码</button>
       </el-form-item>
     </div>
 
@@ -256,6 +253,7 @@ const resetForm = (formEl: FormInstance | undefined) => {
           show-password
         >
         </el-input>
+        <button class="code_input_button">获取验证码</button>
       </el-form-item>
     </div>
 
@@ -323,6 +321,9 @@ const resetForm = (formEl: FormInstance | undefined) => {
   z-index: -1;
 }
 
+.code_input_button {
+  margin: 1vh 0;
+}
 @media screen and (max-width: 969px) {
   /* 手机 */
   /* 类平板 */

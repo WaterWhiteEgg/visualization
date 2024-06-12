@@ -6,8 +6,8 @@ import { useRouter } from "vue-router";
 import type { FormInstance, FormRules } from "element-plus";
 import { useRegister } from "../../stores/register";
 import { usePopup } from "../../stores/popup";
-import { commitUser } from "../../network/db";
-import { findUsername } from "../../network/db";
+import { commitUser, findUsername } from "../../network/db";
+import { postToGetEmailCode } from "../../network/redis";
 
 const registerData = ref<{
   name: string;
@@ -133,7 +133,7 @@ const rules = reactive<FormRules<RuleForm>>({
     },
   ],
   againPassword: [
-    { required: true, message: "请再-次输入密码", trigger: "blur" },
+    { required: true, message: "请再次输入密码", trigger: "blur" },
     {
       pattern:
         /^(?=.*[0-9])(?=.*[a-zA-Z])[\da-zA-Z!@#$%^&*()+=\\[\]{}|:;"'<>,.?/]{6,18}$/,
@@ -243,6 +243,40 @@ const resetForm = () => {
   useRegister().changeRegisterData("");
   router.push("/login");
 };
+
+// 获取邮箱验证码
+const getEmailCode = async (formEl: FormInstance | undefined) => {
+  if (!formEl) return;
+
+  await formEl.validate((valid, fields) => {
+    console.log(fields);
+    // 邮箱地址不能有错,如果存在错误处理
+    if (fields && fields.email && fields.email.length > 0) {
+      usePopup().openPopup("未填写邮箱", "error");
+    }
+    // 验证成功
+    else {
+      // 网络请求
+      postToGetEmailCode(ruleForm.email)
+        .then((res) => {
+          // 如果没问题会返回0
+          if (res.data.status as 0 | 1) {
+            // 有问题处理
+            usePopup().openPopup("未发送完成", "error");
+          }
+          // 没有问题处理
+          else {
+            usePopup().openPopup("发送完成", "success");
+          }
+          //
+        })
+        .catch((err) => {
+          console.log(err);
+          usePopup().openPopup("网络错误", "error");
+        });
+    }
+  });
+};
 </script>
 
 <template>
@@ -282,12 +316,16 @@ const resetForm = () => {
     <div v-if="ruleForm.validate === '邮箱验证'">
       <el-form-item label="邮箱" prop="email" class="email">
         <el-input v-model="ruleForm.email" class="email_input" />
+
         <el-form-item
           label="邮箱验证码"
           prop="emailCode"
           class="formitem email_code"
         >
-          <el-input v-model="ruleForm.emailCode" />
+          <el-input v-model="ruleForm.emailCode" class="code_input" />
+          <div class="code_input_button" @click="getEmailCode(ruleFormRef)">
+            获取验证码
+          </div>
         </el-form-item>
       </el-form-item>
     </div>
@@ -296,7 +334,8 @@ const resetForm = () => {
       <el-form-item label="手机号码" prop="phone" class="phone">
         <el-input v-model="ruleForm.phone" />
         <el-form-item label="手机验证码" prop="phoneCode" class="formitem">
-          <el-input v-model="ruleForm.phoneCode" />
+          <el-input v-model="ruleForm.phoneCode" class="code_input" />
+          <button class="code_input_button">获取验证码</button>
         </el-form-item>
       </el-form-item>
     </div>
@@ -334,7 +373,8 @@ const resetForm = () => {
 
 .formitem {
   margin-top: 1vh;
-  margin-left: 50%;
+  font-size: 0.1rem;
+  margin-left: auto; /* 在主轴方向上靠右对齐 */
 }
 
 .form {
@@ -363,11 +403,24 @@ const resetForm = () => {
   left: 0;
   width: 100%;
   height: 100%;
-  background: url("https://tuapi.eees.cc/api.php?category={dongman,fengjing}") no-repeat center center /
-    cover;
+  background: url("https://tuapi.eees.cc/api.php?category={dongman,fengjing}")
+    no-repeat center center / cover;
   opacity: 0.4;
   /* 调整这里的值来设置透明度 */
   z-index: -1;
+}
+
+.email_code {
+  display: flex;
+}
+.code_input {
+  width: 15vw;
+}
+.code_input_button {
+  font-size: 0.8rem;
+  margin: 0.5vw;
+  padding: 0 1vw;
+  cursor: pointer;
 }
 
 @media screen and (max-width: 969px) {
