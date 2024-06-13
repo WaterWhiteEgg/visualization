@@ -8,6 +8,7 @@ import { useRegister } from "../../stores/register";
 import { usePopup } from "../../stores/popup";
 import { commitUser, findUsername } from "../../network/db";
 import { postToGetEmailCode } from "../../network/redis";
+import { throttle } from "../../assets/ts/throttle";
 
 const registerData = ref<{
   name: string;
@@ -221,7 +222,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
         ...{ user_agent: useRegister().userAgent },
       };
       // 加密密码
-      console.log(mergedForm);
+      // console.log(mergedForm);
       commitUser(mergedForm)
         .then((res) => {
           console.log(res);
@@ -244,10 +245,11 @@ const resetForm = () => {
   router.push("/login");
 };
 
+// 验证码等待数字
+const waitEmailCodeClick = ref(0);
 // 获取邮箱验证码
 const getEmailCode = async (formEl: FormInstance | undefined) => {
   if (!formEl) return;
-
   await formEl.validate((valid, fields) => {
     console.log(fields);
     // 邮箱地址不能有错,如果存在错误处理
@@ -257,6 +259,8 @@ const getEmailCode = async (formEl: FormInstance | undefined) => {
     // 验证成功
     else {
       // 网络请求
+      // 节流阀，延迟后执行
+
       postToGetEmailCode(ruleForm.email)
         .then((res) => {
           // 如果没问题会返回0
@@ -266,6 +270,19 @@ const getEmailCode = async (formEl: FormInstance | undefined) => {
           }
           // 没有问题处理
           else {
+            // 延迟点击
+            // 初始化数据
+            waitEmailCodeClick.value = 60;
+            // 定时改变值
+            let waitEmailCodeTimer = setInterval(() => {
+              waitEmailCodeClick.value = --waitEmailCodeClick.value;
+            }, 1000); // 每秒触发一次
+            throttle(() => {
+              // 停止计时，重置为0
+              clearInterval(waitEmailCodeTimer);
+              waitEmailCodeClick.value = 0;
+            }, 60000);
+
             usePopup().openPopup("发送完成", "success");
           }
           //
@@ -323,8 +340,15 @@ const getEmailCode = async (formEl: FormInstance | undefined) => {
           class="formitem email_code"
         >
           <el-input v-model="ruleForm.emailCode" class="code_input" />
-          <div class="code_input_button" @click="getEmailCode(ruleFormRef)">
+          <div
+            class="code_input_button"
+            @click="getEmailCode(ruleFormRef)"
+            v-if="waitEmailCodeClick === 0"
+          >
             获取验证码
+          </div>
+          <div class="code_input_button" v-else>
+            等待{{ waitEmailCodeClick }}秒
           </div>
         </el-form-item>
       </el-form-item>
