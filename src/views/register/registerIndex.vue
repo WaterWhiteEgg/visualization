@@ -7,8 +7,10 @@ import type { FormInstance, FormRules } from "element-plus";
 import { useRegister } from "../../stores/register";
 import { usePopup } from "../../stores/popup";
 import { commitUser, findUsername } from "../../network/db";
-import { postToGetEmailCode } from "../../network/redis";
-import { throttle } from "../../assets/ts/throttle";
+import {
+  inPostToGetEmailCode,
+  waitEmailCodeClick,
+} from "../../assets/ts/codePost";
 
 const registerData = ref<{
   name: string;
@@ -245,8 +247,6 @@ const resetForm = () => {
   router.push("/login");
 };
 
-// 验证码等待数字
-const waitEmailCodeClick = ref(0);
 // 获取邮箱验证码
 const getEmailCode = async (formEl: FormInstance | undefined) => {
   if (!formEl) return;
@@ -260,37 +260,7 @@ const getEmailCode = async (formEl: FormInstance | undefined) => {
     else {
       // 网络请求
       // 节流阀，延迟后执行
-
-      postToGetEmailCode(ruleForm.email)
-        .then((res) => {
-          // 如果没问题会返回0
-          if (res.data.status as 0 | 1) {
-            // 有问题处理
-            usePopup().openPopup("未发送完成", "error");
-          }
-          // 没有问题处理
-          else {
-            // 延迟点击
-            // 初始化数据
-            waitEmailCodeClick.value = 60;
-            // 定时改变值
-            let waitEmailCodeTimer = setInterval(() => {
-              waitEmailCodeClick.value = --waitEmailCodeClick.value;
-            }, 1000); // 每秒触发一次
-            throttle(() => {
-              // 停止计时，重置为0
-              clearInterval(waitEmailCodeTimer);
-              waitEmailCodeClick.value = 0;
-            }, 60000);
-
-            usePopup().openPopup("发送完成", "success");
-          }
-          //
-        })
-        .catch((err) => {
-          console.log(err);
-          usePopup().openPopup("网络错误", "error");
-        });
+      inPostToGetEmailCode(ruleForm.email);
     }
   });
 };

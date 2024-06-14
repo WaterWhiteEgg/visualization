@@ -4,6 +4,12 @@ import { useRouter } from "vue-router";
 import type { FormInstance, FormRules } from "element-plus";
 import { loginUser } from "../../network/db";
 import { useRegister } from "../../stores/register";
+import { usePopup } from "../../stores/popup";
+
+import {
+  inPostToGetEmailCode,
+  waitEmailCodeClick,
+} from "../../assets/ts/codePost";
 
 interface RuleForm {
   name: string;
@@ -186,6 +192,26 @@ const resetForm = (formEl: FormInstance | undefined) => {
   if (!formEl) return;
   formEl.resetFields();
 };
+
+
+
+// 获取邮箱验证码
+const getEmailCode = async (formEl: FormInstance | undefined) => {
+  if (!formEl) return;
+  await formEl.validate((valid, fields) => {
+    console.log(fields);
+    // 邮箱地址不能有错,如果存在错误处理
+    if (fields && fields.email && fields.email.length > 0) {
+      usePopup().openPopup("未填写邮箱", "error");
+    }
+    // 验证成功
+    else {
+      // 网络请求
+      // 节流阀，延迟后执行
+      inPostToGetEmailCode(ruleForm.email);
+    }
+  });
+};
 </script>
 
 <template>
@@ -236,7 +262,7 @@ const resetForm = (formEl: FormInstance | undefined) => {
           show-password
         >
         </el-input>
-        <button class="code_input_button">获取验证码</button>
+        <div class="code_input_button">获取验证码</div>
       </el-form-item>
     </div>
 
@@ -253,7 +279,16 @@ const resetForm = (formEl: FormInstance | undefined) => {
           show-password
         >
         </el-input>
-        <button class="code_input_button">获取验证码</button>
+        <div
+          class="code_input_button"
+          v-if="waitEmailCodeClick === 0"
+          @click="getEmailCode(ruleFormRef)"
+        >
+          获取验证码
+        </div>
+        <div class="code_input_button" v-else>
+          等待{{ waitEmailCodeClick }}秒
+        </div>
       </el-form-item>
     </div>
 
@@ -323,6 +358,8 @@ const resetForm = (formEl: FormInstance | undefined) => {
 
 .code_input_button {
   margin: 1vh 0;
+  padding: 0.25vh 1vw;
+  border: 0.5px solid #e5e5e5;
 }
 @media screen and (max-width: 969px) {
   /* 手机 */
