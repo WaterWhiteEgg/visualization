@@ -350,7 +350,7 @@ const getEmailCode = async (formEl: FormInstance | undefined) => {
   left: 0;
   width: 100%;
   height: 100%;
-  background: url("https://source.unsplash.com/random") no-repeat center center /
+  background: url("https://t.mwm.moe/pc") no-repeat center center /
     cover;
   opacity: 0.4; /* 调整这里的值来设置透明度 */
   z-index: -1;
@@ -384,8 +384,6 @@ const getEmailCode = async (formEl: FormInstance | undefined) => {
     left: 0;
     width: 100%;
     height: 100%;
-    background: url("https://source.unsplash.com/random") no-repeat center
-      center / cover;
     opacity: 0.4; /* 调整这里的值来设置透明度 */
     z-index: -1;
   }
