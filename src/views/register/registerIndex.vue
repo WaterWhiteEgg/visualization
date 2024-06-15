@@ -89,24 +89,22 @@ const inFindUsername = async (
   const findUsernameForm = {
     ...ruleForm,
   };
-  let res = debounce<
-    Promise<
-      AxiosResponse<{
-        status: number;
-      }>
-    >
-  >(async () => {
-    return await findUsername(findUsernameForm);
+  let res = debounce(async () => {
+    // 进行网络请求
+    try {
+      let findUsernameRes = await findUsername(findUsernameForm);
+      if (findUsernameRes.data.status) {
+        callback(new Error("用户名已存在"));
+      } else {
+        callback();
+      }
+    } catch (error) {
+      callback(new Error("验证出现问题"));
+    }
   });
   // 网络请求
-  let findUsernameRes = await res();
+  await res();
   // console.log(findUsernameRes);
-
-  if (findUsernameRes.data.status) {
-    callback(new Error("用户名已存在"));
-  } else {
-    callback();
-  }
 };
 
 // 验证邮箱验证码
