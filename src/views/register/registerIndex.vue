@@ -7,6 +7,7 @@ import type { FormInstance, FormRules } from "element-plus";
 import { useRegister } from "../../stores/register";
 import { usePopup } from "../../stores/popup";
 import { commitUser, findUsername } from "../../network/db";
+import { postToFindEmailCode } from "../../network/redis";
 import {
   inPostToGetEmailCode,
   waitEmailCodeClick,
@@ -80,7 +81,7 @@ const findAgainPassword = (
   }
 };
 // 寻找用户名
-const useFindUsername = async (
+const inFindUsername = async (
   rule: unknown,
   value: unknown,
   callback: (Error?: Error) => void
@@ -108,6 +109,36 @@ const useFindUsername = async (
   }
 };
 
+// 验证邮箱验证码
+const findEmailCode = async (
+  rule: unknown,
+  value: unknown,
+  callback: (Error?: Error) => void
+) => {
+  // 防抖处理
+  let res = debounce(async () => {
+    try {
+      // 请求postToFindEmailCode，获取res，若有问题catch捕捉
+      let postToFindEmailCodeRes = await postToFindEmailCode(
+        ruleForm.email,
+        ruleForm.emailCode
+      );
+      // 可能出现的状态码是200但验证失败
+      if (postToFindEmailCodeRes.data.status) {
+        callback(new Error("验证码错误"));
+      } else {
+        callback();
+      }
+      // 验证失败处理
+    } catch (error) {
+      callback(new Error("验证码错误"));
+    }
+  });
+  // 网络请求
+  await res();
+  // console.log(findUsernameRes);
+};
+
 // 表单
 const rules = reactive<FormRules<RuleForm>>({
   name: [
@@ -125,7 +156,7 @@ const rules = reactive<FormRules<RuleForm>>({
 
     // 自定义校验规则
     {
-      validator: useFindUsername as unknown as (
+      validator: inFindUsername as unknown as (
         rule: unknown,
         value: unknown,
         callback: (error?: string | Error) => void,
@@ -183,6 +214,17 @@ const rules = reactive<FormRules<RuleForm>>({
       pattern: /^[a-zA-Z0-9]{8}$/,
       message: "请输入格式正确的邮箱验证码",
       trigger: ["blur"],
+    },
+    // 自定义校验规则
+    {
+      validator: findEmailCode as unknown as (
+        rule: unknown,
+        value: unknown,
+        callback: (error?: string | Error) => void,
+        source: unknown,
+        options: unknown
+      ) => void,
+      trigger: "blur",
     },
   ],
   phone: [
@@ -397,8 +439,7 @@ const getEmailCode = async (formEl: FormInstance | undefined) => {
   left: 0;
   width: 100%;
   height: 100%;
-  background: url("https://t.mwm.moe/pc")
-    no-repeat center center / cover;
+  background: url("https://t.mwm.moe/pc") no-repeat center center / cover;
   opacity: 0.4;
   /* 调整这里的值来设置透明度 */
   z-index: -1;
