@@ -123,13 +123,13 @@ const findEmailCode = async (
       );
       // 可能出现的状态码是200但验证失败
       if (postToFindEmailCodeRes.data.status) {
-        callback(new Error("验证码错误"));
+        callback(new Error("验证码验证错误"));
       } else {
         callback();
       }
       // 验证失败处理
     } catch (error) {
-      callback(new Error("验证码错误"));
+      callback(new Error("验证码验证错误"));
     }
   });
   // 网络请求
