@@ -101,7 +101,7 @@ router.post("/register", expressJoi(VdRegister), async (req, res) => {
     const validateRes = await switchLogin(validate, { email, emailCode });
     // 如果validateRes不为0则报错
     if (validateRes) {
-      return res.cc("验证码错误或失效",1,200);
+      return res.cc("验证码错误或失效",1,403);
 
     }
   } catch (error) {
