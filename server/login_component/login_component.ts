@@ -6,10 +6,12 @@ import connection from "../db/dbmain";
 // import CLIENT from "../redis/index";
 import { QueryResult } from "mysql2";
 import bcrypt from "bcrypt";
+import { ResRej } from "../middleware/middleware";
+
 // 表单验证
 import expressJoi from "@escook/express-joi";
 import { VdRegister, VdLogin, VdUsername } from "../middleware/validationForm";
-import { verifyEmail } from "../email/emailRouter";
+import { verificationEmailCode } from "../email/emailRouter";
 const router = express.Router();
 // 哪个环境决定使用哪个环境的key
 const secret_key = isDEV ? MYSECRET_KEY : SECRET_KEY;
@@ -95,8 +97,18 @@ router.post("/register", expressJoi(VdRegister), async (req, res) => {
 
   // console.log(req.body);
   // 验证登录方式，且验证是否通过
+  try {
+    const validateRes = await switchLogin(validate, { email, emailCode });
+    // 如果validateRes不为0则报错
+    if (validateRes) {
+      return res.cc("验证码错误或失效",1,200);
 
-  const validateRes = await switchLogin(validate, { email });
+    }
+  } catch (error) {
+    // 执行过程中可能的错误
+    console.log(error);
+    return error
+  }
 
   // 查询下一个唯一id
   let id: string;
@@ -104,8 +116,7 @@ router.post("/register", expressJoi(VdRegister), async (req, res) => {
     id = await selectId();
   } catch (error) {
     id = "未查询到id";
-    res.cc(error as Error);
-    res.end();
+    return res.cc(error as Error);
   }
 
   // 生成token
@@ -174,28 +185,38 @@ function generateToken(item: { name: string; resource: string }) {
 }
 
 // 查询使用什么登录/注册账号
-function switchLogin(validate: string, data: { email?: string }) {
-  let inValidateRes: object = { status: 1, message: "没有处理结果" };
-  switch (validate) {
-    case "邮箱验证":
-      verifyEmail(data.email || "")
-        .then((res) => {
-          inValidateRes = res as object;
-          return inValidateRes;
-        })
-        .catch((err) => {
-          console.log(err);
-          return err;
-        });
-      break;
-    case "手机认证":
-      console.log("手机认证不支持");
+async function switchLogin(
+  validate: string,
+  data: { email?: string; emailCode?: string }
+) {
+  let inValidateStatusObj: { status: number; message: string } = {
+    status: 1,
+    message: "没有处理结果或有误",
+  };
+  try {
+    switch (validate) {
+      case "邮箱验证":
+        inValidateStatusObj = await verificationEmailCode(
+          data.email || "",
+          data.emailCode || ""
+        );
 
-      break;
+        break;
+      case "手机认证":
+        console.log("手机认证不支持");
 
-    default:
-      console.log("账户登录");
-      break;
+        break;
+
+      default:
+        console.log("账户登录");
+        break;
+    }
+    // 根据验证码回调的status的状态决定验证;
+    return inValidateStatusObj.status;
+  } catch (error) {
+    // 错误直接返回1代表status
+    console.log(error);
+    return 1;
   }
 }
 

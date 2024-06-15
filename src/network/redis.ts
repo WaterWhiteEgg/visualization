@@ -9,3 +9,13 @@ export const postToGetEmailCode = (email: string) => {
     },
   });
 };
+// 验证邮箱验证码
+export const postToFindEmailCode = (email: string, emailCode: string) => {
+  return postRequest({
+    url: "/email/emailCodeRes",
+    data: {
+      email,
+      emailCode,
+    },
+  });
+};

@@ -10,7 +10,7 @@ import CLIENT from "../redis/index";
 import expressJoi from "@escook/express-joi";
 // 邮箱验证
 import { transporter, useQQEmail } from "./index";
-import { emailJoi, VdEmail } from "../middleware/validationForm";
+import { emailJoi, VdEmail, VdEmailCode } from "../middleware/validationForm";
 import { ResRej } from "../middleware/middleware";
 const router = express.Router();
 
@@ -43,8 +43,6 @@ router.post("/emailCode", expressJoi(VdEmail), async (req, res) => {
     res.cc(error as string);
   }
 
-  console.log("q");
-  
   res.send({
     status: 0,
     message: "建立成功",
@@ -99,17 +97,71 @@ export function sendEmailCode(email: string, code: string): Promise<ResRej> {
         console.log(error);
         reject({
           status: 1,
-          message: "邮箱验证失败",
+          message: "邮箱发送失败",
         });
       }
       // 成功发送
       else {
         resolve({
           status: 0,
-          message: "邮箱验证成功",
+          message: "邮箱发送成功",
         });
       }
     });
+  });
+}
+
+// 检查验证码，接口验证
+router.post("/emailCodeRes", expressJoi(VdEmailCode), async (req, res) => {
+  // 收集数据
+  const { emailCode, email }: { emailCode: string; email: string } = req.body;
+  // 获取状态对象
+  let emailRes = { status: 1, message: "没有找到对应的验证码" };
+
+  try {
+    emailRes = await verificationEmailCode(email, emailCode);
+    
+    // 1为验证失败,直接发送结果
+    res.send({
+      status: emailRes.status,
+      message: emailRes.message,
+    });
+  } catch (error) {
+    // 过程可能会出现的错误处理
+    res.cc(error as Error);
+  }
+});
+
+// 检查验证码
+export function verificationEmailCode(
+  email: string,
+  code: string
+): Promise<ResRej> {
+  // console.log(email);
+  return new Promise(async (resolve, reject) => {
+    // 从redis里获取信息
+    try {
+      let realCode = await CLIENT.get(email);
+      // 对比验证码正确性
+
+      if (realCode === code) {
+        resolve({
+          status: 0,
+          message: "验证成功",
+        });
+      } else {
+        reject({
+          status: 1,
+          message: "验证失败",
+        });
+      }
+    } catch (error) {
+      // 其他错误
+      reject({
+        status: 1,
+        message: error,
+      });
+    }
   });
 }
 

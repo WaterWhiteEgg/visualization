@@ -99,3 +99,10 @@ export const VdEmail = {
     email: emailJoi,
   },
 };
+// 邮箱验证码验证
+export const VdEmailCode = {
+  body: {
+    emailCode: emailCodeJoi,
+    email: emailJoi,
+  },
+};

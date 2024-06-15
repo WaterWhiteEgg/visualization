@@ -12,6 +12,9 @@ import loginComponent from "./login_component/login_component";
 import weatherRouter from "./router/weather";
 import emailRouter from "./email/emailRouter";
 
+
+
+
 const corsOptions: CorsOptions = {
   origin: [],
   optionsSuccessStatus: 200,
@@ -21,6 +24,7 @@ corsOptions.origin = isDEV
   ? ["http://localhost:5173"]
   : ["http://8.134.196.45"];
 import { expressjwt } from "express-jwt";
+import { rejects } from "assert";
 
 const app = express();
 app.use(error);
