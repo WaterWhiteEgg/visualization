@@ -78,6 +78,7 @@ export const VdLogin = {
     name,
     password,
     resource,
+    validate,
     user_agent,
   },
 };

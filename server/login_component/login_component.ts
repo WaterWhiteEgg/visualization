@@ -36,6 +36,7 @@ type RuleRegisterForm = {
 type RuleLoginForm = {
   user_agent: string;
   user_id: string;
+  validate:string;
   name: string;
   password: string;
   resource: string;
@@ -246,7 +247,7 @@ router.post("/login", expressJoi(VdLogin), async (req, res) => {
   // console.log(req.body);
   // 登录里的name有可能是user_id 也有可能是用户名
 
-  const { name, password, resource, user_agent }: RuleLoginForm = req.body;
+  const { name, password, resource, user_agent,validate }: RuleLoginForm = req.body;
   // 查询用户名
   let nameOfObj: SelectUsernameAndIdResolve | null = null;
 
