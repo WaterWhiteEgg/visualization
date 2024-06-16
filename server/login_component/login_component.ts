@@ -101,13 +101,12 @@ router.post("/register", expressJoi(VdRegister), async (req, res) => {
     const validateRes = await switchLogin(validate, { email, emailCode });
     // 如果validateRes不为0则报错
     if (validateRes) {
-      return res.cc("验证码错误或失效",1,403);
-
+      return res.cc("验证码错误或失效", 1, 403);
     }
   } catch (error) {
     // 执行过程中可能的错误
-    console.log(error);
-    return error
+    // console.log(error);
+    return error;
   }
 
   // 查询下一个唯一id
@@ -256,12 +255,10 @@ router.post("/login", expressJoi(VdLogin), async (req, res) => {
   } catch (error) {
     res.cc(error as Error);
   }
-  // 如果长度不为一则有问题，不允许登录
+
+  // 如果长度不为一则数据重复或者没有数据，不允许登录
   if (nameOfObj?.length !== 1) {
-    res.send({
-      status: 1,
-      message: "登录失败，找不到具体用户",
-    });
+    res.cc("登录失败，找不到具体用户", 1, 200);
   }
   // 长度为一时
   else {
@@ -272,10 +269,7 @@ router.post("/login", expressJoi(VdLogin), async (req, res) => {
     );
     // 密码错误时
     if (!isOk) {
-      res.send({
-        status: 1,
-        message: "密码错误",
-      });
+      res.cc("密码错误", 1, 200);
     }
     // 密码验证成功执行下一步
     else {
@@ -308,10 +302,7 @@ router.post("/login", expressJoi(VdLogin), async (req, res) => {
       // 判断用户信息是否更改成功
       if (updateUserRes?.status) {
         // 错误处理
-        res.send({
-          status: 1,
-          message: updateUserRes.message,
-        });
+        res.cc(updateUserRes.message);
       }
       // 更新用户数据成功
       else {
@@ -323,8 +314,6 @@ router.post("/login", expressJoi(VdLogin), async (req, res) => {
       }
     }
   }
-
-  // console.log(nameOfObj);
   // 结束响应
   res.end();
 });

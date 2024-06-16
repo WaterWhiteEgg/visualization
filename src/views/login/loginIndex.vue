@@ -5,6 +5,10 @@ import type { FormInstance, FormRules } from "element-plus";
 import { loginUser } from "../../network/db";
 import { useRegister } from "../../stores/register";
 import { usePopup } from "../../stores/popup";
+import { debounce } from "@/assets/ts/debounce";
+
+import { postToFindEmailCode } from "../../network/redis";
+
 
 import {
   inPostToGetEmailCode,
@@ -46,6 +50,38 @@ const ruleForm = reactive<RuleForm>({
   phone: null,
   phoneCode: null,
 });
+
+
+// 验证邮箱验证码
+const findEmailCode = async (
+  rule: unknown,
+  value: unknown,
+  callback: (Error?: Error) => void
+) => {
+  // 防抖处理
+  let res = debounce(async () => {
+    try {
+      // 请求postToFindEmailCode，获取res，若有问题catch捕捉
+      let postToFindEmailCodeRes = await postToFindEmailCode(
+        ruleForm.email,
+        ruleForm.emailCode
+      );
+      // 可能出现的状态码是200但验证失败
+      if (postToFindEmailCodeRes.data.status) {
+        callback(new Error("验证码验证错误"));
+      } else {
+        callback();
+      }
+      // 验证失败处理
+    } catch (error) {
+      callback(new Error("验证码验证错误"));
+    }
+  });
+  // 网络请求
+  await res();
+  // console.log(findUsernameRes);
+};
+
 
 // 表单规则
 const rules = reactive<FormRules<RuleForm>>({
@@ -100,6 +136,18 @@ const rules = reactive<FormRules<RuleForm>>({
       message: "请输入格式正确的邮箱验证码",
       trigger: ["blur"],
     },
+    
+    // 自定义校验规则
+    {
+      validator: findEmailCode as unknown as (
+        rule: unknown,
+        value: unknown,
+        callback: (error?: string | Error) => void,
+        source: unknown,
+        options: unknown
+      ) => void,
+      trigger: "blur",
+    },
   ],
   phone: [
     {
@@ -124,6 +172,7 @@ const rules = reactive<FormRules<RuleForm>>({
       message: "请输入格式正确的手机验证码",
       trigger: ["blur", "change"],
     },
+
   ],
 });
 
@@ -270,7 +319,6 @@ const getEmailCode = async (formEl: FormInstance | undefined) => {
       <el-form-item label="邮箱" prop="email">
         <el-input v-model="ruleForm.email" />
       </el-form-item>
-      <!-- 密码 -->
       <el-form-item label="验证码" style="position: relative" prop="emailCode">
         <el-input
           type="password"
