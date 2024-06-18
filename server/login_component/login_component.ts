@@ -36,7 +36,7 @@ type RuleRegisterForm = {
 type RuleLoginForm = {
   user_agent: string;
   user_id: string;
-  validate:string;
+  validate: string;
   name: string;
   password: string;
   resource: string;
@@ -100,13 +100,13 @@ router.post("/register", expressJoi(VdRegister), async (req, res) => {
   // 验证登录方式，且验证是否通过
   try {
     const validateRes = await switchLogin(validate, { email, emailCode });
-    // 如果validateRes不为0则报错
-    if (validateRes) {
+    // 如果validateRes不为0则报错,处理没有被catch捕捉到的错误
+    if (validateRes.status) {
       return res.cc("验证码错误或失效", 1, 403);
     }
   } catch (error) {
     // 执行过程中可能的错误
-    // console.log(error);
+    console.log(error);
     return error;
   }
 
@@ -188,8 +188,8 @@ function generateToken(item: { name: string; resource: string }) {
 async function switchLogin(
   validate: string,
   data: { email?: string; emailCode?: string }
-) {
-  let inValidateStatusObj: { status: number; message: string } = {
+): Promise<ResRej> {
+  let inValidateStatusObj: ResRej = {
     status: 1,
     message: "没有处理结果或有误",
   };
@@ -197,8 +197,8 @@ async function switchLogin(
     switch (validate) {
       case "邮箱验证":
         inValidateStatusObj = await verificationEmailCode(
-          data.email || "",
-          data.emailCode || ""
+          data.email!,
+          data.emailCode!
         );
 
         break;
@@ -206,17 +206,21 @@ async function switchLogin(
         console.log("手机认证不支持");
 
         break;
-
+      case "用户名登录":
+        break;
       default:
-        console.log("账户登录");
+        console.log("用户名登录");
         break;
     }
     // 根据验证码回调的status的状态决定验证;
-    return inValidateStatusObj.status;
+    return inValidateStatusObj;
   } catch (error) {
     // 错误直接返回1代表status
     console.log(error);
-    return 1;
+    return {
+      status: 1,
+      message: error as string,
+    };
   }
 }
 
@@ -243,78 +247,87 @@ async function selectId(): Promise<string> {
 }
 
 // 用户名登录
-router.post("/login", expressJoi(VdLogin), async (req, res) => {
+router.post("/login", expressJoi(VdLogin), (req, res) => {
   // console.log(req.body);
   // 登录里的name有可能是user_id 也有可能是用户名
 
-  const { name, password, resource, user_agent,validate }: RuleLoginForm = req.body;
-  // 查询用户名
-  let nameOfObj: SelectUsernameAndIdResolve | null = null;
+  const { name, password, resource, user_agent, validate }: RuleLoginForm =
+    req.body;
+  console.log(validate);
 
-  try {
-    nameOfObj = await selectUsernameAndId(name);
-  } catch (error) {
-    res.cc(error as Error);
-  }
+  // 因为可以通过邮箱登录，密码登录，这个selectUsernameAndId只有在密码登录才搜索，如果用户是邮箱的话
+  // 需要做一个搜唯一邮箱的fun然后找这个验证码的对比，再返回数据
+  async function userIdLogin() {
+    // 查询用户名
+    let nameOfObj: SelectUsernameAndIdResolve | null = null;
 
-  // 如果长度不为一则数据重复或者没有数据，不允许登录
-  if (nameOfObj?.length !== 1) {
-    res.cc("登录失败，找不到具体用户", 1, 200);
-  }
-  // 长度为一时
-  else {
-    // 也就是寻找成功，这时候要验证密码
-    const isOk = await bcrypt.compare(
-      password,
-      (nameOfObj.results as User[])[0].password
-    );
-    // 密码错误时
-    if (!isOk) {
-      res.cc("密码错误", 1, 200);
+    try {
+      nameOfObj = await selectUsernameAndId(name);
+    } catch (error) {
+      res.cc(error as Error);
     }
-    // 密码验证成功执行下一步
+
+    // 如果长度不为一则数据重复或者没有数据，不允许登录
+    if (nameOfObj?.length !== 1) {
+      res.cc("登录失败，找不到具体用户", 1, 200);
+    }
+    // 长度为一时
     else {
-      // 额外提供token，并更新用户信息
-      // 生成token
-      const token = generateToken({ name, resource });
-
-      // 更新该用户的信息
-      // 首先是获取一些寻找用户时记录的信息
-      const { user_id, login_count } = (nameOfObj.results as User[])[0];
-
-      // 更新用户信息
-      let updateUserRes: {
-        message: string;
-        status: number;
-      } | null = null;
-
-      try {
-        updateUserRes = await updateUser(
-          user_id,
-          token,
-          login_count,
-          user_agent,
-          req.ip
-        );
-      } catch (error) {
-        res.cc(error as Error);
+      // 也就是寻找成功，这时候要验证密码
+      const isOk = await bcrypt.compare(
+        password,
+        (nameOfObj.results as User[])[0].password
+      );
+      // 密码错误时
+      if (!isOk) {
+        res.cc("密码错误", 1, 200);
       }
 
-      // 判断用户信息是否更改成功
-      if (updateUserRes?.status) {
-        // 错误处理
-        res.cc(updateUserRes.message);
-      }
-      // 更新用户数据成功
+      // 密码验证成功执行下一步
       else {
-        res.send({
-          status: 0,
-          token,
-          message: "登录成功",
-        });
+        // 额外提供token，并更新用户信息
+        // 生成token
+        const token = generateToken({ name, resource });
+
+        // 更新该用户的信息
+        // 首先是获取一些寻找用户时记录的信息
+        const { user_id, login_count } = (nameOfObj.results as User[])[0];
+
+        // 更新用户信息
+        let updateUserRes: {
+          message: string;
+          status: number;
+        } | null = null;
+
+        try {
+          updateUserRes = await updateUser(
+            user_id,
+            token,
+            login_count,
+            user_agent,
+            req.ip
+          );
+        } catch (error) {
+          res.cc(error as Error);
+        }
+
+        // 判断用户信息是否更改成功
+        if (updateUserRes?.status) {
+          // 错误处理
+          res.cc(updateUserRes.message);
+        }
+        // 更新用户数据成功
+        else {
+          res.send({
+            status: 0,
+            token,
+            message: "登录成功",
+          });
+        }
       }
     }
   }
+
   // 结束响应
   res.end();
 });
