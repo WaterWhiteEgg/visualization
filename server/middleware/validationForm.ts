@@ -80,6 +80,10 @@ export const VdLogin = {
     resource,
     validate,
     user_agent,
+    email: emailJoiCanNull,
+    emailCode: emailCodeJoiCanNull,
+    phone: phoneCanNull,
+    phoneCode: phoneCodeCanNull,
   },
 };
 

@@ -22,8 +22,8 @@ interface RuleForm {
   validate: string;
   email: string;
   emailCode: string;
-  phone: null | number;
-  phoneCode: null | number;
+  phone: string;
+  phoneCode: string;
 }
 // 使用webapi获取用户数据
 const userAgent: Ref<string> = ref("");
@@ -47,8 +47,8 @@ const ruleForm = reactive<RuleForm>({
   validate: "用户名登录",
   email: "",
   emailCode: "",
-  phone: null,
-  phoneCode: null,
+  phone: "",
+  phoneCode: "",
 });
 
 
