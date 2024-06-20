@@ -100,72 +100,65 @@ router.post("/register", expressJoi(VdRegister), async (req, res) => {
     validate,
   }: RuleRegisterForm = req.body;
 
-  // console.log(req.body);
-  // 验证登录方式，且验证是否通过
   try {
+    // 验证登录方式，且验证是否通过
     const validateRes = await switchLogin(validate, req.body);
     // 如果validateRes不为0则报错,处理没有被catch捕捉到的错误
     if (validateRes.status) {
       return res.cc(validateRes.message, 1, 200);
     }
+
+    // 查询下一个唯一id
+
+    let id = await selectId();
+
+    // 生成token
+    const token = generateToken({ name, resource });
+    // 用户的网络信息
+    const other_security = createSecurity(req.ip);
+    // 用户的其他信息
+    const other_Information = createOtherInformation();
+
+    // 生成加密过的密码
+    const hashPassword = await bcrypt.hash(againPassword, 10);
+
+    // 注册sql语句
+    const set = `INSERT INTO ${table_name} (username,user_id, password, status,gender,descs,token,other_security,user_agent,other_Information) VALUES (?,?,?,?,?,?,?,?,?,?)`;
+
+    connection.query(
+      set,
+      [
+        name,
+        id,
+        hashPassword,
+        resource,
+        region,
+        desc,
+        token,
+        other_security,
+        user_agent,
+        other_Information,
+      ],
+      function (err) {
+        // 登录错误处理
+        if (err) {
+          return res.cc(err);
+        } 
+          res.send({
+            status: 0,
+            message: "注册成功",
+            token,
+          });
+          // 结束响应
+          res.end();
+      }
+    );
   } catch (error) {
     // 执行过程中可能的错误
     // console.log(error);
-    return error;
-  }
 
-  // 查询下一个唯一id
-  let id: string;
-  try {
-    id = await selectId();
-  } catch (error) {
-    id = "未查询到id";
     return res.cc(error as Error);
   }
-
-  // 生成token
-  const token = generateToken({ name, resource });
-  // 用户的网络信息
-  const other_security = createSecurity(req.ip);
-  // 用户的其他信息
-  const other_Information = createOtherInformation();
-
-  // 生成加密过的密码
-  const hashPassword = await bcrypt.hash(againPassword, 10);
-
-  // 注册sql语句
-  const set = `INSERT INTO ${table_name} (username,user_id, password, status,gender,descs,token,other_security,user_agent,other_Information) VALUES (?,?,?,?,?,?,?,?,?,?)`;
-
-  connection.query(
-    set,
-    [
-      name,
-      id,
-      hashPassword,
-      resource,
-      region,
-      desc,
-      token,
-      other_security,
-      user_agent,
-      other_Information,
-    ],
-    function (err) {
-      // 登录错误处理
-      if (err) {
-        return res.cc(err);
-      }
-
-      res.send({
-        status: 0,
-        message: "注册成功",
-        token,
-      });
-
-      // 结束响应
-      res.end();
-    }
-  );
 });
 // 创建一个用户的网络信息
 function createSecurity(ip?: string) {
@@ -196,8 +189,7 @@ async function selectId(): Promise<string> {
     connection.query(getId, function (err, results) {
       // 登录错误处理
       if (err) {
-        reject(err);
-        return;
+        reject({ status: 1, err });
       }
       // 获取id
 
@@ -229,23 +221,54 @@ router.post("/login", expressJoi(VdLogin), async (req, res) => {
   // 需要做一个搜唯一邮箱的fun然后找这个验证码的对比，再返回数据
   // 验证登录方式，且验证是否通过
   try {
-    const validateRes = await switchLogin(validate, req.body, { ip: req.ip });
+    const validateRes = await switchLogin(validate, req.body);
     // 如果validateRes不为0则报错,处理没有被catch捕捉到的错误
     // console.log(validateRes);
 
     if (validateRes.status) {
       return res.cc(validateRes.message, 1, 200);
     }
-    // 成功
+
+    // 各种验证没问题时，创建个token并更新登录信息
+    // 额外提供token
+    // 生成token
+    const token = generateToken({ name, resource });
+
+    // 更新该用户的信息
+    // 首先是获取一些寻找用户时记录的信息
+    const { user_id, login_count } = (validateRes.data as { results: User[] })
+      .results[0];
+
+    // 更新用户信息
+    let updateUserRes: {
+      message: string;
+      status: number;
+    } | null = null;
+
+    updateUserRes = await updateUser(
+      user_id,
+      token,
+      login_count,
+      user_agent,
+      req.ip
+    );
+
+    // 判断用户信息是否更改成功
+    if (updateUserRes?.status) {
+      // 错误处理
+      res.cc(updateUserRes.message);
+    }
+
+    // 更新用户数据成功
     res.send({
       status: 0,
       message: "登录成功",
-      token: (validateRes.data as { token: string }).token,
+      token: token,
     });
   } catch (error) {
     // 执行过程中可能的错误
     // console.log("登录接口错误",error);
-    return error;
+    return res.cc(error as string);
   }
 
   // 结束响应
@@ -310,7 +333,7 @@ function updateUser(
 async function switchLogin(
   validate: string,
   data: RuleRegisterForm | RuleLoginForm,
-  otherData?: { ip?: string }
+  otherData?: {}
 ): Promise<ResRej> {
   let inValidateStatusObj: ResRej = {
     status: 1,
@@ -331,13 +354,7 @@ async function switchLogin(
 
         break;
       case "用户名登录":
-        inValidateStatusObj = await userIdLogin(
-          data.name,
-          data.password,
-          data.resource,
-          data.user_agent,
-          otherData?.ip || ""
-        );
+        inValidateStatusObj = await userIdLogin(data.name, data.password);
         break;
       default:
         console.log("用户名登录");
@@ -356,13 +373,7 @@ async function switchLogin(
 }
 
 // 验证用户名是否重复，密码正确，同时更新数据等情况
-function userIdLogin(
-  name: string,
-  password: string,
-  resource: string,
-  user_agent: string,
-  ip: string
-): Promise<ResRej> {
+function userIdLogin(name: string, password: string): Promise<ResRej> {
   return new Promise(async (resolve, reject) => {
     // 查询用户名
     let nameOfObj: SelectUsernameAndIdResolve | null = null;
@@ -377,7 +388,7 @@ function userIdLogin(
       if (nameOfObj?.length !== 1) {
         reject({
           status: 1,
-          message: "用户名不唯一",
+          message: "用户名找不到",
         });
       }
 
@@ -392,41 +403,7 @@ function userIdLogin(
       }
 
       // 密码验证成功执行下一步
-      // 额外提供token，并更新用户信息
-      // 生成token
-      const token = generateToken({ name, resource });
-
-      // 更新该用户的信息
-      // 首先是获取一些寻找用户时记录的信息
-      const { user_id, login_count } = (nameOfObj!.results as User[])[0];
-
-      // 更新用户信息
-      let updateUserRes: {
-        message: string;
-        status: number;
-      } | null = null;
-
-      updateUserRes = await updateUser(
-        user_id,
-        token,
-        login_count,
-        user_agent,
-        ip
-      );
-
-      // 判断用户信息是否更改成功
-      if (updateUserRes?.status) {
-        // 错误处理
-        reject({ status: 1, message: updateUserRes.message });
-      }
-      // 更新用户数据成功
-      else {
-        resolve({
-          status: 0,
-          message: "用户名验证成功",
-          data: { token },
-        });
-      }
+      resolve({ status: 0, message: "密码验证成功", data: nameOfObj });
 
       // 错误处理
     } catch (error) {
