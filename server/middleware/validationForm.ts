@@ -3,12 +3,28 @@ import Joi from "joi";
 // 中间件：验证用户输入
 // string()匹配字符,number()匹配数字,regex()加入正则,required()不能为空,min()max()最大/最小长度
 
+export const nameCanNull = Joi.string()
+  .min(3)
+  .max(12)
+  .regex(/^[^\s~!@#$%^&*()_+`\-={}[\]:;"'<>,.?/]+$/)
+  .required()
+  .allow("");
+
 export const name = Joi.string()
   .min(3)
   .max(12)
   .regex(/^[^\s~!@#$%^&*()_+`\-={}[\]:;"'<>,.?/]+$/)
   .required();
 
+export const passwordCanNull = Joi.string()
+  .min(6)
+  .max(18)
+  .regex(
+    /^(?=.*[0-9])(?=.*[a-zA-Z])[\da-zA-Z!@#$%^&*()+=\\[\]{}|:;"'<>,.?/]{6,18}$/
+  )
+  .required()
+  .allow("");
+  
 export const password = Joi.string()
   .min(6)
   .max(18)
@@ -75,8 +91,8 @@ export const VdRegister = {
 // 登录表单验证
 export const VdLogin = {
   body: {
-    name,
-    password,
+    name: nameCanNull,
+    password:passwordCanNull,
     resource,
     validate,
     user_agent,

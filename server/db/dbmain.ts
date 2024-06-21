@@ -29,8 +29,9 @@ connection.connect();
 
 // 监听错误事件
 connection.on("error", (err) => {
-  console.error(err);
   console.log("mysql 数据库系统连接失败，请检查错误详情");
+  console.error(err);
+
 });
 
 export default connection;

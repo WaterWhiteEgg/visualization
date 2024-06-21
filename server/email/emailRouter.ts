@@ -12,6 +12,9 @@ import expressJoi from "@escook/express-joi";
 import { transporter, useQQEmail } from "./index";
 import { emailJoi, VdEmail, VdEmailCode } from "../middleware/validationForm";
 import { ResRej } from "../middleware/middleware";
+
+// 查询用户邮箱对应的数据
+import { selectEmail } from "../login_component/login_component";
 const router = express.Router();
 
 // 发送验证码
@@ -120,7 +123,7 @@ router.post("/emailCodeRes", expressJoi(VdEmailCode), async (req, res) => {
 
   try {
     emailRes = await verificationEmailCode(email, emailCode);
-    
+
     // 1为验证失败,直接发送结果
     res.send({
       status: emailRes.status,
@@ -160,6 +163,46 @@ export function verificationEmailCode(
       reject({
         status: 1,
         message: error,
+      });
+    }
+  });
+}
+
+// 寻找其用户后检查验证码
+export function findUsernameVerificationEmailCode(
+  email: string,
+  code: string
+): Promise<ResRej> {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let selectEmailres = await selectEmail(email);
+      console.log(selectEmailres);
+      // 由于邮箱允许创建多个账号，如果更多需要额外处理
+      switch (selectEmailres.length) {
+        case 0:
+          console.log("找了个寂寞还没有报错");
+          break;
+        case 1:
+          console.log("找到了唯一的用户");
+          let verificationEmailCodeRes = await verificationEmailCode(
+            email,
+            code
+          );
+          resolve({
+            status:verificationEmailCodeRes.status,
+            message:verificationEmailCodeRes.message,
+            data:selectEmailres
+          });
+          // console.log(verificationEmailCodeRes);
+          break;
+        default:
+          console.log("找到了更多的用户...");
+          break;
+      }
+    } catch (error) {
+      reject({
+        status: 1,
+        err: error,
       });
     }
   });
