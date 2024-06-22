@@ -1,7 +1,4 @@
-import jwt from "jsonwebtoken";
 import express from "express";
-import Joi from "joi";
-import bcrypt from "bcrypt";
 import crypto from "crypto";
 
 import CLIENT from "../redis/index";
@@ -141,30 +138,33 @@ export function verificationEmailCode(
   code: string
 ): Promise<ResRej> {
   // console.log(email);
-  return new Promise(async (resolve, reject) => {
+  return new Promise((resolve, reject) => {
     // 从redis里获取信息
-    try {
-      let realCode = await CLIENT.get(email);
-      // 对比验证码正确性
+    async function inVerificationEmailCode() {
+      try {
+        const realCode = await CLIENT.get(email);
+        // 对比验证码正确性
 
-      if (realCode === code) {
-        resolve({
-          status: 0,
-          message: "验证成功",
-        });
-      } else {
+        if (realCode === code) {
+          resolve({
+            status: 0,
+            message: "验证成功",
+          });
+        } else {
+          reject({
+            status: 1,
+            message: "验证失败",
+          });
+        }
+      } catch (error) {
+        // 其他错误
         reject({
           status: 1,
-          message: "验证失败",
+          message: error,
         });
       }
-    } catch (error) {
-      // 其他错误
-      reject({
-        status: 1,
-        message: error,
-      });
     }
+    inVerificationEmailCode();
   });
 }
 
@@ -173,38 +173,40 @@ export function findUsernameVerificationEmailCode(
   email: string,
   code: string
 ): Promise<ResRej> {
-  return new Promise(async (resolve, reject) => {
-    try {
-      let selectEmailres = await selectEmail(email);
-      console.log(selectEmailres);
-      // 由于邮箱允许创建多个账号，如果更多需要额外处理
-      switch (selectEmailres.length) {
-        case 0:
-          console.log("找了个寂寞还没有报错");
-          break;
-        case 1:
-          console.log("找到了唯一的用户");
-          let verificationEmailCodeRes = await verificationEmailCode(
-            email,
-            code
-          );
-          resolve({
-            status:verificationEmailCodeRes.status,
-            message:verificationEmailCodeRes.message,
-            data:selectEmailres
-          });
-          // console.log(verificationEmailCodeRes);
-          break;
-        default:
-          console.log("找到了更多的用户...");
-          break;
+  return new Promise((resolve, reject) => {
+    async function inFindUsernameVerificationEmailCode() {
+      try {
+        const selectEmailres = await selectEmail(email);
+        console.log(selectEmailres);
+        // 由于邮箱允许创建多个账号，如果更多需要额外处理
+        
+        let verificationEmailCodeRes: ResRej;
+
+        switch (selectEmailres.length) {
+          case 0:
+            console.log("找了个寂寞还没有报错");
+            break;
+          case 1:
+            console.log("找到了唯一的用户");
+            verificationEmailCodeRes = await verificationEmailCode(email, code);
+            resolve({
+              status: verificationEmailCodeRes.status,
+              message: verificationEmailCodeRes.message,
+              data: selectEmailres,
+            });
+            break;
+          default:
+            console.log("找到了更多的用户...");
+            break;
+        }
+      } catch (error) {
+        reject({
+          status: 1,
+          err: error,
+        });
       }
-    } catch (error) {
-      reject({
-        status: 1,
-        err: error,
-      });
     }
+    inFindUsernameVerificationEmailCode();
   });
 }
 

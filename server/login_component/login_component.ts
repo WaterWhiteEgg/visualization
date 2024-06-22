@@ -11,7 +11,10 @@ import { ResRej } from "../middleware/middleware";
 // 表单验证
 import expressJoi from "@escook/express-joi";
 import { VdRegister, VdLogin, VdUsername } from "../middleware/validationForm";
-import { verificationEmailCode ,findUsernameVerificationEmailCode} from "../email/emailRouter";
+import {
+  verificationEmailCode,
+  findUsernameVerificationEmailCode,
+} from "../email/emailRouter";
 const router = express.Router();
 // 哪个环境决定使用哪个环境的key
 const secret_key = isDEV ? MYSECRET_KEY : SECRET_KEY;
@@ -110,7 +113,7 @@ router.post("/register", expressJoi(VdRegister), async (req, res) => {
 
     // 查询下一个唯一id
 
-    let id = await selectId();
+    const id = await selectId();
 
     // 生成token
     const token = generateToken({ name, resource });
@@ -138,8 +141,7 @@ router.post("/register", expressJoi(VdRegister), async (req, res) => {
         other_security,
         user_agent,
         other_Information,
-        email
-
+        email,
       ],
       function (err) {
         // 登录错误处理
@@ -238,8 +240,8 @@ router.post("/login", expressJoi(VdLogin), async (req, res) => {
 
     // 更新该用户的信息
     // 首先是获取一些寻找用户时记录的信息
-    console.log(validateRes.data );
-    
+    console.log(validateRes.data);
+
     const { user_id, login_count } = (validateRes.data as { results: User[] })
       .results[0];
 
@@ -337,7 +339,7 @@ function updateUser(
 async function switchLogin(
   validate: string,
   data: RuleRegisterForm | RuleLoginForm,
-  otherData?: {}
+  otherData?: unknown
 ): Promise<ResRej> {
   let inValidateStatusObj: ResRej = {
     status: 1,
@@ -384,44 +386,48 @@ async function switchLogin(
 
 // 验证用户名是否重复，密码正确，同时更新数据等情况
 function userIdLogin(name: string, password: string): Promise<ResRej> {
-  return new Promise(async (resolve, reject) => {
-    // 查询用户名
-    let nameOfObj: SelectUsernameAndIdResolve | null = null;
+  return new Promise( (resolve, reject) => {
 
-    try {
-      nameOfObj = await selectUsernameAndId(name);
+    async function inUserIdLogin() {
+      // 查询用户名
+      let nameOfObj: SelectUsernameAndIdResolve | null = null;
 
-      // 查询用户列表唯一性
-      // 如果长度不为一则数据重复或者没有数据，不允许登录
-      // console.log(nameOfObj);
+      try {
+        nameOfObj = await selectUsernameAndId(name);
 
-      if (nameOfObj?.length !== 1) {
+        // 查询用户列表唯一性
+        // 如果长度不为一则数据重复或者没有数据，不允许登录
+        // console.log(nameOfObj);
+
+        if (nameOfObj?.length !== 1) {
+          reject({
+            status: 1,
+            message: "用户名找不到",
+          });
+        }
+
+        // 验证对的上用户时，这时候要验证密码
+        const isOk = await bcrypt.compare(
+          password,
+          (nameOfObj!.results as User[])[0].password
+        );
+        // 密码错误时
+        if (!isOk) {
+          reject({ status: 1, message: "密码错误" });
+        }
+
+        // 密码验证成功执行下一步
+        resolve({ status: 0, message: "密码验证成功", data: nameOfObj });
+
+        // 错误处理
+      } catch (error) {
         reject({
           status: 1,
-          message: "用户名找不到",
+          message: error,
         });
       }
-
-      // 验证对的上用户时，这时候要验证密码
-      const isOk = await bcrypt.compare(
-        password,
-        (nameOfObj!.results as User[])[0].password
-      );
-      // 密码错误时
-      if (!isOk) {
-        reject({ status: 1, message: "密码错误" });
-      }
-
-      // 密码验证成功执行下一步
-      resolve({ status: 0, message: "密码验证成功", data: nameOfObj });
-
-      // 错误处理
-    } catch (error) {
-      reject({
-        status: 1,
-        message: error,
-      });
     }
+    inUserIdLogin()
   });
 }
 // 验证用户名/用户id

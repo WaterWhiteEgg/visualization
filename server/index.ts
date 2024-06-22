@@ -12,6 +12,8 @@ import loginComponent from "./login_component/login_component";
 import weatherRouter from "./router/weather";
 import emailRouter from "./email/emailRouter";
 
+// 防止一个ip请求过多
+import { limiter } from './limit/index'
 
 
 
@@ -24,7 +26,6 @@ corsOptions.origin = isDEV
   ? ["http://localhost:5173"]
   : ["http://8.134.196.45"];
 import { expressjwt } from "express-jwt";
-import { rejects } from "assert";
 
 const app = express();
 app.use(error);
@@ -47,6 +48,9 @@ app.use(router);
 app.use(weatherRouter);
 app.use("/db/", loginComponent);
 app.use("/email/", emailRouter);
+
+// ip请求限制
+app.use(limiter)
 
 app.listen(2000, () => {
   console.log("mode is " + process.env.NODE_ENV);

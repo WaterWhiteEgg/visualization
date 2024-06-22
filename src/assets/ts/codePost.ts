@@ -15,7 +15,7 @@ const TimerAndPopupEmailCode = (status: 0 | 1) => {
     // 初始化数据
     waitEmailCodeClick.value = 60;
     // 定时改变值
-    let waitEmailCodeTimer = setInterval(() => {
+    const waitEmailCodeTimer = setInterval(() => {
       waitEmailCodeClick.value = --waitEmailCodeClick.value;
     }, 1000); // 每秒触发一次
     throttle(() => {

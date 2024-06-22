@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { debounce } from "@/assets/ts/debounce";
-import type { AxiosResponse } from "axios";
 import { reactive, ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import type { FormInstance, FormRules } from "element-plus";
