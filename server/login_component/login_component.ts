@@ -386,8 +386,7 @@ async function switchLogin(
 
 // 验证用户名是否重复，密码正确，同时更新数据等情况
 function userIdLogin(name: string, password: string): Promise<ResRej> {
-  return new Promise( (resolve, reject) => {
-
+  return new Promise((resolve, reject) => {
     async function inUserIdLogin() {
       // 查询用户名
       let nameOfObj: SelectUsernameAndIdResolve | null = null;
@@ -427,7 +426,7 @@ function userIdLogin(name: string, password: string): Promise<ResRej> {
         });
       }
     }
-    inUserIdLogin()
+    inUserIdLogin();
   });
 }
 // 验证用户名/用户id
@@ -446,10 +445,18 @@ router.post("/username", expressJoi(VdUsername), async (req, res) => {
 
   // 如果长度小于一则没有问题，大于一则有重复的用户
   if (nameOfObj?.length && nameOfObj.length >= 1) {
-    res.send({
-      status: 1,
-      message: "重复的用户名",
-    });
+    // 判断是什么东西重复了，因为有可能是填写的用户id名
+
+    (nameOfObj!.results as User[])[0].user_id === name
+      ? // 如果相等，则证明是用户id重复否则用户名重复
+        res.send({
+          status: 1,
+          message: "与其他用户的id号重复",
+        })
+      : res.send({
+          status: 1,
+          message: "重复的用户名",
+        });
   }
   // 为空的情况
   else {

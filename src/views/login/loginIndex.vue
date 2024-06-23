@@ -2,13 +2,12 @@
 import { reactive, ref, onMounted, type Ref } from "vue";
 import { useRouter } from "vue-router";
 import type { FormInstance, FormRules } from "element-plus";
-import { loginUser } from "../../network/db";
+import { loginUser, findUsername } from "../../network/db";
 import { useRegister } from "../../stores/register";
 import { usePopup } from "../../stores/popup";
 import { debounce } from "@/assets/ts/debounce";
 
 import { postToFindEmailCode } from "../../network/redis";
-
 
 import {
   inPostToGetEmailCode,
@@ -51,7 +50,6 @@ const ruleForm = reactive<RuleForm>({
   phoneCode: "",
 });
 
-
 // 验证邮箱验证码
 const findEmailCode = async (
   rule: unknown,
@@ -81,7 +79,6 @@ const findEmailCode = async (
   await res();
   // console.log(findUsernameRes);
 };
-
 
 // 表单规则
 const rules = reactive<FormRules<RuleForm>>({
@@ -136,7 +133,7 @@ const rules = reactive<FormRules<RuleForm>>({
       message: "请输入格式正确的邮箱验证码",
       trigger: ["blur"],
     },
-    
+
     // 自定义校验规则
     {
       validator: findEmailCode as unknown as (
@@ -172,7 +169,6 @@ const rules = reactive<FormRules<RuleForm>>({
       message: "请输入格式正确的手机验证码",
       trigger: ["blur", "change"],
     },
-
   ],
 });
 
@@ -183,12 +179,23 @@ const submitForm = async (formEl: FormInstance | undefined) => {
   await formEl.validate((valid, fields) => {
     if (valid) {
       // 验证登录，若没有该账户则跳转注册
-
-      // 跳转注册
-      // 记录数据
-      useRegister().changeRegisterData(JSON.stringify(ruleForm));
-      router.push({
-        path: "/register",
+      const loginForm = {
+        ...ruleForm,
+      };
+      findUsername(loginForm).then((res) => {
+        console.log(res.data.status);
+        // 假设没有用户则跳转注册
+        if (!res.data.status) {
+          // 记录数据后跳转注册
+          useRegister().changeRegisterData(JSON.stringify(ruleForm));
+          router.push({
+            path: "/register",
+          });
+        }
+        // 否则处理开始登录
+        else {
+          justSubmitForm(ruleFormRef.value);
+        }
       });
     }
     // 规则错误
@@ -204,7 +211,14 @@ const justSubmitForm = async (formEl: FormInstance | undefined) => {
   await formEl.validate((valid, fields) => {
     if (valid) {
       // 验证登录，若没有该账户则跳转注册
-      console.log("v", valid);
+      // 测试登录
+      const loginForm = {
+        ...ruleForm,
+        ...{ user_agent: useRegister().userAgent },
+      };
+      loginUser(loginForm).then((res) => {
+        console.log(res);
+      });
     }
     // 规则错误
     else {
@@ -217,14 +231,6 @@ const submitGuestForm = async (formEl: FormInstance | undefined) => {
   if (!formEl) return;
   await formEl.validate(async (valid, fields) => {
     if (valid) {
-      // 测试登录
-      const loginForm = {
-        ...ruleForm,
-        ...{ user_agent: useRegister().userAgent },
-      };
-      let res = await loginUser(loginForm);
-      console.log(res);
-
       // commitUser(ruleForm).then((res) => {
       //   console.log(res);
       // });
@@ -241,8 +247,6 @@ const resetForm = (formEl: FormInstance | undefined) => {
   if (!formEl) return;
   formEl.resetFields();
 };
-
-
 
 // 获取邮箱验证码
 const getEmailCode = async (formEl: FormInstance | undefined) => {
@@ -398,8 +402,7 @@ const getEmailCode = async (formEl: FormInstance | undefined) => {
   left: 0;
   width: 100%;
   height: 100%;
-  background: url("https://t.mwm.moe/pc") no-repeat center center /
-    cover;
+  background: url("https://t.mwm.moe/pc") no-repeat center center / cover;
   opacity: 0.4; /* 调整这里的值来设置透明度 */
   z-index: -1;
 }

@@ -5,16 +5,24 @@ import Joi from "joi";
 
 export const nameCanNull = Joi.string()
   .min(3)
-  .max(12)
+  .max(16)
   .regex(/^[^\s~!@#$%^&*()_+`\-={}[\]:;"'<>,.?/]+$/)
   .required()
   .allow("");
 
 export const name = Joi.string()
   .min(3)
-  .max(12)
+  .max(16)
+  .regex(/^[^\s~!@#$%^&*()_+`\-={}[\]:;"'<>,.?/]+$/)
+  .regex(/^(?!w\d{5,}$).*$/)
+  .required();
+
+  export const username = Joi.string()
+  .min(3)
+  .max(16)
   .regex(/^[^\s~!@#$%^&*()_+`\-={}[\]:;"'<>,.?/]+$/)
   .required();
+
 
 export const passwordCanNull = Joi.string()
   .min(6)
@@ -106,7 +114,7 @@ export const VdLogin = {
 // 用户名验证
 export const VdUsername = {
   body: {
-    name,
+    name:username,
   },
 };
 

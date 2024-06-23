@@ -93,7 +93,7 @@ const inFindUsername = async (
     try {
       let findUsernameRes = await findUsername(findUsernameForm);
       if (findUsernameRes.data.status) {
-        callback(new Error("用户名已存在"));
+        callback(new Error(findUsernameRes.data.message));
       } else {
         callback();
       }
@@ -150,7 +150,11 @@ const rules = reactive<FormRules<RuleForm>>({
       message: "你只能在3-16的长度范围里命名",
       trigger: "blur",
     },
-
+    {
+      pattern: /^(?!w\d{5,}$).*$/,
+      message: "请不要使用w+数字的格式命名你的名字",
+      trigger: "blur",
+    },
     // 自定义校验规则
     {
       validator: inFindUsername as unknown as (
