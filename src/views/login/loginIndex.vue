@@ -5,6 +5,7 @@ import type { FormInstance, FormRules } from "element-plus";
 import { loginUser, findUsername } from "../../network/db";
 import { useRegister } from "../../stores/register";
 import { usePopup } from "../../stores/popup";
+import { useToken } from "../../stores/token";
 import { debounce } from "@/assets/ts/debounce";
 
 import { postToFindEmailCode } from "../../network/redis";
@@ -218,6 +219,8 @@ const justSubmitForm = async (formEl: FormInstance | undefined) => {
       };
       loginUser(loginForm).then((res) => {
         console.log(res);
+        // 记录token
+        useToken().changeToken(res.data.token)
       });
     }
     // 规则错误

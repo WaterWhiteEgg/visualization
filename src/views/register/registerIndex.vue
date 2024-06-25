@@ -4,6 +4,7 @@ import { reactive, ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import type { FormInstance, FormRules } from "element-plus";
 import { useRegister } from "../../stores/register";
+import { useToken } from "../../stores/token";
 import { usePopup } from "../../stores/popup";
 import { commitUser, findUsername } from "../../network/db";
 import { postToFindEmailCode } from "../../network/redis";
@@ -266,11 +267,15 @@ const submitForm = async (formEl: FormInstance | undefined) => {
         ...ruleForm,
         ...{ user_agent: useRegister().userAgent },
       };
-      // 加密密码
-      // console.log(mergedForm);
       commitUser(mergedForm)
         .then((res) => {
           console.log(res);
+          // 跳转
+
+          // 更新记录token
+          useToken().changeToken(res.data.token);
+          // 弹窗提示
+          usePopup().openPopup("注册成功", "success");
         })
         .catch((err) => {
           console.log(err);
