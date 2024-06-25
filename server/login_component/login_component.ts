@@ -126,7 +126,7 @@ router.post("/register", expressJoi(VdRegister), async (req, res) => {
     const hashPassword = await bcrypt.hash(againPassword, 10);
 
     // 注册sql语句
-    const set = `INSERT INTO ${table_name} (username,user_id, password, status,gender,descs,token,other_security,user_agent,other_Information,email) VALUES (?,?,?,?,?,?,?,?,?,?)`;
+    const set = `INSERT INTO ${table_name} (username,user_id, password, status,gender,descs,token,other_security,user_agent,other_Information,email) VALUES (?,?,?,?,?,?,?,?,?,?,?)`;
 
     connection.query(
       set,
