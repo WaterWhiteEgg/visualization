@@ -7,6 +7,7 @@ import { useRegister } from "../../stores/register";
 import { usePopup } from "../../stores/popup";
 import { useToken } from "../../stores/token";
 import { debounce } from "@/assets/ts/debounce";
+import { type AxiosResponse } from "axios";
 
 import { postToFindEmailCode } from "../../network/redis";
 
@@ -184,7 +185,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
         ...ruleForm,
       };
       findUsername(loginForm).then((res) => {
-        console.log(res.data.status);
+        // console.log(res.data.status);
         // 假设没有用户则跳转注册
         if (!res.data.status) {
           // 记录数据后跳转注册
@@ -205,7 +206,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
     }
   });
 };
-// 仅注册提交
+// 注册提交，会再次再次验证表单
 const justSubmitForm = async (formEl: FormInstance | undefined) => {
   if (!formEl) return;
 
@@ -217,11 +218,30 @@ const justSubmitForm = async (formEl: FormInstance | undefined) => {
         ...ruleForm,
         ...{ user_agent: useRegister().userAgent },
       };
-      loginUser(loginForm).then((res) => {
-        console.log(res);
-        // 记录token
-        useToken().changeToken(res.data.token)
-      });
+      loginUser(loginForm).then(
+        (
+          res: AxiosResponse<{
+            token?: string;
+            status: 0 | 1;
+            error?: { status: number; message: string };
+          }>
+        ) => {
+          // 根据status返回的结果决定登录状态,1就是失败了
+          console.log(res);
+
+          if (res.data.status) {
+            // 提示登录失败
+            usePopup().openPopup(res.data.error!.message, "error");
+          }
+          // 登录成功
+          else {
+            // 记录token
+            useToken().changeToken(res.data.token as string);
+            // 提示登录成功
+            usePopup().openPopup("登录成功", "success");
+          }
+        }
+      );
     }
     // 规则错误
     else {
