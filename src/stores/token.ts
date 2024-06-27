@@ -12,6 +12,7 @@ export const useToken = defineStore(
     const token = ref("");
     // 切换用户token数据
     function changeToken(str: string) {
+      
       token.value = str;
     }
     // 判断测试模式

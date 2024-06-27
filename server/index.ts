@@ -11,6 +11,7 @@ import router from "./router/router";
 import loginComponent from "./login_component/login_component";
 import weatherRouter from "./router/weather";
 import emailRouter from "./email/emailRouter";
+import userRouter from "./user/user";
 
 // 防止一个ip请求过多
 import { limiter } from './limit/index'
@@ -46,6 +47,7 @@ app.use(express.urlencoded({ extended: true }));
 // app.use(middleware);
 app.use(router);
 app.use(weatherRouter);
+app.use(userRouter);
 app.use("/db/", loginComponent);
 app.use("/email/", emailRouter);
 

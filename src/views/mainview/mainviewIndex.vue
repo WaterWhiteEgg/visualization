@@ -2,12 +2,19 @@
 import { ref } from "vue";
 import indexList from "./child/indexList.vue";
 import indexSearch from "./child/indexSearch.vue";
-
+import { getUserData } from "../../network/user";
 // 判断是否显示列表
 const isShowListFlag = ref(false);
 // 切换isShowListFlag,默认直接切换
 const changeIsShowListFlag = (bool: boolean = !isShowListFlag.value) => {
   isShowListFlag.value = bool;
+};
+
+// 测试，通过token认证
+const getUser = () => {
+  getUserData().then((res) => {
+    console.log(res);
+  });
 };
 </script>
 <template>
@@ -35,6 +42,7 @@ const changeIsShowListFlag = (bool: boolean = !isShowListFlag.value) => {
                 <Link />
               </el-icon>
             </a>
+            <span @click="getUser">你的用户</span>
           </div>
         </div>
         <div class="main-list-body">
