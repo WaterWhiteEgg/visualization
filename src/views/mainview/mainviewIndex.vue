@@ -19,15 +19,9 @@ const getUser = () => {
 </script>
 <template>
   <div class="main">
-    <Transition
-      :enter-active-class="isShowListFlag ? 'animated slideInLeft' : 'hidden'"
-      :leave-active-class="isShowListFlag ? '' : 'animated slideOutLeft'"
-    >
-      <div
-        class="main-button"
-        v-if="!isShowListFlag"
-        @click="changeIsShowListFlag()"
-      >
+    <Transition :enter-active-class="isShowListFlag ? 'animated slideInLeft' : 'hidden'"
+      :leave-active-class="isShowListFlag ? '' : 'animated slideOutLeft'">
+      <div class="main-button" v-if="!isShowListFlag" @click="changeIsShowListFlag()">
         <el-icon size="30" color="#ffffffe3" class="expand">
           <Expand />
         </el-icon>
@@ -42,7 +36,7 @@ const getUser = () => {
                 <Link />
               </el-icon>
             </a>
-            <span @click="getUser">你的用户</span>
+            <span @click="getUser" class="main-list-head-title-user">你的111111111111111111用户</span>
           </div>
         </div>
         <div class="main-list-body">
@@ -97,16 +91,31 @@ const getUser = () => {
 }
 
 .main-list-head {
+  width: 100%;
 }
 
 .main-list-head-title {
   display: flex;
   align-items: center;
+  justify-content: start;
   padding: 1vh 0 0 0.5vw;
+  width: 100%;
+  white-space: nowrap;
+
 }
 
 .main-list-head-title a {
   display: flex;
+  padding-right:   .5vw;
+}
+
+.main-list-head-title-user {
+  margin-right: 1vw;
+  margin-left: auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: .8rem;
+  color: #5a5a5a;
 }
 
 .main-list-body {
@@ -114,10 +123,10 @@ const getUser = () => {
 }
 
 @media screen and (max-width: 969px) {
+
   /* 手机 */
   /* 类平板 */
-  .expand {
-  }
+  .expand {}
 
   .main {
     position: relative;

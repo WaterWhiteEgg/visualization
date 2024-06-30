@@ -36,36 +36,16 @@ const toRouter = (str: string) => {
       </el-collapse-item>
       <el-collapse-item title="项目管理" name="2">
         <div>
-          Operation feedback: enable the users to clearly perceive their
-          operations by style updates and interactive effects;
+          目前想要储存一些简单的数据并进行增删改查
         </div>
-        <div>
-          Visual feedback: reflect current state by updating or rearranging
-          elements of the page.
-        </div>
+        
       </el-collapse-item>
       <el-collapse-item title="记录" name="3">
-        <div>
-          Simplify the process: keep operating process simple and intuitive;
-        </div>
-        <div>
-          Definite and clear: enunciate your intentions clearly so that the
-          users can quickly understand and make decisions;
-        </div>
-        <div>
-          Easy to identify: the interface should be straightforward, which helps
-          the users to identify and frees them from memorizing and recalling.
-        </div>
+        希望储存用户的操作以及一些数据的展示
       </el-collapse-item>
       <el-collapse-item title="其他" name="4">
         <div>
-          Decision making: giving advices about operations is acceptable, but do
-          not make decisions for the users;
-        </div>
-        <div>
-          Controlled consequences: users should be granted the freedom to
-          operate, including canceling, aborting or terminating current
-          operation.
+         给不是主要使用功能提供
         </div>
       </el-collapse-item>
     </el-collapse>
