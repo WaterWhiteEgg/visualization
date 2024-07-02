@@ -9,26 +9,26 @@ import axios from "axios";
 // 高德，聚何ip，api,仅在生产模式编译
 import { key } from "./realdata/key";
 
-const TokenVerification = function (config) {
-  // 发送请求的相关逻辑
-  // config:对象  与 axios.defaults 相当
-  // 获取token
+// const TokenVerification = function (config) {
+//   // 发送请求的相关逻辑
+//   // config:对象  与 axios.defaults 相当
+//   // 获取token
 
-  let userinfo = window.sessionStorage.getItem("token");
-  console.log(userinfo);
+//   let userinfo = window.sessionStorage.getItem("token");
+//   console.log(userinfo);
 
-  // 判断token存在再做配置
-  if (userinfo) {
-    let token = JSON.parse(userinfo).token;
-    // 注意：token前边有 'Bearer ' 的信息前缀,API接口需求，Bearer后边有空格
-    config.headers.Authorization = "Bearer " + token;
-  }
-  return config;
-};
-const TokenVerificationError = function (error) {
-  // Do something with request error
-  return Promise.reject(error);
-};
+//   // 判断token存在再做配置
+//   if (userinfo) {
+//     let token = JSON.parse(userinfo).token;
+//     // 注意：token前边有 'Bearer ' 的信息前缀,API接口需求，Bearer后边有空格
+//     config.headers.Authorization = "Bearer " + token;
+//   }
+//   return config;
+// };
+// const TokenVerificationError = function (error) {
+//   // Do something with request error
+//   return Promise.reject(error);
+// };
 
 // import { inkey } from "./key";
 type Option = {
