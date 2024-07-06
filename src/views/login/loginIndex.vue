@@ -237,9 +237,9 @@ const justSubmitForm = async (formEl: FormInstance | undefined) => {
           else {
             // 记录token
             console.log(res.data.token);
-            console.log(useToken());
             
             useToken().changeToken(res.data.token as string);
+            
             // 提示登录成功
             usePopup().openPopup("登录成功", "success");
           }

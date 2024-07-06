@@ -6,7 +6,6 @@ export const useToken = defineStore(
   (): {
     token: Ref<string>;
     changeToken: (str: string) => void;
-    isDevelopmentMode: Ref<boolean>;
   } => {
     // 用户的token
     const token = ref("");
@@ -15,9 +14,8 @@ export const useToken = defineStore(
       
       token.value = str;
     }
-    // 判断测试模式
-    const isDevelopmentMode = ref(import.meta.env.MODE === "development");
-    return { token, changeToken, isDevelopmentMode };
+
+    return { token, changeToken };
   },
   {
     persist: true,

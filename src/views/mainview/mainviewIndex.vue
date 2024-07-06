@@ -36,7 +36,7 @@ const getUser = () => {
                 <Link />
               </el-icon>
             </a>
-            <span @click="getUser" class="main-list-head-title-user">你的111111111111111111用户</span>
+            <span @click="getUser" class="main-list-head-title-user">你的1111111用户</span>
           </div>
         </div>
         <div class="main-list-body">
