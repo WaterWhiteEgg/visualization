@@ -1,40 +1,25 @@
 # visualization
+这个项目展示了可视化天气，可查询国内最近的天气状况，以及额外的可以查询一些城市信息
 
-This template should help get you started developing with Vue 3 in Vite.
+## 目前做了的
+- 简易的登录注册系统
+- 动态适配的布局
+- 过渡动画效果
+- 搜索城市功能
+- 定位用户ip所在地区提供初始数据
 
-## Recommended IDE Setup
+## 目前考虑做的
+- 对应的天气图标以及特效，让整个背景直接能看出今天的天气
+- 对登录系统提供更多的功能，目前的登录也没什么别的功能
+- 更好的ui界面，现在的界面不够现代化，应该更加轻一点
+  
+## 往后的构思
+- 想要更多小功能，同时要以简便使用作为方向
+- 能不能有更好的天气接口啊高德就提供一天
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+## 当前需解决
+挂载新服务器
+主界面的用户名样式优化，提供功能界面 检测token跳转
+完成整个的邮箱 登录 注册验证
+游客登录
 
-## Type Support for `.vue` Imports in TS
-
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin) to make the TypeScript language service aware of `.vue` types.
-
-If the standalone TypeScript plugin doesn't feel fast enough to you, Volar has also implemented a [Take Over Mode](https://github.com/johnsoncodehk/volar/discussions/471#discussioncomment-1361669) that is more performant. You can enable it by the following steps:
-
-1. Disable the built-in TypeScript Extension
-    1) Run `Extensions: Show Built-in Extensions` from VSCode's command palette
-    2) Find `TypeScript and JavaScript Language Features`, right click and select `Disable (Workspace)`
-2. Reload the VSCode window by running `Developer: Reload Window` from the command palette.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
-
-## Project Setup
-
-```sh
-npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
-npm run dev
-```
-
-### Type-Check, Compile and Minify for Production
-
-```sh
-npm run build
-```
