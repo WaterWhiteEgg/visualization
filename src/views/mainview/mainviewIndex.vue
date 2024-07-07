@@ -1,8 +1,15 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import indexList from "./child/indexList.vue";
 import indexSearch from "./child/indexSearch.vue";
 import { getUserData } from "../../network/user";
+import { useRegister } from "../../stores/register";
+
+onMounted(() => {
+  // 尝试获取用户信息
+  getUser();
+});
+
 // 判断是否显示列表
 const isShowListFlag = ref(false);
 // 切换isShowListFlag,默认直接切换
@@ -10,18 +17,24 @@ const changeIsShowListFlag = (bool: boolean = !isShowListFlag.value) => {
   isShowListFlag.value = bool;
 };
 
-// 测试，通过token认证
+// 通过token认证获取user数据，放到全局记录
 const getUser = () => {
   getUserData().then((res) => {
-    console.log(res);
-  });
+    useRegister().changeUserData(res.data.data as string);
+  })
 };
 </script>
 <template>
   <div class="main">
-    <Transition :enter-active-class="isShowListFlag ? 'animated slideInLeft' : 'hidden'"
-      :leave-active-class="isShowListFlag ? '' : 'animated slideOutLeft'">
-      <div class="main-button" v-if="!isShowListFlag" @click="changeIsShowListFlag()">
+    <Transition
+      :enter-active-class="isShowListFlag ? 'animated slideInLeft' : 'hidden'"
+      :leave-active-class="isShowListFlag ? '' : 'animated slideOutLeft'"
+    >
+      <div
+        class="main-button"
+        v-if="!isShowListFlag"
+        @click="changeIsShowListFlag()"
+      >
         <el-icon size="30" color="#ffffffe3" class="expand">
           <Expand />
         </el-icon>
@@ -36,7 +49,9 @@ const getUser = () => {
                 <Link />
               </el-icon>
             </a>
-            <span @click="getUser" class="main-list-head-title-user">你的1111111用户</span>
+            <span class="main-list-head-title-user">{{
+              JSON.parse(useRegister().userData).username + ">"
+            }}</span>
           </div>
         </div>
         <div class="main-list-body">
@@ -101,12 +116,11 @@ const getUser = () => {
   padding: 1vh 0 0 0.5vw;
   width: 100%;
   white-space: nowrap;
-
 }
 
 .main-list-head-title a {
   display: flex;
-  padding-right:   .5vw;
+  padding-right: 0.5vw;
 }
 
 .main-list-head-title-user {
@@ -114,7 +128,7 @@ const getUser = () => {
   margin-left: auto;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-size: .8rem;
+  font-size: 0.8rem;
   color: #5a5a5a;
 }
 
@@ -123,10 +137,10 @@ const getUser = () => {
 }
 
 @media screen and (max-width: 969px) {
-
   /* 手机 */
   /* 类平板 */
-  .expand {}
+  .expand {
+  }
 
   .main {
     position: relative;

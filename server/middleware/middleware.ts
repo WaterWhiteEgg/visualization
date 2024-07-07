@@ -11,4 +11,18 @@ export type ResRej = {
   data?: unknown;
 };
 
+export interface JWTToken {
+  user: JWTTokenUser;
+  status: JWTTokenStatus;
+  iat: number;
+  exp: number;
+}
+export interface JWTTokenUser {
+  name: string;
+}
+
+export interface JWTTokenStatus {
+  resource: string;
+}
+
 export {};
