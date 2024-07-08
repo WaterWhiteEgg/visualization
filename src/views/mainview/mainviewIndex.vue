@@ -4,10 +4,16 @@ import indexList from "./child/indexList.vue";
 import indexSearch from "./child/indexSearch.vue";
 import { getUserData } from "../../network/user";
 import { useRegister } from "../../stores/register";
+import { useToken } from "../../stores/token";
+import { useRouter } from "vue-router";
 
+// 实例化
+const router = useRouter();
+
+// 挂载时
 onMounted(() => {
-  // 尝试获取用户信息
-  getUser();
+  // 有token时尝试获取用户信息
+  useToken().token ? getUser() : null;
 });
 
 // 判断是否显示列表
@@ -21,7 +27,7 @@ const changeIsShowListFlag = (bool: boolean = !isShowListFlag.value) => {
 const getUser = () => {
   getUserData().then((res) => {
     useRegister().changeUserData(res.data.data as string);
-  })
+  });
 };
 </script>
 <template>
@@ -49,9 +55,11 @@ const getUser = () => {
                 <Link />
               </el-icon>
             </a>
-            <span class="main-list-head-title-user">{{
-              JSON.parse(useRegister().userData).username + ">"
-            }}</span>
+            <span
+              class="main-list-head-title-user"
+              @click="router.push('/login')"
+              >{{ JSON.parse(useRegister().userData).username + ">" }}</span
+            >
           </div>
         </div>
         <div class="main-list-body">
