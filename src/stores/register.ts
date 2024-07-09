@@ -25,7 +25,7 @@ export const useRegister = defineStore(
       registerData.value = str;
     }
     // token验证后的用户数据，不会一直保存
-    const userData = ref(`{"username":"未登录"}`);
+    const userData = ref(`{"username":"未登录","user_id":"0"}`);
     // 切换token验证后的用户数据
     function changeUserData(str: string) {
       userData.value = str;
@@ -41,3 +41,15 @@ export const useRegister = defineStore(
     };
   }
 );
+
+export interface ParseUserData {
+  username: string;
+  email: string;
+  gender: number;
+  is_active: number;
+  last_time: string;
+  login_count: number;
+  registration_time: string;
+  status: number;
+  user_id: string;
+}

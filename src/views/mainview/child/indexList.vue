@@ -25,7 +25,7 @@ const toRouter = (str: string) => {
       <el-collapse-item title="用户管理" name="1">
         <listLeft @click="toRouter('/login')">
           <template #title
-            >登录/注册 <span style="color: red"> (*beta)</span></template
+            > 登录/注册 </template
           >
         </listLeft>
         <div>

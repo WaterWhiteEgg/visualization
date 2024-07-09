@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import mainviewIndex from "./views/mainview/mainviewIndex.vue";
+
+import {usePopup} from "./stores/popup"
 </script>
 <template>
   <div class="appview">
-    <mainviewIndex></mainviewIndex>
+    <mainviewIndex v-if="usePopup().isOpenMainviewIndex"></mainviewIndex>
     <router-view></router-view>
   </div>
 </template>

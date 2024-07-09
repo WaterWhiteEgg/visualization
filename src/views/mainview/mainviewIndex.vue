@@ -3,7 +3,7 @@ import { ref, onMounted } from "vue";
 import indexList from "./child/indexList.vue";
 import indexSearch from "./child/indexSearch.vue";
 import { getUserData } from "../../network/user";
-import { useRegister } from "../../stores/register";
+import { useRegister,type ParseUserData } from "../../stores/register";
 import { useToken } from "../../stores/token";
 import { useRouter } from "vue-router";
 
@@ -28,6 +28,15 @@ const getUser = () => {
   getUserData().then((res) => {
     useRegister().changeUserData(res.data.data as string);
   });
+};
+
+// 前往/user 还需要额外给名字
+const toUser = () => {
+  let inUserData = JSON.parse(useRegister().userData) as ParseUserData;
+  // 判断是否登录验证过了，没有相对应数据就让其跳转登录
+  inUserData.user_id === "0"
+    ? router.push("/login")
+    : router.push("/user/" + inUserData.username);
 };
 </script>
 <template>
@@ -55,11 +64,9 @@ const getUser = () => {
                 <Link />
               </el-icon>
             </a>
-            <span
-              class="main-list-head-title-user"
-              @click="router.push('/login')"
-              >{{ JSON.parse(useRegister().userData).username + ">" }}</span
-            >
+            <span class="main-list-head-title-user" @click="toUser">{{
+              JSON.parse(useRegister().userData).username + ">"
+            }}</span>
           </div>
         </div>
         <div class="main-list-body">

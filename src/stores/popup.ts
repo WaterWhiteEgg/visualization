@@ -8,6 +8,8 @@ export const usePopup = defineStore(
     openPopup: typeof openPopup;
     isThrottleCloseButton: Ref<boolean>;
     throttleCount: Ref<number>;
+    isOpenMainviewIndex: Ref<boolean>;
+    changeisOpenMainviewIndex: typeof changeisOpenMainviewIndex;
   } => {
     // 弹出框
     function openPopup(
@@ -24,6 +26,19 @@ export const usePopup = defineStore(
     // 节流阀计数值
     const throttleCount = ref(0);
 
-    return { openPopup, isThrottleCloseButton, throttleCount };
+    // 控制mainviewIndex的弹窗
+    const isOpenMainviewIndex = ref(true);
+
+    function changeisOpenMainviewIndex(bol: boolean) {
+      isOpenMainviewIndex.value = bol;
+    }
+
+    return {
+      openPopup,
+      isThrottleCloseButton,
+      throttleCount,
+      isOpenMainviewIndex,
+      changeisOpenMainviewIndex,
+    };
   }
 );
