@@ -36,7 +36,7 @@ const toUser = () => {
   // 判断是否登录验证过了，没有相对应数据就让其跳转登录
   inUserData.user_id === "0"
     ? router.push("/login")
-    : router.push("/user/" + inUserData.username);
+    : router.push("/user/" + inUserData.user_id);
 };
 </script>
 <template>

@@ -27,7 +27,7 @@ const router = createRouter({
       component: HomeRegister,
     },
     {
-      path: "/user/:name",
+      path: "/user/:user_id",
       name: "user",
       component: HomeUser,
     },
