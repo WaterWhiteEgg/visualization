@@ -2,8 +2,8 @@
 import { ref, onMounted } from "vue";
 import indexList from "./child/indexList.vue";
 import indexSearch from "./child/indexSearch.vue";
-import { getUserData } from "../../network/user";
-import { useRegister,type ParseUserData } from "../../stores/register";
+import { getUserData, userVerifyToken } from "../../network/user";
+import { useRegister, type ParseUserData } from "../../stores/register";
 import { useToken } from "../../stores/token";
 import { useRouter } from "vue-router";
 
@@ -25,9 +25,15 @@ const changeIsShowListFlag = (bool: boolean = !isShowListFlag.value) => {
 
 // 通过token认证获取user数据，放到全局记录
 const getUser = () => {
-  getUserData().then((res) => {
-    useRegister().changeUserData(res.data.data as string);
+  userVerifyToken().then((res) => {
+    // console.log(JSON.stringify(res.data.data.user));
+
+    useRegister().changeUserData(JSON.stringify(res.data.data.user) as string);
   });
+  // userVerifyToken().then((res)=>{
+  //   console.log(res);
+
+  // })
 };
 
 // 前往/user 还需要额外给名字

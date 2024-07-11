@@ -25,7 +25,7 @@ const corsOptions: CorsOptions = {
 // 判断是否是开发环境
 corsOptions.origin = isDEV
   ? ["http://localhost:5173"]
-  : ["http://8.134.196.45"];
+  : ["http://47.115.60.3"];
 import { expressjwt } from "express-jwt";
 
 const app = express();
@@ -37,7 +37,7 @@ app.use(
   expressjwt({
     secret: isDEV ? MYSECRET_KEY : SECRET_KEY,
     algorithms: ["HS256"], // 使用何种加密算法解析
-  }).unless({ path: [/^\/db\/*/,/^\/email\/*/, "/weather", "/city", "/ipcity", "/myip"] }) // 登录页无需校验
+  }).unless({ path: [/^\/db\/*/,/^\/email\/*/, "/weather", "/city", "/ipcity", "/myip","/easyuser"] }) // 登录页无需校验
 );
 
 // 解析post的两个中间件

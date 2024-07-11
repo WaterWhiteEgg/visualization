@@ -2,20 +2,37 @@
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { usePopup } from "@/stores/popup";
 import { useRegister } from "@/stores/register";
+import { getUserData, userVerifyToken, getEasyUserData } from "@/network/user";
 
+let isShowMainUserFlag = ref(false);
 // 挂载中
 onMounted(() => {
   // 取消显示mainviewIndex
   // usePopup().changeisOpenMainviewIndex(false);
-  
-  // 由于在解析token时已经获取到数据了，但为了安全起见，进入这个界面需要再一次验证token
-  // 1验证token是否正确，
-  // 1.1如不正确则让他滚去/login再搞一个
-  // 1.2若正确，查看token解析出来的id是否是动态路由上传的值
-  // 2如果是则进入个人界面提供更多操作
-  // 2.1如果不是，则进入基础面板信息
 
-  // 3若token没有，则无论如何都进入基础面板信息
+  // 由于在解析token时已经获取到数据了，但为了安全起见，进入这个界面需要再一次验证token
+  // console.log(userinfo);
+
+  // 判断token存在再做配置
+  if (!window.localStorage.getItem("token")) {
+    // 3若token没有，则无论如何都进入基础面板信息
+    isShowMainUserFlag.value = false;
+  }
+  // 有token的情况
+  else {
+    // 1验证token是否正确，
+
+    userVerifyToken()
+      .then(() => {})
+      // token错误
+      .catch((err) => {
+        console.log(err);
+      });
+    // 1.1如不正确则让他滚去/login再搞一个
+    // 1.2若正确，查看token解析出来的id是否是动态路由上传的值
+    // 2如果是则进入个人界面提供更多操作
+    // 2.1如果不是，则进入基础面板信息
+  }
 }),
   // 销毁前
   onBeforeUnmount(() => {

@@ -20,7 +20,7 @@ type Option = {
 // 默认的请求地址
 const isDev = import.meta.env.MODE === "development";
 
-const baseURL = isDev ? "http://localhost:2000" : "http://8.134.196.45:2000";
+const baseURL = isDev ? "http://localhost:2000" : "http://47.115.60.3:2000";
 export const request = (option: Option) => {
   const net1 = axios.create({
     method: "get",

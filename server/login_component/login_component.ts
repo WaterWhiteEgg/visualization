@@ -116,7 +116,7 @@ router.post("/register", expressJoi(VdRegister), async (req, res) => {
     const id = await selectId();
 
     // 生成token
-    const token = generateToken({ name, resource });
+    const token = generateToken({ username:name, resource, user_id: id });
     // 用户的网络信息
     const other_security = createSecurity(req.ip);
     // 用户的其他信息
@@ -176,12 +176,20 @@ function createOtherInformation(obj: object = {}) {
 }
 
 // 获取token
-function generateToken(item: { name: string; resource: string }) {
-  const { name, resource } = item;
+function generateToken(item: {
+  username: string;
+  resource: string;
+  user_id: string;
+}) {
+  const { username, resource, user_id } = item;
   const expiresIn = resource === "1" ? "720h" : "60s";
-  const token = jwt.sign({ user: { name }, status: { resource } }, secret_key, {
-    expiresIn,
-  });
+  const token = jwt.sign(
+    { user: { username, user_id }, status: { resource } },
+    secret_key,
+    {
+      expiresIn,
+    }
+  );
   return token;
 }
 
@@ -234,16 +242,19 @@ router.post("/login", expressJoi(VdLogin), async (req, res) => {
     }
 
     // 各种验证没问题时，创建个token并更新登录信息
+    // 首先是获取一些寻找用户时记录的信息
+
+    const { username,user_id, login_count } = (validateRes.data as { results: User[] })
+      .results[0];
+
     // 额外提供token
     // 生成token
-    const token = generateToken({ name, resource });
+
+    // console.log(validateRes.data);
+
+    const token = generateToken({ username, resource, user_id });
 
     // 更新该用户的信息
-    // 首先是获取一些寻找用户时记录的信息
-    console.log(validateRes.data);
-
-    const { user_id, login_count } = (validateRes.data as { results: User[] })
-      .results[0];
 
     // 更新用户信息
     let updateUserRes: {

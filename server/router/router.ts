@@ -6,7 +6,6 @@ import { IPkey, key } from "../realdata/key";
 import { isDEV } from "../key";
 const router: Router = express.Router();
 
-
 router.get("/city", async (req, res) => {
   const result = await axios.get(
     "https://restapi.amap.com/v3/config/district?parameters",
@@ -26,7 +25,6 @@ router.get("/city", async (req, res) => {
   });
 });
 router.get("/ipcity", async (req, res) => {
-  
   const result = await axios.get("http://apis.juhe.cn/ip/ipNewV3", {
     params: {
       key: isDEV ? MYIPkey : IPkey,
@@ -62,6 +60,16 @@ router.get("/myip", (req, res) => {
       data: ipv4,
     });
   }
+});
+
+// 验证token
+router.get("/verifyToken", async (req, res) => {
+  const tokenValue = req.auth;
+  res.send({
+    status: 0,
+    message: "解析成功",
+    data: tokenValue,
+  });
 });
 
 export default router;

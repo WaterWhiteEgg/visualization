@@ -23,25 +23,65 @@ userRouter.get("/user", async (req, res) => {
     const {
       username,
       email,
+      descs,
       gender,
       is_active,
       last_time,
       login_count,
       registration_time,
+      phone_number,
       status,
+      is_admin,
       user_id,
     } = (selectUsernameAndIdRes.results as User[])[0];
     res.send({
       status: 0,
       data: JSON.stringify({
         username,
+        descs,
         email,
         gender,
         is_active,
+        phone_number,
         last_time,
         login_count,
         registration_time,
         status,
+        is_admin,
+        user_id,
+      }),
+      message: "查询成功 " + selectUsernameAndIdRes.message,
+    });
+  } catch (error) {
+    return res.cc(error as string);
+  }
+});
+
+userRouter.get("/easyuser", async (req, res) => {
+  // 查找该用户的数据，仅提供一些基本数据，不需要token验证
+  const { name }: { name: string } = req.body;
+  try {
+    const selectUsernameAndIdRes = await selectUsernameAndId(name);
+    // console.log(selectUsernameAndIdRes);
+    // 解构出需要的字段
+    const {
+      username,
+      gender,
+      descs,
+      is_active,
+      last_time,
+      registration_time,
+      user_id,
+    } = (selectUsernameAndIdRes.results as User[])[0];
+    res.send({
+      status: 0,
+      data: JSON.stringify({
+        username,
+        gender,
+        descs,
+        is_active,
+        last_time,
+        registration_time,
         user_id,
       }),
       message: "查询成功 " + selectUsernameAndIdRes.message,
