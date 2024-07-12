@@ -1,14 +1,13 @@
 import { request } from "./index";
 
-
 export const userVerifyToken = () => {
   return request({
     url: "/verifyToken",
   });
 };
-export const getEasyUserData = () => {
+export const getEasyUserData = (user_id: string) => {
   return request({
-    url: "/easyuser",
+    url: "/easyuser?user_id=" + user_id,
   });
 };
 

@@ -17,12 +17,16 @@ export const name = Joi.string()
   .regex(/^(?!w\d{5,}$).*$/)
   .required();
 
-  export const username = Joi.string()
+export const username = Joi.string()
   .min(3)
   .max(16)
   .regex(/^[^\s~!@#$%^&*()_+`\-={}[\]:;"'<>,.?/]+$/)
   .required();
 
+export const user_id = Joi.string()
+  .min(6)
+  .regex(/^w\d{5,}$/)
+  .required();
 
 export const passwordCanNull = Joi.string()
   .min(6)
@@ -32,7 +36,7 @@ export const passwordCanNull = Joi.string()
   )
   .required()
   .allow("");
-  
+
 export const password = Joi.string()
   .min(6)
   .max(18)
@@ -100,7 +104,7 @@ export const VdRegister = {
 export const VdLogin = {
   body: {
     name: nameCanNull,
-    password:passwordCanNull,
+    password: passwordCanNull,
     resource,
     validate,
     user_agent,
@@ -114,7 +118,7 @@ export const VdLogin = {
 // 用户名验证
 export const VdUsername = {
   body: {
-    name:username,
+    name: username,
   },
 };
 
@@ -133,5 +137,12 @@ export const VdEmailCode = {
   body: {
     emailCode: emailCodeJoi,
     email: emailJoi,
+  },
+};
+
+// 验证name（userid与用户名）
+export const VdQuserId = {
+  query: {
+    user_id,
   },
 };

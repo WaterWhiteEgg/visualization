@@ -10,6 +10,8 @@ export const useRegister = defineStore(
     changeUserAgent: (str: string) => void;
     userData: Ref<string>;
     changeUserData: (str: string) => void;
+    allUserData: Ref<string>;
+    changeAllUserData: (str: string) => void;
   } => {
     // 用户注册时的数据
     const registerData = ref("{}");
@@ -30,6 +32,12 @@ export const useRegister = defineStore(
     function changeUserData(str: string) {
       userData.value = str;
     }
+    // token验证后的所有能提供的详细用户数据
+    const allUserData = ref(`{}`);
+    // 切换token验证后的用户数据
+    function changeAllUserData(str: string) {
+      allUserData.value = str;
+    }
 
     return {
       registerData,
@@ -38,6 +46,8 @@ export const useRegister = defineStore(
       changeUserAgent,
       userData,
       changeUserData,
+      allUserData,
+      changeAllUserData,
     };
   }
 );
