@@ -1,22 +1,21 @@
 import { postRequest } from "./index";
 
-export const commitUser = (json: object) => {
-  console.log(json);
+export const commitUser = (data: object) => {
   
   return postRequest({
     url: "/db/register",
-    data: json,
+    data: data,
   });
 };
-export const loginUser = (json: object) => {
+export const loginUser = (data: object) => {
   return postRequest({
     url: "/db/login",
-    data: json,
+    data: data,
   });
 };
-export const findUsername = (json: object) => {
+export const findUsername = (data: object) => {
   return postRequest({
     url: "/db/username",
-    data: json,
+    data: data,
   });
 };
