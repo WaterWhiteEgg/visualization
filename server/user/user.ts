@@ -19,9 +19,9 @@ userRouter.get("/user", async (req, res) => {
   // 查找该用户的数据
   try {
     const selectUsernameAndIdRes = await selectUsernameAndId(
-      tokenValue.user.name
+      tokenValue.user.user_id
     );
-    // console.log(selectUsernameAndIdRes);
+    // console.log(tokenValue.user);
     // 解构出需要的字段
     const {
       username,
@@ -63,10 +63,12 @@ userRouter.get("/user", async (req, res) => {
 userRouter.get("/easyuser", expressJoi(VdQuserId), async (req, res) => {
   // 查找该用户的数据，仅提供一些基本数据，不需要token验证
   const query = req.query;
-  console.log(query.user_id );
+  console.log(query.user_id);
 
   try {
-    const selectUsernameAndIdRes = await selectUsernameAndId(query.user_id as string);
+    const selectUsernameAndIdRes = await selectUsernameAndId(
+      query.user_id as string
+    );
     // console.log(selectUsernameAndIdRes);
     // 解构出需要的字段
     // console.log(selectUsernameAndIdRes);

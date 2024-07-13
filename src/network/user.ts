@@ -16,3 +16,21 @@ export const getUserData = () => {
     url: "/user",
   });
 };
+
+export interface Tokendata {
+  data: {
+    exp: number;
+    iat: number;
+    status: { resource: string };
+    user: { username: string; user_id: string };
+  };
+  message: string;
+  status: 1 | 0;
+}
+
+export interface Userdata {
+  exp: number;
+  iat: number;
+  status: { resource: string };
+  user: { username: string; user_id: string };
+}

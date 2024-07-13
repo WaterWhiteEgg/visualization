@@ -18,7 +18,8 @@ export interface JWTToken {
   exp: number;
 }
 export interface JWTTokenUser {
-  name: string;
+  user_id: string;
+  username: string;
 }
 
 export interface JWTTokenStatus {
