@@ -7,28 +7,15 @@ import {
   userVerifyToken,
   getEasyUserData,
   type Tokendata,
+  type UserData,
+  type UserAxiosData,
 } from "@/network/user";
 import { useRoute, useRouter } from "vue-router";
 // 挂载route实例
 const route = useRoute();
 // 挂载router实例
 const router = useRouter();
-// userdata数据类型
-export interface UserData {
-  username: string;
-  status?: number;
-  descs: string;
-  gender: number;
-  user_id: string;
-  is_guest?: number;
-  email?: string;
-  phone_number?: string;
-  registration_time: string;
-  last_time: string;
-  login_count?: number;
-  is_active: number;
-  is_admin?: number;
-}
+
 // 渲染的对象
 const userData: Ref<UserData | {}> = ref({});
 // 判断是否显示token本体才能执行的flag
@@ -53,6 +40,10 @@ onMounted(() => {
 
     userVerifyToken()
       .then((res) => {
+        // 全局储存
+        useRegister().changeUserData(
+          JSON.stringify((res.data as Tokendata).data.user)
+        );
         // 1.2若正确，查看token解析出来的id是否是动态路由上传的值
         if (
           (res.data as Tokendata).data.user.user_id !== route.params.user_id
@@ -89,8 +80,11 @@ const doUserdata = () => {
   // 请求基本数据,使用动态路由提供的值去寻找
 
   getUserData().then((res) => {
-    console.log(res);
-    userData.value = JSON.parse(res.data.data);
+    // console.log(res);
+    // 全局储存
+    useRegister().changeAllUserData((res.data as UserAxiosData).data);
+    // 提供数据
+    userData.value = JSON.parse((res.data as UserAxiosData).data);
   });
 };
 // 销毁前

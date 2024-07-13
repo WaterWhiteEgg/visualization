@@ -34,6 +34,7 @@ userRouter.get("/user", async (req, res) => {
       registration_time,
       phone_number,
       status,
+      is_guest,
       is_admin,
       user_id,
     } = (selectUsernameAndIdRes.results as User[])[0];
@@ -47,6 +48,7 @@ userRouter.get("/user", async (req, res) => {
         is_active,
         phone_number,
         last_time,
+        is_guest,
         login_count,
         registration_time,
         status,
