@@ -2,6 +2,7 @@
 import { ref, onMounted, onBeforeUnmount, type Ref } from "vue";
 import { usePopup } from "@/stores/popup";
 import { useRegister } from "@/stores/register";
+
 import {
   getUserData,
   userVerifyToken,
@@ -69,10 +70,16 @@ const doEasydata = (user_id: string) => {
   isShowMainUserFlag.value = false;
   // 请求基本数据,使用动态路由提供的值去寻找
 
-  getEasyUserData(user_id).then((res) => {
-    // console.log(JSON.parse(res.data.data));
-    userData.value = JSON.parse(res.data.data);
-  });
+  getEasyUserData(user_id)
+    .then((res) => {
+      // console.log(JSON.parse(res.data.data));
+      userData.value = JSON.parse(res.data.data);
+    })
+    // 还有一种情况是找不到任何id存在的情况
+    .catch(() => {
+      // 进入错误界面
+      router.push("/error");
+    });
 };
 // 进入个人面板,这是直接解析token的
 const doUserdata = () => {

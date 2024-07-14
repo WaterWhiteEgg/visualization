@@ -97,6 +97,10 @@ const toUser = () => {
   transition: 0.5s all;
 }
 
+.expand {
+  color: #cdcdcd;
+}
+
 .main {
   position: absolute;
   z-index: 999999;
@@ -160,9 +164,10 @@ const toUser = () => {
 @media screen and (max-width: 969px) {
   /* 手机 */
   /* 类平板 */
-  .expand {
-  }
 
+  .expand {
+    color: #ffffff;
+  }
   .main {
     position: relative;
     background-color: #beedffe0;
