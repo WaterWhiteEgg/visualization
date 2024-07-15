@@ -107,7 +107,10 @@ const emits = defineEmits<{
 </script>
 <template>
   <div class="user">
-    <div class="user_title">img</div>
+    <div class="user_title">
+      <div>头像？</div>
+      <div class="user_title_name">用户名</div>
+    </div>
     <div class="user_message">
       {{ userData }}
       <div class="user_message_useradmin"></div>
@@ -118,14 +121,41 @@ const emits = defineEmits<{
 <style scoped>
 .user {
   display: flex;
+
   flex-direction: column;
+  background-color: #f7f7f7;
 }
 .user_title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100vw;
   height: 20vh;
-  background-color: red;
+  background-image: linear-gradient(-90deg, #29bdd9 0%, #276ace 100%);
+}
+.user_title_name {
+  font-size: 2rem;
 }
 .user_message {
-  width: 100vw;
+  width: 80vw;
+  margin: 0 auto;
+  background-color: #fff;
+}
+.user_item {
+  width: 80vw;
+  margin: 0 auto;
+  background-color: #fff;
+}
+
+@media screen and (max-width: 969px) {
+  /* 手机 */
+  /* 类平板 */
+
+  .user_message {
+    width: 100vw;
+  }
+  .user_item {
+    width: 100vw;
+  }
 }
 </style>

@@ -40,7 +40,7 @@ router.beforeEach((to, from, next) => {
   // 由于from无法记录未注册的路由，所以要通过to.matched.length判断to是否是一个没有内容的组件
   // 没有内容的话将上一个路由的路径用to记录
   if (!to.matched.length) {
-    console.log(to);
+    // console.log(to);
 
     previousErrorTofullPath = to.fullPath;
     next("/error");

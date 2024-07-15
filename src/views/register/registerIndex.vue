@@ -270,12 +270,13 @@ const submitForm = async (formEl: FormInstance | undefined) => {
       commitUser(mergedForm)
         .then((res) => {
           console.log(res);
-          // 跳转
 
           // 更新记录token
           useToken().changeToken(res.data.token);
           // 弹窗提示
           usePopup().openPopup("注册成功", "success");
+          // 跳转页面
+          router.push("/");
         })
         .catch((err) => {
           console.log(err);
