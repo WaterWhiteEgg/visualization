@@ -54,6 +54,27 @@ app.use("/email/", emailRouter);
 // ip请求限制
 app.use(limiter)
 
+import disk from "diskusage"
+import os from "os"
+
+// 获取系统的空闲内存，单位为字节
+
+console.log("!");
+let path = os.platform() === 'win32' ? 'c:' : '/';
+
+// Callbacks
+disk.check(path, function(err, info) {
+  if (err) {
+    console.log(err);
+  } else {
+    console.log(info!.available);
+    console.log(info!.free);
+    console.log(info!.total);
+  }
+});
+
+
+
 app.listen(2000, () => {
   console.log("mode is " + process.env.NODE_ENV);
   console.log("server open :2000");

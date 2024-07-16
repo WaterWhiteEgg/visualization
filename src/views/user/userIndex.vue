@@ -3,6 +3,11 @@ import { ref, onMounted, onBeforeUnmount, type Ref } from "vue";
 import { usePopup } from "@/stores/popup";
 import { useRegister } from "@/stores/register";
 
+import { ElMessage } from "element-plus";
+import { Plus } from "@element-plus/icons-vue";
+
+import type { UploadProps } from "element-plus";
+
 import {
   getUserData,
   userVerifyToken,
@@ -17,10 +22,18 @@ const route = useRoute();
 // 挂载router实例
 const router = useRouter();
 
+const props = withDefaults(defineProps<{}>(), {});
+const emits = defineEmits<{
+  (e: "emit", i: void): void;
+}>();
+
+const imageUrl = ref("");
+
 // 渲染的对象
 const userData: Ref<UserData | {}> = ref({});
 // 判断是否显示token本体才能执行的flag
 const isShowMainUserFlag = ref(false);
+
 // 挂载中
 onMounted(() => {
   // 取消显示mainviewIndex
@@ -100,10 +113,31 @@ onBeforeUnmount(() => {
   // usePopup().changeisOpenMainviewIndex(true);
 });
 
-const props = withDefaults(defineProps<{}>(), {});
-const emits = defineEmits<{
-  (e: "emit", i: void): void;
-}>();
+
+
+// 图片处理
+const handleAvatarSuccess: UploadProps["onSuccess"] = (
+  response,
+  uploadFile
+) => {
+  console.log(response,uploadFile);
+  
+  imageUrl.value = URL.createObjectURL(uploadFile.raw!);
+};
+
+// 图片验证规则
+const beforeAvatarUpload: UploadProps["beforeUpload"] = (rawFile) => {
+  if (rawFile.type !== "image/jpeg") {
+    ElMessage.error("Avatar picture must be JPG format!");
+    return false;
+  } else if (rawFile.size / 1024 / 1024 > 2) {
+    ElMessage.error("Avatar picture size can not exceed 2MB!");
+    return false;
+  }
+  return true;
+};
+
+
 </script>
 <template>
   <div class="user">
@@ -115,7 +149,18 @@ const emits = defineEmits<{
       {{ userData }}
       <div class="user_message_useradmin"></div>
     </div>
-    <div class="user_item">item</div>
+    <div class="user_item">
+      <el-upload
+        class="avatar-uploader"
+        action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+        :show-file-list="true"
+        :on-success="handleAvatarSuccess"
+        :before-upload="beforeAvatarUpload"
+      >
+        <img v-if="imageUrl" :src="imageUrl" class="avatar" />
+        <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
+      </el-upload>
+    </div>
   </div>
 </template>
 <style scoped>
@@ -147,6 +192,31 @@ const emits = defineEmits<{
   background-color: #fff;
 }
 
+.avatar-uploader .avatar {
+  width: 178px;
+  height: 178px;
+  display: block;
+}
+.avatar-uploader .el-upload {
+  border: 1px dashed var(--el-border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: var(--el-transition-duration-fast);
+}
+
+.avatar-uploader .el-upload:hover {
+  border-color: var(--el-color-primary);
+}
+
+.el-icon.avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 178px;
+  height: 178px;
+  text-align: center;
+}
 @media screen and (max-width: 969px) {
   /* 手机 */
   /* 类平板 */
@@ -159,3 +229,4 @@ const emits = defineEmits<{
   }
 }
 </style>
+
