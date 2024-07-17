@@ -1,8 +1,10 @@
 // index.ts
 import express from "express";
 import cors from "cors";
+import path from "path";
+
 import { type CorsOptions } from "cors";
-import { MYSECRET_KEY, isDEV } from "./key";
+import { MYSECRET_KEY, isDEV, BASEURL } from "./key";
 import { SECRET_KEY } from "./realdata/key";
 
 import { error } from "./middleware/error";
@@ -12,20 +14,17 @@ import loginComponent from "./login_component/login_component";
 import weatherRouter from "./router/weather";
 import emailRouter from "./email/emailRouter";
 import userRouter from "./user/user";
+import publicRouter from "./public_server/public_server";
 
 // 防止一个ip请求过多
-import { limiter } from './limit/index'
-
-
+import { limiter } from "./limit/index";
 
 const corsOptions: CorsOptions = {
   origin: [],
   optionsSuccessStatus: 200,
 };
 // 判断是否是开发环境
-corsOptions.origin = isDEV
-  ? ["http://localhost:5173"]
-  : ["http://47.115.60.3"];
+corsOptions.origin = BASEURL;
 import { expressjwt } from "express-jwt";
 
 const app = express();
@@ -37,7 +36,18 @@ app.use(
   expressjwt({
     secret: isDEV ? MYSECRET_KEY : SECRET_KEY,
     algorithms: ["HS256"], // 使用何种加密算法解析
-  }).unless({ path: [/^\/db\/*/,/^\/email\/*/, "/weather", "/city", "/ipcity", "/myip","/easyuser"] }) // 登录页无需校验
+  }).unless({
+    path: [
+      /^\/db\/*/,
+      /^\/email\/*/,
+      /^\/img\/*/,
+      "/weather",
+      "/city",
+      "/ipcity",
+      "/myip",
+      "/easyuser",
+    ],
+  }) // 登录页无需校验
 );
 
 // 解析post的两个中间件
@@ -51,19 +61,21 @@ app.use(userRouter);
 app.use("/db/", loginComponent);
 app.use("/email/", emailRouter);
 
-// ip请求限制
-app.use(limiter)
+// 将 /public/img 目录下的文件暴露出来
+app.use("/img", express.static(path.join(__dirname, "public", "img")));
 
-import disk from "diskusage"
-import os from "os"
+// ip请求限制
+app.use(limiter);
+
+import disk from "diskusage";
+import os from "os";
 
 // 获取系统的空闲内存，单位为字节
 
-console.log("!");
-let path = os.platform() === 'win32' ? 'c:' : '/';
+let SYSTEMPATH = os.platform() === "win32" ? "c:" : "/";
 
 // Callbacks
-disk.check(path, function(err, info) {
+disk.check(SYSTEMPATH, function (err, info) {
   if (err) {
     console.log(err);
   } else {
@@ -72,8 +84,6 @@ disk.check(path, function(err, info) {
     console.log(info!.total);
   }
 });
-
-
 
 app.listen(2000, () => {
   console.log("mode is " + process.env.NODE_ENV);
