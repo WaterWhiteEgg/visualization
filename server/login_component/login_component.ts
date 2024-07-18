@@ -7,6 +7,7 @@ import connection from "../db/dbmain";
 import { QueryResult } from "mysql2";
 import bcrypt from "bcrypt";
 import { ResRej } from "../middleware/middleware";
+import { imgId } from "../public_server/public_server";
 
 // 表单验证
 import expressJoi from "@escook/express-joi";
@@ -81,6 +82,7 @@ export interface User {
   other_security: string;
   user_agent: string;
   token: string;
+  avatar_url: string;
 }
 
 // 注册
@@ -116,7 +118,7 @@ router.post("/register", expressJoi(VdRegister), async (req, res) => {
     const id = await selectId();
 
     // 生成token
-    const token = generateToken({ username:name, resource, user_id: id });
+    const token = generateToken({ username: name, resource, user_id: id });
     // 用户的网络信息
     const other_security = createSecurity(req.ip);
     // 用户的其他信息
@@ -125,8 +127,11 @@ router.post("/register", expressJoi(VdRegister), async (req, res) => {
     // 生成加密过的密码
     const hashPassword = await bcrypt.hash(againPassword, 10);
 
+    // 获取默认头像信息，url格式的
+    const avatar_url = imgId();
+
     // 注册sql语句
-    const set = `INSERT INTO ${table_name} (username,user_id, password, status,gender,descs,token,other_security,user_agent,other_Information,email) VALUES (?,?,?,?,?,?,?,?,?,?,?)`;
+    const set = `INSERT INTO ${table_name} (username,user_id, password, status,gender,descs,token,other_security,user_agent,other_Information,email,avatar_url) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`;
 
     connection.query(
       set,
@@ -142,6 +147,7 @@ router.post("/register", expressJoi(VdRegister), async (req, res) => {
         user_agent,
         other_Information,
         email,
+        avatar_url,
       ],
       function (err) {
         // 登录错误处理
@@ -244,8 +250,9 @@ router.post("/login", expressJoi(VdLogin), async (req, res) => {
     // 各种验证没问题时，创建个token并更新登录信息
     // 首先是获取一些寻找用户时记录的信息
 
-    const { username,user_id, login_count } = (validateRes.data as { results: User[] })
-      .results[0];
+    const { username, user_id, login_count } = (
+      validateRes.data as { results: User[] }
+    ).results[0];
 
     // 额外提供token
     // 生成token

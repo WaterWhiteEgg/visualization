@@ -14,7 +14,6 @@ import loginComponent from "./login_component/login_component";
 import weatherRouter from "./router/weather";
 import emailRouter from "./email/emailRouter";
 import userRouter from "./user/user";
-import publicRouter from "./public_server/public_server";
 
 // 防止一个ip请求过多
 import { limiter } from "./limit/index";
@@ -24,6 +23,7 @@ const corsOptions: CorsOptions = {
   optionsSuccessStatus: 200,
 };
 // 判断是否是开发环境
+
 corsOptions.origin = BASEURL;
 import { expressjwt } from "express-jwt";
 

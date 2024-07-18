@@ -42,6 +42,8 @@ export interface UserData {
   login_count?: number;
   is_active: number;
   is_admin?: number;
+  avatar_url: string;
+
 }
 
 // user的请求结构

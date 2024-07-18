@@ -85,7 +85,7 @@ const doEasydata = (user_id: string) => {
 
   getEasyUserData(user_id)
     .then((res) => {
-      // console.log(JSON.parse(res.data.data));
+      console.log(JSON.parse(res.data.data));
       userData.value = JSON.parse(res.data.data);
     })
     // 还有一种情况是找不到任何id存在的情况
@@ -100,7 +100,7 @@ const doUserdata = () => {
   // 请求基本数据,使用动态路由提供的值去寻找
 
   getUserData().then((res) => {
-    // console.log(res);
+    console.log(res);
     // 全局储存
     useRegister().changeAllUserData((res.data as UserAxiosData).data);
     // 提供数据
@@ -142,7 +142,7 @@ const beforeAvatarUpload: UploadProps["beforeUpload"] = (rawFile) => {
 <template>
   <div class="user">
     <div class="user_title">
-      <div>头像？</div>
+      <div>{{userData.avatar_url}}<img :src="userData.avatar_url" alt=""></div>
       <div class="user_title_name">用户名</div>
     </div>
     <div class="user_message">

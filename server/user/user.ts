@@ -37,6 +37,7 @@ userRouter.get("/user", async (req, res) => {
       is_guest,
       is_admin,
       user_id,
+      avatar_url,
     } = (selectUsernameAndIdRes.results as User[])[0];
     res.send({
       status: 0,
@@ -54,6 +55,7 @@ userRouter.get("/user", async (req, res) => {
         status,
         is_admin,
         user_id,
+        avatar_url,
       }),
       message: "查询成功 " + selectUsernameAndIdRes.message,
     });
@@ -90,6 +92,7 @@ userRouter.get("/easyuser", expressJoi(VdQuserId), async (req, res) => {
       last_time,
       registration_time,
       user_id,
+      avatar_url,
     } = (selectUsernameAndIdRes.results as User[])[0];
     res.send({
       status: 0,
@@ -101,6 +104,7 @@ userRouter.get("/easyuser", expressJoi(VdQuserId), async (req, res) => {
         last_time,
         registration_time,
         user_id,
+        avatar_url,
       }),
       message: "查询成功 " + selectUsernameAndIdRes.message,
     });
