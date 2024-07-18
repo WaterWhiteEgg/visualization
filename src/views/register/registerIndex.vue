@@ -277,6 +277,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
           usePopup().openPopup("注册成功", "success");
           // 跳转页面
           router.push("/");
+          window.location.reload()
         })
         .catch((err) => {
           console.log(err);
