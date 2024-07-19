@@ -1,17 +1,16 @@
 import axios from "axios";
 
-import {TokenVerification,TokenVerificationError} from "./middleware"; //导入网络拦截守卫
+import { TokenVerification, TokenVerificationError } from "./middleware"; //导入网络拦截守卫
 
 // 高德，聚何ip，api,仅在生产模式编译
 import { key } from "./realdata/key";
 import { inkey } from "./key";
 
-
-
 type Option = {
   url: string;
   params?: object;
   headers?: {
+    "Content-Type"?: "multipart/form-data";
     Authorization?: string;
   };
   data?: object | string;
@@ -20,14 +19,16 @@ type Option = {
 // 默认的请求地址
 const isDev = import.meta.env.MODE === "development";
 
-const baseURL = isDev ? "http://localhost:2000" : "http://47.115.60.3:2000";
+export const baseURL = isDev
+  ? "http://localhost:2000"
+  : "http://47.115.60.3:2000";
 export const request = (option: Option) => {
   const net1 = axios.create({
     method: "get",
     baseURL,
     timeout: 10000,
   });
-  
+
   net1.interceptors.request.use(TokenVerification, TokenVerificationError);
   return net1(option);
 };
@@ -37,6 +38,7 @@ export const postRequest = (option: Option) => {
     method: "post",
     baseURL,
     timeout: 10000,
+    
   });
   net2.interceptors.request.use(TokenVerification, TokenVerificationError);
 

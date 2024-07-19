@@ -6,7 +6,7 @@ import { useRegister } from "@/stores/register";
 import { ElMessage } from "element-plus";
 import { Plus } from "@element-plus/icons-vue";
 
-import type { UploadProps } from "element-plus";
+import type { UploadProps, UploadRequestOptions } from "element-plus";
 
 import {
   getUserData,
@@ -113,36 +113,43 @@ onBeforeUnmount(() => {
   // usePopup().changeisOpenMainviewIndex(true);
 });
 
+// 在上传图片之前触发，图片验证规则
+const beforeAvatarUpload: UploadProps["beforeUpload"] = (rawFile) => {
+  // 传入格式
+  if (rawFile.type !== "image/jpeg") {
+    usePopup().openPopup("请传入jpg/jpeg格式的图片！", "warning");
+    return false;
+  }
+  // 文件大小，这个是2M
+  else if (rawFile.size / 1024 / 1024 > 2) {
+    usePopup().openPopup("文件大小限制在2MB", "warning");
+    return false;
+  }
+  // 成功返回
+  return true;
+};
+// 上传头像
+const updateAvater: (
+  options: UploadRequestOptions
+) => XMLHttpRequest | Promise<unknown> = async (options) => {
+  console.log(options.file);
 
-
-// 图片处理
+  // 请求地址。。。
+};
+// 图片成功处理
 const handleAvatarSuccess: UploadProps["onSuccess"] = (
   response,
   uploadFile
 ) => {
-  console.log(response,uploadFile);
-  
+  console.log(response, uploadFile);
+
   imageUrl.value = URL.createObjectURL(uploadFile.raw!);
 };
-
-// 图片验证规则
-const beforeAvatarUpload: UploadProps["beforeUpload"] = (rawFile) => {
-  if (rawFile.type !== "image/jpeg") {
-    ElMessage.error("Avatar picture must be JPG format!");
-    return false;
-  } else if (rawFile.size / 1024 / 1024 > 2) {
-    ElMessage.error("Avatar picture size can not exceed 2MB!");
-    return false;
-  }
-  return true;
-};
-
-
 </script>
 <template>
   <div class="user">
     <div class="user_title">
-      <div>{{userData.avatar_url}}<img :src="userData.avatar_url" alt=""></div>
+      <div><img :src="userData.avatar_url" :title="userData.avatar_url" /></div>
       <div class="user_title_name">用户名</div>
     </div>
     <div class="user_message">
@@ -152,8 +159,11 @@ const beforeAvatarUpload: UploadProps["beforeUpload"] = (rawFile) => {
     <div class="user_item">
       <el-upload
         class="avatar-uploader"
-        action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+        name="avatar"
+        :http-request="updateAvater"
         :show-file-list="true"
+        method="post"
+        :drag="true"
         :on-success="handleAvatarSuccess"
         :before-upload="beforeAvatarUpload"
       >
@@ -229,4 +239,3 @@ const beforeAvatarUpload: UploadProps["beforeUpload"] = (rawFile) => {
   }
 }
 </style>
-

@@ -14,6 +14,7 @@ import loginComponent from "./login_component/login_component";
 import weatherRouter from "./router/weather";
 import emailRouter from "./email/emailRouter";
 import userRouter from "./user/user";
+import publicRouter from "./public_server/public_server";
 
 // 防止一个ip请求过多
 import { limiter } from "./limit/index";
@@ -60,6 +61,7 @@ app.use(weatherRouter);
 app.use(userRouter);
 app.use("/db/", loginComponent);
 app.use("/email/", emailRouter);
+app.use("/public/", publicRouter);
 
 // 将 /public/img 目录下的文件暴露出来
 app.use("/img", express.static(path.join(__dirname, "public", "img")));
