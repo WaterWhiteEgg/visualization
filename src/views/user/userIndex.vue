@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, type Ref } from "vue";
+import { ref, toRefs, onMounted, onBeforeUnmount, type Ref } from "vue";
 import { usePopup } from "@/stores/popup";
 import { useRegister } from "@/stores/register";
 
-import { ElMessage } from "element-plus";
 import { Plus } from "@element-plus/icons-vue";
 
 import type { UploadProps, UploadRequestOptions } from "element-plus";
@@ -16,6 +15,7 @@ import {
   type UserData,
   type UserAxiosData,
 } from "@/network/user";
+import { commitAvater } from "../../network/updateFile";
 import { useRoute, useRouter } from "vue-router";
 // 挂载route实例
 const route = useRoute();
@@ -128,11 +128,24 @@ const beforeAvatarUpload: UploadProps["beforeUpload"] = (rawFile) => {
   // 成功返回
   return true;
 };
+
+// 头像文件存放
+const avatarFile = ref();
 // 上传头像
 const updateAvater: (
   options: UploadRequestOptions
 ) => XMLHttpRequest | Promise<unknown> = async (options) => {
-  console.log(options.file);
+  console.log(111);
+
+  console.log(toRefs(avatarFile.value[0]));
+
+  commitAvater(toRefs(avatarFile.value[0]))
+    .then((res) => {
+      console.log(res);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 
   // 请求地址。。。
 };
@@ -163,9 +176,11 @@ const handleAvatarSuccess: UploadProps["onSuccess"] = (
         :http-request="updateAvater"
         :show-file-list="true"
         method="post"
+        v-model:file-list="avatarFile"
         :drag="true"
         :on-success="handleAvatarSuccess"
         :before-upload="beforeAvatarUpload"
+        :auto-upload="false"
       >
         <img v-if="imageUrl" :src="imageUrl" class="avatar" />
         <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>

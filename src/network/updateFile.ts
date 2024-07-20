@@ -1,10 +1,10 @@
 // 上传文件
 import { postRequest } from "./index";
 
+import { type UploadRawFile } from "element-plus";
 // 上传头像
-export const commitAvater = (fromData) => {
+export const commitAvater = (fromData: UploadRawFile) => {
   return postRequest({
-    headers: { "Content-Type": "multipart/form-data" },
     url: "/public/avatar",
 
     data: fromData,

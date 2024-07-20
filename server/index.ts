@@ -16,6 +16,7 @@ import emailRouter from "./email/emailRouter";
 import userRouter from "./user/user";
 import publicRouter from "./public_server/public_server";
 
+
 // 防止一个ip请求过多
 import { limiter } from "./limit/index";
 
@@ -31,6 +32,7 @@ import { expressjwt } from "express-jwt";
 const app = express();
 app.use(error);
 app.use(cors(corsOptions));
+
 
 // 解析token
 app.use(
