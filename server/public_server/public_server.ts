@@ -9,7 +9,7 @@ const publicRouter: Router = express.Router();
 
 // 处理头像文件路径
 const avatarFile = multer({
-  dest: "../public/img/avatar/",
+  dest: "./public/img/avatar/",
   limits: {
     fileSize: 2 * 1024 * 1024, // 限制文件大小为 2MB
     files: 1, // 限制文件数量为 1

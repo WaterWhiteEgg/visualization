@@ -107,11 +107,6 @@ const doUserdata = () => {
     userData.value = JSON.parse((res.data as UserAxiosData).data);
   });
 };
-// 销毁前
-onBeforeUnmount(() => {
-  // 重新显示mainviewIndex
-  // usePopup().changeisOpenMainviewIndex(true);
-});
 
 // 在上传图片之前触发，图片验证规则
 const beforeAvatarUpload: UploadProps["beforeUpload"] = (rawFile) => {
@@ -135,19 +130,31 @@ const avatarFile = ref();
 const updateAvater: (
   options: UploadRequestOptions
 ) => XMLHttpRequest | Promise<unknown> = async (options) => {
-  console.log(111);
+  // 获取文件
+  let fd = new FormData();
+  fd.append("avatar", options.file);
+  // 这里是请求上传接口
+  console.log(fd);
 
-  console.log(toRefs(avatarFile.value[0]));
+  let res = await commitAvater(fd);
+  console.log(res);
 
-  commitAvater(toRefs(avatarFile.value[0]))
-    .then((res) => {
-      console.log(res);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-
-  // 请求地址。。。
+  // if (result.code == 200) {
+  //   // 后台只返回文件名称，需要拼接
+  //   formData.value.appLogo =
+  //     import.meta.env.VITE_APP_HOSTURL +
+  //     import.meta.env.VITE_APP_BASEURL +
+  //     "file/previewFile/" +
+  //     result.data;
+  //   // 去掉form表单验证的*
+  //   // formRef.value.clearValidate(['appLogo'])
+  //   // 上传成功清空文件
+  //   uploadBanner.value.handleRemove(file);
+  // } else {
+  //   formData.value.appLogo = "";
+  //   ElMessage.error(result.message);
+  //   uploadBanner.value.handleRemove(file);
+  // }
 };
 // 图片成功处理
 const handleAvatarSuccess: UploadProps["onSuccess"] = (
@@ -158,6 +165,12 @@ const handleAvatarSuccess: UploadProps["onSuccess"] = (
 
   imageUrl.value = URL.createObjectURL(uploadFile.raw!);
 };
+
+// 销毁前
+onBeforeUnmount(() => {
+  // 重新显示mainviewIndex
+  // usePopup().changeisOpenMainviewIndex(true);
+});
 </script>
 <template>
   <div class="user">
@@ -172,15 +185,14 @@ const handleAvatarSuccess: UploadProps["onSuccess"] = (
     <div class="user_item">
       <el-upload
         class="avatar-uploader"
-        name="avatar"
+        :limit="1"
+        :show-file-list="false"
         :http-request="updateAvater"
-        :show-file-list="true"
         method="post"
-        v-model:file-list="avatarFile"
         :drag="true"
         :on-success="handleAvatarSuccess"
+        ref="avatarFile"
         :before-upload="beforeAvatarUpload"
-        :auto-upload="false"
       >
         <img v-if="imageUrl" :src="imageUrl" class="avatar" />
         <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
