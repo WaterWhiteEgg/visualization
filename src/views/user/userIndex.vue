@@ -162,8 +162,16 @@ const handleAvatarSuccess: UploadProps["onSuccess"] = (
   uploadFile
 ) => {
   console.log(response, uploadFile);
+  // imageUrl.value = URL.createObjectURL(uploadFile.raw!);
+};
 
-  imageUrl.value = URL.createObjectURL(uploadFile.raw!);
+const onChange = (file, fileListVal) => {
+  imageUrl.value = URL.createObjectURL(fileListVal[0].raw!);
+};
+const a = () => {
+  avatarFile.value!.submit();
+
+  console.log(avatarFile.value);
 };
 
 // 销毁前
@@ -187,16 +195,17 @@ onBeforeUnmount(() => {
         class="avatar-uploader"
         :limit="1"
         :show-file-list="false"
+        :on-change="onChange"
         :http-request="updateAvater"
-        method="post"
         :drag="true"
         :on-success="handleAvatarSuccess"
         ref="avatarFile"
         :before-upload="beforeAvatarUpload"
+        :auto-upload="false"
       >
         <img v-if="imageUrl" :src="imageUrl" class="avatar" />
-        <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
       </el-upload>
+      <div @click="a">1</div>
     </div>
   </div>
 </template>
