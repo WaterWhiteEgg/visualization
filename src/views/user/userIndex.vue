@@ -3,9 +3,12 @@ import { ref, toRefs, onMounted, onBeforeUnmount, type Ref } from "vue";
 import { usePopup } from "@/stores/popup";
 import { useRegister } from "@/stores/register";
 
-import { Plus } from "@element-plus/icons-vue";
-
-import type { UploadProps, UploadRequestOptions } from "element-plus";
+import type {
+  UploadProps,
+  UploadRequestOptions,
+  UploadFile,
+  UploadFiles,
+} from "element-plus";
 
 import {
   getUserData,
@@ -26,8 +29,6 @@ const props = withDefaults(defineProps<{}>(), {});
 const emits = defineEmits<{
   (e: "emit", i: void): void;
 }>();
-
-const imageUrl = ref("");
 
 // 渲染的对象
 const userData: Ref<UserData | {}> = ref({});
@@ -124,8 +125,13 @@ const beforeAvatarUpload: UploadProps["beforeUpload"] = (rawFile) => {
   return true;
 };
 
-// 头像文件存放
-const avatarFile = ref();
+// 预览图像，应该是ref
+const imageUrl = ref("");
+// 头像文件列表
+const avatarFile = ref([]);
+// 头像input的dom
+const updateRef = ref();
+
 // 上传头像
 const updateAvater: (
   options: UploadRequestOptions
@@ -134,28 +140,38 @@ const updateAvater: (
   let fd = new FormData();
   fd.append("avatar", options.file);
   // 这里是请求上传接口
-  console.log(fd);
 
   let res = await commitAvater(fd);
-  console.log(res);
-
-  // if (result.code == 200) {
-  //   // 后台只返回文件名称，需要拼接
-  //   formData.value.appLogo =
-  //     import.meta.env.VITE_APP_HOSTURL +
-  //     import.meta.env.VITE_APP_BASEURL +
-  //     "file/previewFile/" +
-  //     result.data;
-  //   // 去掉form表单验证的*
-  //   // formRef.value.clearValidate(['appLogo'])
-  //   // 上传成功清空文件
-  //   uploadBanner.value.handleRemove(file);
-  // } else {
-  //   formData.value.appLogo = "";
-  //   ElMessage.error(result.message);
-  //   uploadBanner.value.handleRemove(file);
-  // }
+  // console.log(res);
 };
+
+// 头像input切换时钩子
+const onAvatarFileChange: (
+  uploadFile: UploadFile,
+  uploadFiles: UploadFiles
+) => void = (file, fileListVal) => {
+  // 验证图片
+  if (!beforeAvatarUpload(file.raw!)) {
+    // 处理错误
+    return false;
+  }
+ 
+  console.log(fileListVal);
+
+  // 显示图片
+  imageUrl.value = URL.createObjectURL(fileListVal[0].raw!);
+};
+
+// 提交图片，执行里面的提交方法
+const commitAvatar = () => {
+  // 重新赋值原来的文件
+  console.log(updateRef.value);
+  // 清空之前预备上传的文件
+  // updateRef.value.clearFiles();
+  // updateRef.value.handleStart(avatarFile.value);
+  updateRef.value.submit();
+};
+
 // 图片成功处理
 const handleAvatarSuccess: UploadProps["onSuccess"] = (
   response,
@@ -165,13 +181,14 @@ const handleAvatarSuccess: UploadProps["onSuccess"] = (
   // imageUrl.value = URL.createObjectURL(uploadFile.raw!);
 };
 
-const onChange = (file, fileListVal) => {
-  imageUrl.value = URL.createObjectURL(fileListVal[0].raw!);
-};
-const a = () => {
-  avatarFile.value!.submit();
+const exceed = (files, ffiles) => {
+  console.log(1);
+   // 清空之前预备上传的文件
+   if (ffiles.length !== 0) {
+    updateRef.value.clearFiles();
+    
+  }
 
-  console.log(avatarFile.value);
 };
 
 // 销毁前
@@ -184,7 +201,7 @@ onBeforeUnmount(() => {
   <div class="user">
     <div class="user_title">
       <div><img :src="userData.avatar_url" :title="userData.avatar_url" /></div>
-      <div class="user_title_name">用户名</div>
+      <div class="user_title_name">用户名{{ avatarFile }}</div>
     </div>
     <div class="user_message">
       {{ userData }}
@@ -194,18 +211,22 @@ onBeforeUnmount(() => {
       <el-upload
         class="avatar-uploader"
         :limit="1"
+        v-model:file-list="avatarFile"
         :show-file-list="false"
-        :on-change="onChange"
+        :on-change="onAvatarFileChange"
         :http-request="updateAvater"
         :drag="true"
         :on-success="handleAvatarSuccess"
-        ref="avatarFile"
+        :on-exceed="exceed"
+        ref="updateRef"
         :before-upload="beforeAvatarUpload"
         :auto-upload="false"
       >
         <img v-if="imageUrl" :src="imageUrl" class="avatar" />
       </el-upload>
-      <div @click="a">1</div>
+      <el-button class="ml-3" type="success" @click="commitAvatar"
+        >提交</el-button
+      >
     </div>
   </div>
 </template>
