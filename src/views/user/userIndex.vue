@@ -8,6 +8,8 @@ import type {
   UploadRequestOptions,
   UploadFile,
   UploadFiles,
+  UploadRawFile,
+  UploadUserFile,
 } from "element-plus";
 
 import {
@@ -131,6 +133,8 @@ const imageUrl = ref("");
 const avatarFile = ref([]);
 // 头像input的dom
 const updateRef = ref();
+// 判断是否需要更新页面
+const isUpdateAvatarFile = ref(true);
 
 // 上传头像
 const updateAvater: (
@@ -139,10 +143,16 @@ const updateAvater: (
   // 获取文件
   let fd = new FormData();
   fd.append("avatar", options.file);
-  // 这里是请求上传接口
+  // 请求上传接口
+  try {
+    let res = await commitAvater(fd);
+    usePopup().openPopup("请求成功", "success");
 
-  let res = await commitAvater(fd);
-  // console.log(res);
+    // 重复请求
+  } catch (error) {
+    // 错误处理
+    usePopup().openPopup("网络错误", "error");
+  }
 };
 
 // 头像input切换时钩子
@@ -155,21 +165,24 @@ const onAvatarFileChange: (
     // 处理错误
     return false;
   }
- 
+
   console.log(fileListVal);
 
   // 显示图片
   imageUrl.value = URL.createObjectURL(fileListVal[0].raw!);
 };
 
-// 提交图片，执行里面的提交方法
+// 执行里面的提交方法
 const commitAvatar = () => {
-  // 重新赋值原来的文件
-  console.log(updateRef.value);
-  // 清空之前预备上传的文件
-  // updateRef.value.clearFiles();
-  // updateRef.value.handleStart(avatarFile.value);
-  updateRef.value.submit();
+  // 除非更新了文件，否则只用请求一次就够了
+  
+  if (isUpdateAvatarFile.value) {
+    updateRef.value.submit();
+    isUpdateAvatarFile.value = false;
+    // console.log(res);
+  } else {
+    usePopup().openPopup("重复的请求", "warning");
+  }
 };
 
 // 图片成功处理
@@ -180,15 +193,26 @@ const handleAvatarSuccess: UploadProps["onSuccess"] = (
   console.log(response, uploadFile);
   // imageUrl.value = URL.createObjectURL(uploadFile.raw!);
 };
+// 超出一个样式后，清除之前的放入现在传入的文件
+const exceed: (files: File[], uploadFiles: UploadUserFile[]) => void = (
+  files,
+  uploadFiles
+) => {
+  console.log(files, uploadFiles);
 
-const exceed = (files, ffiles) => {
-  console.log(1);
-   // 清空之前预备上传的文件
-   if (ffiles.length !== 0) {
-    updateRef.value.clearFiles();
-    
+  if (!beforeAvatarUpload(files[0] as UploadRawFile)) {
+    // 处理错误
+    return false;
   }
 
+  // 清空之前预备上传的文件
+  updateRef.value.clearFiles();
+  // 上传最新的文件
+  updateRef.value.handleStart(files[0]);
+  // 显示图片
+  imageUrl.value = URL.createObjectURL(files[0]);
+  // 更新文件后可以再次请求(其实element-plus的el-upload他的提交方法你没有更新数据也不会请求，我加布尔值只是为了更好的判断)
+  isUpdateAvatarFile.value = true;
 };
 
 // 销毁前
