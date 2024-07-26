@@ -1,6 +1,5 @@
 import express from "express";
 import multer from "multer";
-import bodyParser from "body-parser";
 import crypto from "crypto";
 import path from "path";
 import type { Router } from "express";

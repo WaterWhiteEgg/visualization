@@ -243,8 +243,7 @@ const justSubmitForm = async (formEl: FormInstance | undefined) => {
             // 提示登录成功
             usePopup().openPopup("登录成功", "success");
             // 跳转路由
-            router.push("/")
-            window.location.reload()
+            router.replace("/")
           }
         }
       );

@@ -3,6 +3,10 @@ import { useToken } from "@/stores/token";
 import loading from "@/components/loading/loadingIndex.vue";
 import { createVNode, render } from "vue";
 import { type RouteLocationNormalized } from "vue-router";
+import { userVerifyToken } from "@/network/user";
+import { useRegister, type ParseUserData } from "@/stores/register";
+
+
 // loading在ts文件里无法使用，可以使用vue提供的createVNode 进行函数式编程
 const loadingNode = createVNode(loading);
 // console.log(loadingNode);
@@ -25,16 +29,16 @@ export let previousErrorTofullPath: string = "/";
 
 // 路由前
 router.beforeEach((to, from, next) => {
+  // 显示加载条
   loadingNode.component?.exposed?.startLoading();
   // 记录上一个值
   previousFormRoute = from;
 
   // 检查token
-  if (useToken().token) {
-    // console.log(useToken().token);
-  } else {
-    console.log("没有token");
-  }
+  // 有token时尝试获取用户信息
+  useToken().token ? getUser() : null;
+
+
 
   // 检查路径存在
   // 由于from无法记录未注册的路由，所以要通过to.matched.length判断to是否是一个没有内容的组件
@@ -48,8 +52,8 @@ router.beforeEach((to, from, next) => {
   // 正常跳转
   // 正常跳转说明to.matched.length有内容，那么上一个路径from是有记录的
   else {
-    console.log(from);
-    
+    // console.log(from);
+
     next();
   }
 });
@@ -58,3 +62,18 @@ router.afterEach((_to, _from, failure) => {
   // console.log(failure?"路由错误":"没有问题");
   loadingNode.component?.exposed?.endLoading();
 });
+
+
+
+// 通过token认证获取user数据，放到全局记录
+const getUser = () => {
+  userVerifyToken().then((res) => {
+    // console.log(JSON.stringify(res.data.data.user));
+
+    useRegister().changeUserData(JSON.stringify(res.data.data.user) as string);
+  });
+  // userVerifyToken().then((res)=>{
+  //   console.log(res);
+
+  // })
+};
