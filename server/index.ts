@@ -8,6 +8,7 @@ import { MYSECRET_KEY, isDEV, BASEURL } from "./key";
 import { SECRET_KEY } from "./realdata/key";
 
 import { error } from "./middleware/error";
+import { globalError } from "./middleware/global_error";
 
 import router from "./router/router";
 import loginComponent from "./login_component/login_component";
@@ -15,7 +16,6 @@ import weatherRouter from "./router/weather";
 import emailRouter from "./email/emailRouter";
 import userRouter from "./user/user";
 import publicRouter from "./public_server/public_server";
-
 
 // 防止一个ip请求过多
 import { limiter } from "./limit/index";
@@ -32,7 +32,6 @@ import { expressjwt } from "express-jwt";
 const app = express();
 app.use(error);
 app.use(cors(corsOptions));
-
 
 // 解析token
 app.use(
@@ -68,6 +67,8 @@ app.use("/public/", publicRouter);
 // 将 /public/img 目录下的文件暴露出来
 app.use("/img", express.static(path.join(__dirname, "public", "img")));
 
+// 全局错误处理
+app.use(globalError);
 // ip请求限制
 app.use(limiter);
 

@@ -31,10 +31,20 @@ const storage = multer.diskStorage({
 
 // 处理文件
 const avatarFile = multer({
+  // 处理文件储存相关
   storage: storage,
   limits: {
-    fileSize: 2 * 1024 * 1024, // 限制文件大小为 2MB
+    fileSize: 1 * 1024 * 1024, // 限制文件大小为 2MB
     files: 1, // 限制文件数量为 1
+  },
+  // 处理文件类型
+  fileFilter(req, file, cb) {
+    // 允许 jpg 和 png 格式的文件
+    if (file.mimetype === "image/jpeg" || file.mimetype === "image/png") {
+      cb(null, true);
+    } else {
+      cb(new Error("只能传递png或jpg格式"));
+    }
   },
 });
 

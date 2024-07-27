@@ -114,13 +114,13 @@ const doUserdata = () => {
 // 在上传图片之前触发，图片验证规则
 const beforeAvatarUpload: UploadProps["beforeUpload"] = (rawFile) => {
   // 传入格式
-  if (rawFile.type !== "image/jpeg") {
-    usePopup().openPopup("请传入jpg/jpeg格式的图片！", "warning");
+  if (rawFile.type !== "image/jpeg" &&rawFile.type !== "image/png") {
+    usePopup().openPopup("请传入jpg / png格式的图片！", "warning");
     return false;
   }
   // 文件大小，这个是2M
-  else if (rawFile.size / 1024 / 1024 > 2) {
-    usePopup().openPopup("文件大小限制在2MB", "warning");
+  else if (rawFile.size / 1024 / 1024 > 1) {
+    usePopup().openPopup("文件大小限制在1MB", "warning");
     return false;
   }
   // 成功返回
@@ -151,6 +151,8 @@ const updateAvater: (
     // 重复请求
   } catch (error) {
     // 错误处理
+    console.log(error);
+
     usePopup().openPopup("网络错误", "error");
   }
 };
@@ -175,7 +177,7 @@ const onAvatarFileChange: (
 // 执行里面的提交方法
 const commitAvatar = () => {
   // 除非更新了文件，否则只用请求一次就够了
-  
+
   if (isUpdateAvatarFile.value) {
     updateRef.value.submit();
     isUpdateAvatarFile.value = false;
