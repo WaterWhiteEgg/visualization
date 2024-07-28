@@ -1,10 +1,10 @@
 import { createRouter, createWebHistory } from "vue-router";
 
 const HomeView = () => import("../views/index/indexCityMap.vue");
-const HomeLogin = () => import("../views/login/loginIndex.vue");
-const HomeUser = () => import("../views/user/userIndex.vue");
-const HomeRegister = () => import("../views/register/registerIndex.vue");
-const HomeError = () => import("../views/error/errorIndex.vue");
+const HomeLogin = () => import("../views/login/indexLogin.vue");
+const HomeUser = () => import("../views/user/indexUser.vue");
+const HomeRegister = () => import("../views/register/indexRegister.vue");
+const HomeError = () => import("../views/error/indexError.vue");
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
