@@ -9,9 +9,8 @@ import type {
   UploadFiles,
   UploadRawFile,
   UploadUserFile,
-
 } from "element-plus";
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage, ElMessageBox } from "element-plus";
 import { commitAvater } from "@/network/updateFile";
 import { useRoute, useRouter } from "vue-router";
 
@@ -55,7 +54,7 @@ const updateAvater: (
   // 请求上传接口
   try {
     let res = await commitAvater(fd);
-    usePopup().openPopup("请求成功", "success");
+    usePopup().openPopup("请求成功,刷新页面查看", "success");
 
     // 重复请求
   } catch (error) {
@@ -85,30 +84,24 @@ const onAvatarFileChange: (
 
 // 执行里面的提交方法
 const commitAvatar = () => {
-  // 除非更新了文件，否则只用请求一次就够了
-  ElMessageBox.confirm(
-    'proxy will permanently delete the file. Continue?',
-    'Warning',
-    {
-      confirmButtonText: 'OK',
-      cancelButtonText: 'Cancel',
-      type: 'warning',
-    }
-  )
+  //   弹窗选择
+  ElMessageBox.confirm("确定上传文件吗？", "Warning", {
+    confirmButtonText: "确定",
+    cancelButtonText: "取消",
+    type: "warning",
+  })
+    // 确定选择
     .then(() => {
-        usePopup().openPopup("")
+      // 除非更新了文件，否则只用请求一次就够了
+      if (isUpdateAvatarFile.value && avatarFile.value.length !== 0) {
+        updateRef.value.submit();
+        isUpdateAvatarFile.value = false;
+      } else {
+        usePopup().openPopup("错误的请求", "error");
+      }
     })
-    .catch(() => {
-        usePopup().openPopup("")
-    })
-}
-  if (isUpdateAvatarFile.value && avatarFile.value.length !== 0) {
-    updateRef.value.submit();
-    isUpdateAvatarFile.value = false;
-    // console.log(res);
-  } else {
-    usePopup().openPopup("重复的请求", "warning");
-  }
+    // 取消选择
+    .catch((err) => {});
 };
 
 // 图片成功处理
@@ -159,7 +152,11 @@ const exceed: (files: File[], uploadFiles: UploadUserFile[]) => void = (
     >
       <img v-if="imageUrl" :src="imageUrl" class="avatar" />
     </el-upload>
-    <el-button class="ml-3" type="success" @click="commitAvatar"
+    <el-button
+      class="ml-3"
+      type="success"
+      @click="commitAvatar"
+      v-show="isUpdateAvatarFile && avatarFile.length !== 0"
       >提交</el-button
     >
   </div>
