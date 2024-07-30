@@ -137,7 +137,7 @@ const exceed: (files: File[], uploadFiles: UploadUserFile[]) => void = (
 <template>
   <div class="user_item">
     <el-upload
-      class="avatar-uploader"
+      class="user_item_uploader"
       :limit="1"
       v-model:file-list="avatarFile"
       :show-file-list="false"
@@ -150,6 +150,9 @@ const exceed: (files: File[], uploadFiles: UploadUserFile[]) => void = (
       :before-upload="beforeAvatarUpload"
       :auto-upload="false"
     >
+      <span class="user_item_uploader_title" v-show="!imageUrl"
+        >拖拽文件或或点击以上传jpg/png格式的图片，建议使用300x300不超过1M的图片。</span
+      >
       <img v-if="imageUrl" :src="imageUrl" class="avatar" />
     </el-upload>
     <el-button
@@ -167,5 +170,14 @@ const exceed: (files: File[], uploadFiles: UploadUserFile[]) => void = (
   width: 15vh;
   border-radius: 50%;
   overflow: hidden;
+}
+.user_item {
+  width: 80vw;
+  margin: 0 auto;
+  font-size: 0.8rem;
+  background-color: #fff;
+}
+.user_item_uploader_title {
+  color: #a9a9a9;
 }
 </style>
