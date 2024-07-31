@@ -30,6 +30,7 @@ const gender = computed(() => {
 <template>
   <div class="user_message">
     <div class="user_message_descs">
+      简介: 
       {{ userData.descs ? userData.descs : "这个人很懒，没有填写简介喔~" }}
     </div>
 
@@ -84,7 +85,7 @@ const gender = computed(() => {
   padding: 0.5vh 0.5vw;
   overflow: scroll;
   color: #5f5f5f;
-  border: 1px dotted #cdcdcd;
+  border: 1px solid #e7e7e7;
 }
 /* 隐藏滚动条，兼容 Chrome 和 Firefox */
 .user_message_descs {
