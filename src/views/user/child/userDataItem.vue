@@ -5,6 +5,14 @@ import { usePopup } from "@/stores/popup";
 import { useRoute, useRouter } from "vue-router";
 import itemAvatar from "./item/itemAvatar.vue";
 
+const props = withDefaults(
+  defineProps<{
+    isShowMainUserFlag: boolean;
+  }>(),
+  {
+    isShowMainUserFlag: false,
+  }
+);
 // 挂载route实例
 const route = useRoute();
 // 挂载router实例

@@ -47,8 +47,6 @@ onMounted(() => {
   // usePopup().changeisOpenMainviewIndex(false);
 
   // 由于在解析token时已经获取到数据了，但为了安全起见，进入这个界面需要再一次验证token
-  // console.log(userinfo);
-  // console.log(route.params.user_id);
 
   // 判断token存在再做配置
   if (!window.localStorage.getItem("token")) {
@@ -124,8 +122,8 @@ onBeforeUnmount(() => {
 <template>
   <div class="user">
     <userTitle :userData="userData"></userTitle>
-    <userMessage :userData="userData"></userMessage>
-    <userDataItem></userDataItem>
+    <userMessage :userData="userData" :isShowMainUserFlag="isShowMainUserFlag"></userMessage>
+    <userDataItem :isShowMainUserFlag="isShowMainUserFlag"></userDataItem>
   </div>
 </template>
 <style scoped>

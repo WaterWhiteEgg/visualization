@@ -3,10 +3,12 @@ import { computed, ref } from "vue";
 import { type UserData } from "@/network/user";
 const props = withDefaults(
   defineProps<{
-    userData: UserData | {};
+    userData: UserData;
+    isShowMainUserFlag: boolean;
   }>(),
   {
     userData: undefined,
+    isShowMainUserFlag: false,
   }
 );
 const emits = defineEmits<{
@@ -29,11 +31,11 @@ const gender = computed(() => {
 </script>
 <template>
   <div class="user_message">
+    {{ userData }}
     <div class="user_message_descs">
-      简介: 
+      简介:
       {{ userData.descs ? userData.descs : "这个人很懒，没有填写简介喔~" }}
     </div>
-
     <div class="user_message_useradmin">
       <div>
         用户名:
@@ -47,19 +49,20 @@ const gender = computed(() => {
         性别:
         {{ gender }}
       </div>
-      <div>
+      <div v-if="isShowMainUserFlag">
         邮箱:
         {{ userData.email ? userData.email : "未填写" }}
       </div>
-      <div>
+      <div v-if="isShowMainUserFlag">
         手机号码:
         {{ userData.phone_number ? userData.phone_number : "未填写" }}
       </div>
-      <div>
+
+      <div v-if="isShowMainUserFlag">
         管理员认证:
         {{ userData.is_admin ? "管理员" : "非管理员" }}
       </div>
-      <div>
+      <div v-if="isShowMainUserFlag">
         游客登录:
         {{ userData.is_guest ? "游客登录" : "否" }}
       </div>
