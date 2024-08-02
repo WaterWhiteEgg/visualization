@@ -447,6 +447,16 @@ function userIdLogin(name: string, password: string): Promise<ResRej> {
     inUserIdLogin();
   });
 }
+// 游客登录
+// 使用游客登录时，可以免去注册验证
+router.post("/guest/login", async (req, res) => {
+  // 解构获取的数据
+  const { name, resource, password }: RuleLoginForm = req.body;
+  res.send({
+    status: 0,
+    name,
+  });
+});
 // 验证用户名/用户id
 router.post("/username", expressJoi(VdUsername), async (req, res) => {
   // console.log(req.body);

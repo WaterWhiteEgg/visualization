@@ -22,7 +22,7 @@ const router = useRouter();
 const dialogVisible = ref(false);
 </script>
 <template>
-  <div class="user_item">
+  <div class="user_item" v-if="isShowMainUserFlag">
     <div class="user_item_title">
       <el-icon><Tools /></el-icon>
       <span>设置</span>
