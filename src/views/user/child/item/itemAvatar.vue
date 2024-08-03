@@ -12,6 +12,7 @@ import type {
 } from "element-plus";
 import { ElMessageBox } from "element-plus";
 import { commitAvater } from "@/network/updateFile";
+import { AxiosError } from "axios";
 
 // 在上传图片之前触发，图片验证规则
 const beforeAvatarUpload: UploadProps["beforeUpload"] = (rawFile) => {
@@ -50,12 +51,21 @@ const updateAvater: (
     let res = await commitAvater(fd);
     usePopup().openPopup("请求成功,刷新页面查看", "success");
 
-    // 重复请求
+    // 修改按钮
+    isUpdateAvatarFile.value = false;
+
   } catch (error) {
     // 错误处理
-    console.log(error);
-
-    usePopup().openPopup("网络错误", "error");
+    console.log(
+      ((error as AxiosError).response?.data as { error: string; status: 0 | 1 })
+        .error
+    );
+    // 报错有内容优先显示
+    usePopup().openPopup(
+      ((error as AxiosError).response?.data as { error: string; status: 0 | 1 })
+        .error || "网络错误",
+      "error"
+    );
   }
 };
 
@@ -89,7 +99,6 @@ const commitAvatar = () => {
       // 除非更新了文件，否则只用请求一次就够了
       if (isUpdateAvatarFile.value && avatarFile.value.length !== 0) {
         updateRef.value.submit();
-        isUpdateAvatarFile.value = false;
       } else {
         usePopup().openPopup("错误的请求", "error");
       }
