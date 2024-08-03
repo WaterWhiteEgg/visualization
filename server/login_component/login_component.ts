@@ -359,6 +359,7 @@ async function switchLogin(
   data: RuleRegisterForm | RuleLoginForm,
   otherData?: unknown
 ): Promise<ResRej> {
+  // 默认值
   let inValidateStatusObj: ResRej = {
     status: 1,
     message: "没有处理结果或有误",
@@ -451,7 +452,62 @@ function userIdLogin(name: string, password: string): Promise<ResRej> {
 // 使用游客登录时，可以免去注册验证
 router.post("/guest/login", async (req, res) => {
   // 解构获取的数据
-  const { name, resource, password }: RuleLoginForm = req.body;
+  const { name, resource, password, user_agent }: RuleLoginForm = req.body;
+
+  try {
+    // 查询下一个唯一id
+    const id = await selectId();
+
+    // 生成token
+    const token = generateToken({ username: name, resource, user_id: id });
+    // 用户的网络信息
+    const other_security = createSecurity(req.ip);
+    // 用户的其他信息
+    const other_Information = createOtherInformation();
+
+    // 生成加密过的密码
+    const hashPassword = await bcrypt.hash(password, 10);
+
+    // 获取默认头像信息，url格式的
+    const avatar_url = imgId();
+
+    // 注册sql语句
+    const set = `INSERT INTO ${table_name} (username,user_id, password, status,token,other_security,user_agent,other_Information,avatar_url) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`;
+
+    connection.query(
+      set,
+      [
+        name,
+        id,
+        hashPassword,
+        resource,
+
+        token,
+        other_security,
+        user_agent,
+        other_Information,
+        avatar_url,
+      ],
+      function (err) {
+        // 登录错误处理
+        if (err) {
+          return res.cc(err);
+        }
+        res.send({
+          status: 0,
+          message: "游客注册成功",
+          token,
+        });
+        // 结束响应
+        res.end();
+      }
+    );
+  } catch (error) {
+    // 执行过程中可能的错误
+    // console.log(error);
+
+    return res.cc(error as Error);
+  }
   res.send({
     status: 0,
     name,

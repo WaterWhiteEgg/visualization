@@ -10,8 +10,9 @@ const publicRouter: Router = express.Router();
 
 // 表名
 import connection from "../db/dbmain";
-const table_name = "_user";
+import { table_name } from "../key";
 
+import { checkLoggedIn } from "../login_component/guest";
 // 处理文件储存相关
 const storage = multer.diskStorage({
   // 储存位置
@@ -53,38 +54,43 @@ export function imgId(id: string = "default.jpg") {
   return `${LOCALBASEURL}/img/avatar/${id}`;
 }
 
-publicRouter.post("/avatar", avatarFile.single("avatar"), (req, res) => {
-  console.log(req.file);
+publicRouter.post(
+  "/avatar",
+  checkLoggedIn,
+  avatarFile.single("avatar"),
+  (req, res) => {
+    console.log(req.file);
 
-  // 获取token的数据
-  const tokenValue = req.auth;
+    // 获取token的数据
+    const tokenValue = req.auth;
 
-  // 获取头像的网址
-  const avatarUrl = imgId(req.file!.filename);
-  // 查询name是用户名时找不找到后，再查询是用户id找不找到
-  const set = `UPDATE ${table_name} SET avatar_url = ? WHERE user_id = ?`;
+    // 获取头像的网址
+    const avatarUrl = imgId(req.file!.filename);
+    // 查询name是用户名时找不找到后，再查询是用户id找不找到
+    const set = `UPDATE ${table_name} SET avatar_url = ? WHERE user_id = ?`;
 
-  connection.query(
-    set,
-    [avatarUrl, tokenValue!.user.user_id],
-    function (err, results) {
-      // 更新错误处理
-      if (err) {
-        return res.cc(err);
+    connection.query(
+      set,
+      [avatarUrl, tokenValue!.user.user_id],
+      function (err, results) {
+        // 更新错误处理
+        if (err) {
+          return res.cc(err);
+        }
+
+        // 验证成功
+        // 判断是否修改失败
+        if ((results as ResultSetHeader).affectedRows !== 1) {
+          res.cc("修改失败");
+        }
+
+        res.send({
+          status: 0,
+          massage: "修改成功",
+          url: avatarUrl,
+        });
       }
-
-      // 验证成功
-      // 判断是否修改失败
-      if ((results as ResultSetHeader).affectedRows !== 1) {
-        res.cc("修改失败");
-      }
-
-      res.send({
-        status: 0,
-        massage: "修改成功",
-        url: avatarUrl,
-      });
-    }
-  );
-});
+    );
+  }
+);
 export default publicRouter;
