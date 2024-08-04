@@ -36,6 +36,8 @@ onMounted(() => {
 
 // router实例
 const router = useRouter();
+// 表单加载动画flag
+const isStartFormLoading = ref(false);
 // 配置表单大小
 const formSize = ref("default");
 // 表单数据
@@ -289,7 +291,13 @@ const getEmailCode = async (formEl: FormInstance | undefined) => {
     else {
       // 网络请求
       // 节流阀，延迟后执行
-      inPostToGetEmailCode(ruleForm.email);
+      // 开启加载动画
+      isStartFormLoading.value = true;
+      // 节流阀，延迟后执行
+      inPostToGetEmailCode(ruleForm.email).finally(() => {
+        // 关闭加载动画
+        isStartFormLoading.value = false;
+      });
     }
   });
 };
@@ -303,6 +311,7 @@ const getEmailCode = async (formEl: FormInstance | undefined) => {
     label-width="auto"
     class="form"
     :size="formSize"
+    v-loading="isStartFormLoading"
     status-icon
   >
     <h3>{{ ruleForm.validate === "用户名登录" ? "登录/注册" : "登录" }}</h3>

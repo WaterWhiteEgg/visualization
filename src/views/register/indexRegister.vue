@@ -48,6 +48,8 @@ onMounted(() => {
   }
 });
 
+// 页面加载flag
+const isStartFormLoading = ref(false);
 // 配置表单大小
 const formSize = ref("default");
 // 表单数据
@@ -64,8 +66,6 @@ const ruleForm = reactive<RuleForm>({
   region: "0",
   desc: "",
 });
-
-// 表单规则
 
 // 再次判断密码
 const findAgainPassword = (
@@ -277,7 +277,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
           usePopup().openPopup("注册成功", "success");
           // 跳转页面
           router.replace("/");
-          window.location.reload()
+          window.location.reload();
         })
         .catch((err) => {
           console.log(err);
@@ -309,8 +309,13 @@ const getEmailCode = async (formEl: FormInstance | undefined) => {
     // 验证成功
     else {
       // 网络请求
+      // 开启加载动画
+      isStartFormLoading.value = true;
       // 节流阀，延迟后执行
-      inPostToGetEmailCode(ruleForm.email);
+      inPostToGetEmailCode(ruleForm.email).finally(() => {
+        // 关闭加载动画
+        isStartFormLoading.value = false;
+      });
     }
   });
 };
@@ -325,6 +330,7 @@ const getEmailCode = async (formEl: FormInstance | undefined) => {
     class="form"
     :size="formSize"
     status-icon
+    v-loading="isStartFormLoading"
   >
     <h3>注册</h3>
     <el-form-item label="用户名" prop="name">

@@ -14,6 +14,9 @@ import { ElMessageBox } from "element-plus";
 import { commitAvater } from "@/network/updateFile";
 import { AxiosError } from "axios";
 
+// 加载flag
+const isStartUpdateLoading = ref(false);
+
 // 在上传图片之前触发，图片验证规则
 const beforeAvatarUpload: UploadProps["beforeUpload"] = (rawFile) => {
   // 传入格式
@@ -50,22 +53,20 @@ const updateAvater: (
   try {
     let res = await commitAvater(fd);
     usePopup().openPopup("请求成功,刷新页面查看", "success");
-
     // 修改按钮
     isUpdateAvatarFile.value = false;
-
+    // 直接结束加载动画
+    isStartUpdateLoading.value = false;
   } catch (error) {
     // 错误处理
-    console.log(
-      ((error as AxiosError).response?.data as { error: string; status: 0 | 1 })
-        .error
-    );
     // 报错有内容优先显示
     usePopup().openPopup(
       ((error as AxiosError).response?.data as { error: string; status: 0 | 1 })
         .error || "网络错误",
       "error"
     );
+    // 直接结束加载动画
+    isStartUpdateLoading.value = false;
   }
 };
 
@@ -88,6 +89,8 @@ const onAvatarFileChange: (
 
 // 执行里面的提交方法
 const commitAvatar = () => {
+  // 加载中动画
+  isStartUpdateLoading.value = true;
   //   弹窗选择
   ElMessageBox.confirm("确定上传文件吗？", "Warning", {
     confirmButtonText: "确定",
@@ -98,13 +101,19 @@ const commitAvatar = () => {
     .then(() => {
       // 除非更新了文件，否则只用请求一次就够了
       if (isUpdateAvatarFile.value && avatarFile.value.length !== 0) {
+        // 请求上传
         updateRef.value.submit();
       } else {
         usePopup().openPopup("错误的请求", "error");
+        // 直接结束加载动画
+        isStartUpdateLoading.value = false;
       }
     })
     // 取消选择
-    .catch((err) => {});
+    .catch((err) => {
+      // 直接结束加载动画
+      isStartUpdateLoading.value = false;
+    });
 };
 
 // 图片成功处理
@@ -126,6 +135,8 @@ const exceed: (files: File[], uploadFiles: UploadUserFile[]) => void = (
     // 处理错误
     return false;
   }
+  // 加载中动画
+  isStartUpdateLoading.value = true;
 
   // 清空之前预备上传的文件
   updateRef.value.clearFiles();
@@ -135,11 +146,15 @@ const exceed: (files: File[], uploadFiles: UploadUserFile[]) => void = (
   imageUrl.value = URL.createObjectURL(files[0]);
   // 更新文件后可以再次请求(其实element-plus的el-upload他的提交方法你没有更新数据也不会请求，我加布尔值只是为了更好的判断)
   isUpdateAvatarFile.value = true;
+
+  // 直接结束加载动画
+  isStartUpdateLoading.value = false;
 };
 </script>
 <template>
   <el-upload
     class="user_item_uploader"
+    v-loading="isStartUpdateLoading"
     :limit="1"
     v-model:file-list="avatarFile"
     :show-file-list="false"

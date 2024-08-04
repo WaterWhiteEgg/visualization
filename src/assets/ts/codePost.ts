@@ -29,8 +29,8 @@ const TimerAndPopupEmailCode = (status: 0 | 1) => {
 };
 
 // 处理验证码请求
-export function inPostToGetEmailCode(email: string) {
-  postToGetEmailCode(email)
+export async function inPostToGetEmailCode(email: string) {
+  return postToGetEmailCode(email)
     .then((res) => {
       // 处理发送完成的状态
       TimerAndPopupEmailCode(res.data.status as 0 | 1);
