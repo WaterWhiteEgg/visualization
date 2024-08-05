@@ -390,44 +390,54 @@ const getEmailCode = async (formEl: FormInstance | undefined) => {
 
     <el-form-item>
       <!-- 登录分为直接验证登录，和验证后跳转注册的情况 -->
+      <div v-if="ruleForm.validate === '用户名登录'">
+        <el-popover
+          placement="bottom"
+          :width="200"
+          trigger="hover"
+          content="进行登录提交，创建/登录 会在没有相对应账户时跳转注册界面。"
+        >
+          <template #reference>
+            <el-button type="primary" @click="submitForm(ruleFormRef)">
+              创建/登录
+            </el-button>
+          </template>
+        </el-popover>
+      </div>
 
-      <el-popover
-        placement="bottom"
-        :width="200"
-        trigger="hover"
-        content="进行登录提交，创建/登录 会在没有相对应账户时跳转注册界面。"
-      >
-        <template #reference>
-          <el-button
-            type="primary"
-            @click="submitForm(ruleFormRef)"
-            v-if="ruleForm.validate === '用户名登录'"
-          >
-            创建/登录
-          </el-button>
-          <el-button type="primary" @click="justSubmitForm(ruleFormRef)" v-else>
-            登录
-          </el-button>
-        </template>
-      </el-popover>
+      <div v-else>
+        <el-popover
+          placement="bottom"
+          :width="200"
+          trigger="hover"
+          content="进行登录提交，创建/登录 会在没有相对应账户时跳转注册界面。"
+        >
+          <template #reference>
+            <el-button type="primary" @click="justSubmitForm(ruleFormRef)">
+              登录
+            </el-button>
+          </template>
+        </el-popover>
+      </div>
 
-      <el-popover
-        placement="bottom"
-        :width="200"
-        trigger="hover"
-        content="游客登录会尝试直接注册一个账号，不会绑定验证，功能可能会受限。"
-      >
-        <template #reference>
-          <el-button
-            type="primary"
-            color="#707070"
-            @click="submitGuestForm(ruleFormRef)"
-            v-if="ruleForm.validate === '用户名登录'"
-          >
-            游客登录
-          </el-button>
-        </template>
-      </el-popover>
+      <div v-if="ruleForm.validate === '用户名登录'">
+        <el-popover
+          placement="bottom"
+          :width="200"
+          trigger="hover"
+          content="游客登录会尝试直接注册一个账号，不会绑定验证，功能可能会受限。"
+        >
+          <template #reference>
+            <el-button
+              type="primary"
+              color="#707070"
+              @click="submitGuestForm(ruleFormRef)"
+            >
+              游客登录
+            </el-button>
+          </template>
+        </el-popover>
+      </div>
 
       <el-button @click="resetForm(ruleFormRef)">重置</el-button>
     </el-form-item>
