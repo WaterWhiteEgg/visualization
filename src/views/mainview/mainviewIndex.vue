@@ -158,8 +158,7 @@ const toUser = () => {
 
   .main-button {
     position: relative;
-    width: 30px;
-    cursor: pointer;
+height: 30px;
   }
 
   .main-list {
@@ -170,5 +169,13 @@ const toUser = () => {
     overflow: scroll;
     background-color: #ffffff;
   }
+  .main-list-head {
+background-color: #beedffe0;
+}
+
+.main-list-head-title-user {
+  margin-right: 2vw;
+  font-size: 1rem;
+}
 }
 </style>

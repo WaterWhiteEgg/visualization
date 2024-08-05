@@ -388,7 +388,7 @@ const getEmailCode = async (formEl: FormInstance | undefined) => {
       </el-radio-group>
     </el-form-item>
 
-    <el-form-item>
+    <el-form-item class="form_button">
       <!-- 登录分为直接验证登录，和验证后跳转注册的情况 -->
       <div v-if="ruleForm.validate === '用户名登录'">
         <el-popover
@@ -479,6 +479,9 @@ const getEmailCode = async (formEl: FormInstance | undefined) => {
   margin: 1vh 0;
   padding: 0.25vh 1vw;
   border: 0.5px solid #e5e5e5;
+}
+.form_button div {
+  margin-right: .5vw;
 }
 @media screen and (max-width: 969px) {
   /* 手机 */
