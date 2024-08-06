@@ -2,7 +2,7 @@
 import { reactive, ref, onMounted, type Ref } from "vue";
 import { useRouter } from "vue-router";
 import type { FormInstance, FormRules } from "element-plus";
-import { loginUser, findUsername } from "../../network/db";
+import { loginUser, findUsername, guestLoginUser } from "../../network/db";
 import { useRegister } from "../../stores/register";
 import { usePopup } from "../../stores/popup";
 import { useToken } from "../../stores/token";
@@ -261,9 +261,14 @@ const submitGuestForm = async (formEl: FormInstance | undefined) => {
   if (!formEl) return;
   await formEl.validate(async (valid, fields) => {
     if (valid) {
-      // commitUser(ruleForm).then((res) => {
-      //   console.log(res);
-      // });
+      // 游客登录提供的数据会少一点
+      const guestForm = {
+        ...ruleForm,
+        ...{ user_agent: useRegister().userAgent },
+      };
+      guestLoginUser(guestForm).then((res) => {
+        console.log(res);
+      });
     }
     // 错误提示
     else {
@@ -481,7 +486,7 @@ const getEmailCode = async (formEl: FormInstance | undefined) => {
   border: 0.5px solid #e5e5e5;
 }
 .form_button div {
-  margin-right: .5vw;
+  margin-right: 0.5vw;
 }
 @media screen and (max-width: 969px) {
   /* 手机 */

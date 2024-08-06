@@ -20,7 +20,7 @@ const router = express.Router();
 // 哪个环境决定使用哪个环境的key
 const secret_key = isDEV ? MYSECRET_KEY : SECRET_KEY;
 // 表名
-const table_name = "_user";
+import { table_name } from "../key";
 
 type RuleRegisterForm = {
   user_agent: string;
@@ -472,7 +472,7 @@ router.post("/guest/login", async (req, res) => {
     const avatar_url = imgId();
 
     // 注册sql语句
-    const set = `INSERT INTO ${table_name} (username,user_id, password, status,token,other_security,user_agent,other_Information,avatar_url) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`;
+    const set = `INSERT INTO ${table_name} (username,user_id, password, status,token,other_security,user_agent,other_Information,avatar_url,is_guest) VALUES (?,?,?,?,?,?,?,?,?,?)`;
 
     connection.query(
       set,
@@ -481,12 +481,12 @@ router.post("/guest/login", async (req, res) => {
         id,
         hashPassword,
         resource,
-
         token,
         other_security,
         user_agent,
         other_Information,
         avatar_url,
+        1,
       ],
       function (err) {
         // 登录错误处理
@@ -508,10 +508,6 @@ router.post("/guest/login", async (req, res) => {
 
     return res.cc(error as Error);
   }
-  res.send({
-    status: 0,
-    name,
-  });
 });
 // 验证用户名/用户id
 router.post("/username", expressJoi(VdUsername), async (req, res) => {

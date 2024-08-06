@@ -5,7 +5,7 @@ import { User } from "./login_component";
 
 // 检查token的用户是否是游客登录
 export function checkLoggedIn(req: Request, res: Response, next: NextFunction) {
-  // 假设你有一种方式来判断用户是否已登录
+  
 
   //   查询数据
   const set = `SELECT * 
