@@ -284,7 +284,9 @@ const submitGuestForm = async (formEl: FormInstance | undefined) => {
           guestLoginUser(guestForm).then((res) => {
             console.log(res);
           });
-        });
+        })
+      // 点击取消
+        .catch((err) => {});
     }
 
     // 错误提示
