@@ -2,6 +2,7 @@
 import { reactive, ref, onMounted, type Ref } from "vue";
 import { useRouter } from "vue-router";
 import type { FormInstance, FormRules } from "element-plus";
+import { ElMessageBox } from "element-plus";
 import { loginUser, findUsername, guestLoginUser } from "../../network/db";
 import { useRegister } from "../../stores/register";
 import { usePopup } from "../../stores/popup";
@@ -186,6 +187,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
       const loginForm = {
         ...ruleForm,
       };
+
       findUsername(loginForm).then((res) => {
         // console.log(res.data.status);
         // 假设没有用户则跳转注册
@@ -261,18 +263,33 @@ const submitGuestForm = async (formEl: FormInstance | undefined) => {
   if (!formEl) return;
   await formEl.validate(async (valid, fields) => {
     if (valid) {
-      // 游客登录提供的数据会少一点
-      const guestForm = {
-        ...ruleForm,
-        ...{ user_agent: useRegister().userAgent },
-      };
-      guestLoginUser(guestForm).then((res) => {
-        console.log(res);
-      });
+      // 确认游客登陆
+      ElMessageBox.confirm(
+        "你确定进行游客登陆吗，一些操作会遭到限制",
+        "Warning",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        }
+      )
+        // 点击确定
+        .then(() => {
+          // 游客登录提供的数据会少一点
+
+          const guestForm = {
+            ...ruleForm,
+            ...{ user_agent: useRegister().userAgent },
+          };
+          guestLoginUser(guestForm).then((res) => {
+            console.log(res);
+          });
+        });
     }
+
     // 错误提示
     else {
-      console.log("error submit!", fields);
+      console.log("错误的提交", fields);
     }
   });
 };

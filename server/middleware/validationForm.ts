@@ -139,6 +139,16 @@ export const VdEmailCode = {
     email: emailJoi,
   },
 };
+// 游客登录表单验证
+export const VdGuestLogin = {
+  body: {
+    name: nameCanNull,
+    password: passwordCanNull,
+    resource,
+    validate,
+    user_agent,
+  },
+};
 
 // 验证name（userid与用户名）
 export const VdQuserId = {

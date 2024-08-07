@@ -6,12 +6,18 @@ import connection from "../db/dbmain";
 // import CLIENT from "../redis/index";
 import { QueryResult } from "mysql2";
 import bcrypt from "bcrypt";
+import crypto from "crypto";
 import { ResRej } from "../middleware/middleware";
 import { imgId } from "../public_server/public_server";
 
 // 表单验证
 import expressJoi from "@escook/express-joi";
-import { VdRegister, VdLogin, VdUsername } from "../middleware/validationForm";
+import {
+  VdRegister,
+  VdLogin,
+  VdUsername,
+  VdGuestLogin,
+} from "../middleware/validationForm";
 import {
   verificationEmailCode,
   findUsernameVerificationEmailCode,
@@ -48,6 +54,14 @@ type RuleLoginForm = {
   emailCode: string;
   phone: string;
   phoneCode: string;
+};
+
+type RuleGuestLoginForm = {
+  user_agent: string;
+  validate: string;
+  name: string;
+  password: string;
+  resource: string;
 };
 
 // 这是使用updete等会获得的字段
@@ -220,6 +234,14 @@ async function selectId(): Promise<string> {
   });
 }
 
+// 获取随机的用户名填满哈希
+const generateRandomName = (name: string, max = 16, nameLong = 3) => {
+  // 将名字随机化
+  const hash = crypto.createHash("sha256").update(name).digest("hex"); // 对随机字节进行哈希
+  const truncatedName = name.substring(0, nameLong); // 截取原始名称的前nameLong个字符，越小越多哈希
+  const hashName = hash.substring(0, max - truncatedName.length); // 截取哈希值确保总长度不超过 max
+  return `${truncatedName}${hashName}`;
+};
 // 用户名登录
 router.post("/login", expressJoi(VdLogin), async (req, res) => {
   // console.log(req.body);
@@ -450,21 +472,20 @@ function userIdLogin(name: string, password: string): Promise<ResRej> {
 }
 // 游客登录
 // 使用游客登录时，可以免去注册验证
-router.post("/guest/login", async (req, res) => {
+router.post("/guest/login", expressJoi(VdGuestLogin), async (req, res) => {
   // 解构获取的数据
-  const { name, resource, password, user_agent }: RuleLoginForm = req.body;
-
+  const { name, resource, password, user_agent }: RuleGuestLoginForm = req.body;
   try {
     // 查询下一个唯一id
     const id = await selectId();
-
+    // 生成随机的用户名
+    const realName = generateRandomName(name);
     // 生成token
-    const token = generateToken({ username: name, resource, user_id: id });
+    const token = generateToken({ username: realName, resource, user_id: id });
     // 用户的网络信息
     const other_security = createSecurity(req.ip);
     // 用户的其他信息
     const other_Information = createOtherInformation();
-
     // 生成加密过的密码
     const hashPassword = await bcrypt.hash(password, 10);
 
@@ -477,7 +498,7 @@ router.post("/guest/login", async (req, res) => {
     connection.query(
       set,
       [
-        name,
+        realName,
         id,
         hashPassword,
         resource,
