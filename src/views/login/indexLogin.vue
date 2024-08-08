@@ -241,7 +241,6 @@ const justSubmitForm = async (formEl: FormInstance | undefined) => {
           else {
             // 记录token
             // console.log(res.data.token);
-
             useToken().changeToken(res.data.token as string);
 
             // 提示登录成功
@@ -265,11 +264,12 @@ const submitGuestForm = async (formEl: FormInstance | undefined) => {
     if (valid) {
       // 确认游客登陆
       ElMessageBox.confirm(
-        "你确定进行游客登陆吗，一些操作会遭到限制",
+        "你确定进行游客登陆吗，一些操作会遭到限制<span style='color:red;font-weight: 900;'>(用户名会保留一些关键字随机化)</span>",
         "Warning",
         {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
+          dangerouslyUseHTMLString: true,
           type: "warning",
         }
       )
@@ -283,9 +283,15 @@ const submitGuestForm = async (formEl: FormInstance | undefined) => {
           };
           guestLoginUser(guestForm).then((res) => {
             console.log(res);
+            // token切换
+            useToken().changeToken(res.data.token as string);
+            // 弹窗提示
+            usePopup().openPopup("游客登录...", "success");
+            // 跳转路由
+            router.replace("/");
           });
         })
-      // 点击取消
+        // 点击取消
         .catch((err) => {});
     }
 
