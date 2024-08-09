@@ -2,9 +2,11 @@ import express from "express";
 import type { Router } from "express";
 import axios from "axios";
 import { JWTToken } from "../middleware/middleware";
+import connection from "../db/dbmain";
+import { ResultSetHeader } from "../login_component/login_component";
 
 import { key } from "../realdata/key";
-import { MYkey, isDEV } from "../key";
+import { MYkey, isDEV, table_name } from "../key";
 import { selectUsernameAndId, User } from "../login_component/login_component";
 
 import expressJoi from "@escook/express-joi";
@@ -113,4 +115,49 @@ userRouter.get("/easyuser", expressJoi(VdQuserId), async (req, res) => {
   }
 });
 
+// 修改用户名
+userRouter.put("/change/username", async (req, res) => {
+  const { userId, username }: { userId: string; username: string } = req.body;
+
+  try {
+    // 查找用户想改变的用户名
+    const selectUsernameAndIdRes = await selectUsernameAndId(username);
+
+    // 更新用户名
+    const updateResult = await updateUsername(userId, username);
+  } catch (error) {
+    res.cc(error as Error);
+  }
+});
+// 更新用户名
+const updateUsername = (newUsername: string, id: string) => {
+  const updateQuery = `
+  UPDATE ${table_name}
+  SET username = ?
+  WHERE user_id = ?;
+`;
+  return new Promise((resolve, reject) => {
+    // 尝试更新
+    connection.query(
+      updateQuery,
+      [newUsername, id],
+      function (err, updateResults) {
+        // 错误处理
+        if (err) {
+          reject(err);
+        }
+
+        // 判断是否修改成功
+        if ((updateResults as ResultSetHeader).affectedRows === 1) {
+          resolve({
+            message: "修改成功",
+            status: 0,
+          });
+        } else {
+          reject({ err: "修改失败！" });
+        }
+      }
+    );
+  });
+};
 export default userRouter;
