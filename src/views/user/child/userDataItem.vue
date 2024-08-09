@@ -2,14 +2,17 @@
 import { ref, toRefs, onMounted, onBeforeUnmount, type Ref } from "vue";
 import { usePopup } from "@/stores/popup";
 
+import { type UserData } from "@/network/user";
 import { useRoute, useRouter } from "vue-router";
 import itemAvatar from "./item/itemAvatar.vue";
 
 const props = withDefaults(
   defineProps<{
+    userData: UserData;
     isShowMainUserFlag: boolean;
   }>(),
   {
+    userData: undefined,
     isShowMainUserFlag: false,
   }
 );
@@ -27,7 +30,11 @@ const dialogVisible = ref(false);
       <el-icon><Tools /></el-icon>
       <span>设置</span>
     </div>
-    <el-button icon="PictureFilled" @click="dialogVisible = true">
+    <el-button
+      icon="PictureFilled"
+      @click="dialogVisible = true"
+      v-if="!(userData?.is_guest)"
+    >
       更换头像
     </el-button>
 

@@ -122,8 +122,14 @@ onBeforeUnmount(() => {
 <template>
   <div class="user">
     <userTitle :userData="userData"></userTitle>
-    <userMessage :userData="userData" :isShowMainUserFlag="isShowMainUserFlag"></userMessage>
-    <userDataItem :isShowMainUserFlag="isShowMainUserFlag"></userDataItem>
+    <userMessage
+      :userData="userData"
+      :isShowMainUserFlag="isShowMainUserFlag"
+    ></userMessage>
+    <userDataItem
+      :isShowMainUserFlag="isShowMainUserFlag"
+      :userData="userData"
+    ></userDataItem>
   </div>
 </template>
 <style scoped>
