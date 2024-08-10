@@ -1,4 +1,4 @@
-import { request } from "./index";
+import { request, putRequest } from "./index";
 
 export const userVerifyToken = () => {
   return request({
@@ -14,6 +14,16 @@ export const getEasyUserData = (user_id: string) => {
 export const getUserData = () => {
   return request({
     url: "/user",
+  });
+};
+// 更换用户名
+export const changeUsername = (newUsername: string, user_id: string) => {
+  return putRequest({
+    url: "/change/username",
+    data: {
+      username: newUsername,
+      user_id,
+    },
   });
 };
 
@@ -43,7 +53,6 @@ export interface UserData {
   is_active: number;
   is_admin?: number;
   avatar_url: string;
-
 }
 
 // user的请求结构

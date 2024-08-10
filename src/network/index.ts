@@ -38,11 +38,21 @@ export const postRequest = (option: Option) => {
     method: "post",
     baseURL,
     timeout: 10000,
-    
   });
   net2.interceptors.request.use(TokenVerification, TokenVerificationError);
 
   return net2(option);
+};
+
+export const putRequest = (option: Option) => {
+  const net3 = axios.create({
+    method: "put",
+    baseURL,
+    timeout: 10000,
+  });
+  net3.interceptors.request.use(TokenVerification, TokenVerificationError);
+
+  return net3(option);
 };
 
 // 来自高德的api接口

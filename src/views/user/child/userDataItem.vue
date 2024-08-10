@@ -5,6 +5,7 @@ import { usePopup } from "@/stores/popup";
 import { type UserData } from "@/network/user";
 import { useRoute, useRouter } from "vue-router";
 import itemAvatar from "./item/itemAvatar.vue";
+import itemUsername from "./item/itemUsername.vue";
 
 const props = withDefaults(
   defineProps<{
@@ -21,8 +22,11 @@ const route = useRoute();
 // 挂载router实例
 const router = useRouter();
 
-// 弹窗开关
-const dialogVisible = ref(false);
+// 头像更换弹窗开关
+const dialogVisibleAvatar = ref(false);
+
+// 名字更换弹窗开关
+const dialogVisibleUsername = ref(false);
 </script>
 <template>
   <div class="user_item" v-if="isShowMainUserFlag">
@@ -30,16 +34,29 @@ const dialogVisible = ref(false);
       <el-icon><Tools /></el-icon>
       <span>设置</span>
     </div>
+
     <el-button
       icon="PictureFilled"
-      @click="dialogVisible = true"
+      @click="dialogVisibleAvatar = true"
       v-if="!(userData?.is_guest)"
     >
       更换头像
     </el-button>
 
-    <el-dialog v-model="dialogVisible" title="更换头像" width="90vw" draggable>
+    <el-dialog v-model="dialogVisibleAvatar" title="更换头像" width="90vw" draggable>
       <itemAvatar></itemAvatar>
+    </el-dialog>
+
+    <el-button
+      icon="PictureFilled"
+      @click="dialogVisibleUsername = true"
+      v-if="!(userData?.is_guest)"
+    >
+      更换名字
+    </el-button>
+
+    <el-dialog v-model="dialogVisibleUsername" title="更换名字" width="90vw" draggable>
+      <itemUsername :userData="userData"></itemUsername>
     </el-dialog>
   </div>
 </template>

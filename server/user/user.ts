@@ -117,14 +117,22 @@ userRouter.get("/easyuser", expressJoi(VdQuserId), async (req, res) => {
 
 // 修改用户名
 userRouter.put("/change/username", async (req, res) => {
-  const { userId, username }: { userId: string; username: string } = req.body;
+  const { user_id, username }: { user_id: string; username: string } = req.body;
 
   try {
     // 查找用户想改变的用户名
     const selectUsernameAndIdRes = await selectUsernameAndId(username);
+    console.log(selectUsernameAndIdRes);
+
+    //  只有空的情况才能改变用户名
+    if (selectUsernameAndIdRes.length !== 0) {
+      res.cc("有重复的用户名");
+    }
 
     // 更新用户名
-    const updateResult = await updateUsername(userId, username);
+    const updateResult = await updateUsername(username, user_id);
+
+    res.send(updateResult);
   } catch (error) {
     res.cc(error as Error);
   }
@@ -136,6 +144,8 @@ const updateUsername = (newUsername: string, id: string) => {
   SET username = ?
   WHERE user_id = ?;
 `;
+  console.log(newUsername, id);
+
   return new Promise((resolve, reject) => {
     // 尝试更新
     connection.query(
@@ -147,14 +157,17 @@ const updateUsername = (newUsername: string, id: string) => {
           reject(err);
         }
 
+        console.log(updateResults);
+
         // 判断是否修改成功
-        if ((updateResults as ResultSetHeader).affectedRows === 1) {
+        if ((updateResults as ResultSetHeader).affectedRows !== 1) {
+          reject({ status: 1, err: "修改失败！" });
+        } 
+        else {
           resolve({
             message: "修改成功",
             status: 0,
           });
-        } else {
-          reject({ err: "修改失败！" });
         }
       }
     );
