@@ -122,7 +122,7 @@ userRouter.put("/change/username", async (req, res) => {
   try {
     // 查找用户想改变的用户名
     const selectUsernameAndIdRes = await selectUsernameAndId(username);
-    console.log(selectUsernameAndIdRes);
+    // console.log(selectUsernameAndIdRes);
 
     //  只有空的情况才能改变用户名
     if (selectUsernameAndIdRes.length !== 0) {
@@ -133,6 +133,7 @@ userRouter.put("/change/username", async (req, res) => {
     const updateResult = await updateUsername(username, user_id);
 
     res.send(updateResult);
+    
   } catch (error) {
     res.cc(error as Error);
   }
