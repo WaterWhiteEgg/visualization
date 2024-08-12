@@ -156,3 +156,11 @@ export const VdQuserId = {
     user_id,
   },
 };
+
+// 用户名切换认证
+export const VdChangeUsername = {
+  body: {
+    username,
+    user_id,
+  },
+};

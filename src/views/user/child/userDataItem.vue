@@ -34,30 +34,40 @@ const dialogVisibleUsername = ref(false);
       <el-icon><Tools /></el-icon>
       <span>设置</span>
     </div>
+    <div class="user_item_system">
+      <el-button
+        icon="PictureFilled"
+        @click="dialogVisibleAvatar = true"
+        v-if="!userData?.is_guest"
+      >
+        更换头像
+      </el-button>
 
-    <el-button
-      icon="PictureFilled"
-      @click="dialogVisibleAvatar = true"
-      v-if="!(userData?.is_guest)"
-    >
-      更换头像
-    </el-button>
+      <el-dialog
+        v-model="dialogVisibleAvatar"
+        title="更换头像"
+        width="90vw"
+        draggable
+      >
+        <itemAvatar></itemAvatar>
+      </el-dialog>
+      <el-button
+        icon="EditPen"
+        @click="dialogVisibleUsername = true"
+        v-if="!userData?.is_guest"
+      >
+        更换名字
+      </el-button>
 
-    <el-dialog v-model="dialogVisibleAvatar" title="更换头像" width="90vw" draggable>
-      <itemAvatar></itemAvatar>
-    </el-dialog>
-
-    <el-button
-      icon="PictureFilled"
-      @click="dialogVisibleUsername = true"
-      v-if="!(userData?.is_guest)"
-    >
-      更换名字
-    </el-button>
-
-    <el-dialog v-model="dialogVisibleUsername" title="更换名字" width="90vw" draggable>
-      <itemUsername :userData="userData"></itemUsername>
-    </el-dialog>
+      <el-dialog
+        v-model="dialogVisibleUsername"
+        title="更换名字"
+        width="90vw"
+        draggable
+      >
+        <itemUsername :userData="userData"></itemUsername>
+      </el-dialog>
+    </div>
   </div>
 </template>
 <style scoped>
@@ -88,5 +98,9 @@ const dialogVisibleUsername = ref(false);
   padding-left: 0.5vw;
 
   font-weight: 900;
+}
+.user_item_system{
+display: flex;
+align-items: center;
 }
 </style>

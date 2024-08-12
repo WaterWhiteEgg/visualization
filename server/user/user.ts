@@ -10,7 +10,8 @@ import { MYkey, isDEV, table_name } from "../key";
 import { selectUsernameAndId, User } from "../login_component/login_component";
 
 import expressJoi from "@escook/express-joi";
-import { VdQuserId } from "../middleware/validationForm";
+import { VdChangeUsername, VdQuserId } from "../middleware/validationForm";
+import { checkLoggedIn } from "../login_component/guest";
 
 const userRouter: Router = express.Router();
 
@@ -115,29 +116,36 @@ userRouter.get("/easyuser", expressJoi(VdQuserId), async (req, res) => {
   }
 });
 
-// 修改用户名
-userRouter.put("/change/username", async (req, res) => {
-  const { user_id, username }: { user_id: string; username: string } = req.body;
+// 修改用户名,不允许游客登录
+userRouter.put(
+  "/change/username",checkLoggedIn,
+  expressJoi(VdChangeUsername),
+  async (req, res) => {
+    const { user_id, username }: { user_id: string; username: string } =
+      req.body;
 
-  try {
-    // 查找用户想改变的用户名
-    const selectUsernameAndIdRes = await selectUsernameAndId(username);
-    // console.log(selectUsernameAndIdRes);
+    try {
+      // 查找用户想改变的用户名
+      const selectUsernameAndIdRes = await selectUsernameAndId(username);
+      // console.log(selectUsernameAndIdRes);
 
-    //  只有空的情况才能改变用户名
-    if (selectUsernameAndIdRes.length !== 0) {
-      res.cc("有重复的用户名");
+      //  只有空的情况才能改变用户名
+      if (selectUsernameAndIdRes.length !== 0) {
+        res.cc("有重复的用户名");
+      }
+
+      // 更新用户名
+      const updateResult = await updateUsername(username, user_id);
+
+      res.send(updateResult);
+
+    } 
+    // 错误处理
+    catch (error) {
+      res.cc(error as Error);
     }
-
-    // 更新用户名
-    const updateResult = await updateUsername(username, user_id);
-
-    res.send(updateResult);
-    
-  } catch (error) {
-    res.cc(error as Error);
   }
-});
+);
 // 更新用户名
 const updateUsername = (newUsername: string, id: string) => {
   const updateQuery = `
@@ -163,8 +171,7 @@ const updateUsername = (newUsername: string, id: string) => {
         // 判断是否修改成功
         if ((updateResults as ResultSetHeader).affectedRows !== 1) {
           reject({ status: 1, err: "修改失败！" });
-        } 
-        else {
+        } else {
           resolve({
             message: "修改成功",
             status: 0,

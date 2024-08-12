@@ -18,7 +18,7 @@ export const guestLoginUser = (data: object) => {
     data: data,
   });
 };
-export const findUsername = (data: object) => {
+export const findUsername = (data: {name:string}) => {
   return postRequest({
     url: "/db/username",
     data: data,

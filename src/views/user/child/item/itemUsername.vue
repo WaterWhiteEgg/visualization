@@ -2,21 +2,10 @@
 import { ref, reactive, type Ref } from "vue";
 
 import type { FormInstance, FormRules } from "element-plus";
+import { ElMessageBox } from "element-plus";
 import { usePopup } from "@/stores/popup";
 import { type UserData, changeUsername } from "@/network/user";
 import { inFindUsername } from "@/assets/ts/user/inFindUsername";
-
-import type {
-  UploadProps,
-  UploadRequestOptions,
-  UploadFile,
-  UploadFiles,
-  UploadRawFile,
-  UploadUserFile,
-} from "element-plus";
-import { ElMessageBox } from "element-plus";
-import { commitAvater } from "@/network/updateFile";
-import { AxiosError } from "axios";
 
 const props = withDefaults(
   defineProps<{
@@ -28,7 +17,6 @@ const props = withDefaults(
 );
 
 // 更新的名字
-const newUsername = ref("");
 const ruleForm = reactive({
   name: "",
 });
@@ -37,7 +25,7 @@ const ruleForm = reactive({
 const ruleFormRef = ref<FormInstance>();
 
 // 用户名验证规则实例
- const usernameRules = inFindUsername(ruleForm)
+const usernameRules = inFindUsername(ruleForm);
 // 验证规则
 const rules = reactive<FormRules<typeof ruleForm>>({
   name: [
@@ -71,16 +59,35 @@ const rules = reactive<FormRules<typeof ruleForm>>({
   ],
 });
 
-// 提交用户名
+// 提交修改的用户名
 const commitNewUsername = (formEl: FormInstance | undefined) => {
+  // 验证数据
   if (!formEl) return;
   formEl.validate((valid) => {
     if (valid) {
-      changeUsername(newUsername.value, props.userData.user_id).then((res) => {
-        console.log(res);
-      });
-    } else {
-      console.log("error submit!");
+
+      // 确认修改
+      ElMessageBox.confirm("你确定修改用户名吗", "Warning", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        // 点击确定
+        .then(() => {
+          changeUsername(ruleForm.name, props.userData.user_id).then((res) => {
+            // console.log(res);
+            usePopup().openPopup("提交成功,刷新页面可查看", "success");
+          });
+        })
+        // 点击取消
+        .catch((err) => {
+          console.log(err);
+        });
+
+    } 
+    // 验证失败
+    else {
+      usePopup().openPopup("验证失败", "error");
     }
   });
 };
@@ -100,7 +107,7 @@ const commitNewUsername = (formEl: FormInstance | undefined) => {
     </el-form-item>
 
     <el-form-item>
-      <el-button type="primary" @click="commitNewUsername(ruleFormRef)">
+      <el-button type="success" @click="commitNewUsername(ruleFormRef)">
         提交
       </el-button>
     </el-form-item>
