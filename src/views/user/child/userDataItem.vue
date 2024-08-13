@@ -35,38 +35,43 @@ const dialogVisibleUsername = ref(false);
       <span>设置</span>
     </div>
     <div class="user_item_system">
-      <el-button
-        icon="PictureFilled"
-        @click="dialogVisibleAvatar = true"
-        v-if="!userData?.is_guest"
-      >
-        更换头像
-      </el-button>
+      <div>
+        <el-button
+          icon="PictureFilled"
+          @click="dialogVisibleAvatar = true"
+          v-if="!userData?.is_guest"
+        >
+          更换头像
+        </el-button>
 
-      <el-dialog
-        v-model="dialogVisibleAvatar"
-        title="更换头像"
-        width="90vw"
-        draggable
-      >
-        <itemAvatar></itemAvatar>
-      </el-dialog>
-      <el-button
-        icon="EditPen"
-        @click="dialogVisibleUsername = true"
-        v-if="!userData?.is_guest"
-      >
-        更换名字
-      </el-button>
+        <el-dialog
+          v-model="dialogVisibleAvatar"
+          title="更换头像"
+          width="90vw"
+          draggable
+        >
+          <itemAvatar></itemAvatar>
+        </el-dialog>
+      </div>
 
-      <el-dialog
-        v-model="dialogVisibleUsername"
-        title="更换名字"
-        width="90vw"
-        draggable
-      >
-        <itemUsername :userData="userData"></itemUsername>
-      </el-dialog>
+      <div>
+        <el-button
+          icon="EditPen"
+          @click="dialogVisibleUsername = true"
+          v-if="!userData?.is_guest"
+        >
+          更换名字
+        </el-button>
+
+        <el-dialog
+          v-model="dialogVisibleUsername"
+          title="更换名字"
+          width="90vw"
+          draggable
+        >
+          <itemUsername :userData="userData"></itemUsername>
+        </el-dialog>
+      </div>
     </div>
   </div>
 </template>
@@ -99,8 +104,24 @@ const dialogVisibleUsername = ref(false);
 
   font-weight: 900;
 }
-.user_item_system{
-display: flex;
-align-items: center;
+.user_item_system {
+  display: flex;
+  align-items: center;
+}
+
+@media screen and (max-width: 969px) {
+  /* 手机 */
+  /* 类平板 */
+  
+.user_item_title::after {
+  width: 90vw; /* 设置下划线的宽度 */
+}
+  .user_item_system {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .user_item_system div {
+    margin-bottom: 0.5vh;
+  }
 }
 </style>

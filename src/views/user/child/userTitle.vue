@@ -15,7 +15,6 @@ const emits = defineEmits<{
 </script>
 <template>
   <div class="user_title">
-    {{  }}
     <div class="user_title_avatar">
       <img
         :src="userData.avatar_url"

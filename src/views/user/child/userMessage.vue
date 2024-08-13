@@ -31,7 +31,6 @@ const gender = computed(() => {
 </script>
 <template>
   <div class="user_message">
-    {{ userData }}
     <div class="user_message_descs">
       简介:
       {{ userData.descs ? userData.descs : "这个人很懒，没有填写简介喔~" }}
@@ -109,5 +108,14 @@ const gender = computed(() => {
   padding: 1vh 0;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+@media screen and (max-width: 969px) {
+  /* 手机 */
+  /* 类平板 */
+  .user_message_descs{
+    border: 0;
+    border-bottom:1px solid #75757586 ;
+  }
 }
 </style>
