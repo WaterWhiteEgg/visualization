@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
-import { type UserData } from "@/network/user";
+import { computed, ref, watch } from "vue";
+import { changeDescs, type UserData } from "@/network/user";
+import { usePopup } from "@/stores/popup";
+
 const props = withDefaults(
   defineProps<{
     userData: UserData;
@@ -28,12 +30,52 @@ const gender = computed(() => {
       return "未填写";
   }
 });
+
+// 简介弹窗布尔值
+const dialogVisibleDescs = ref(false);
+// 简介储存的值
+const inDescs = ref("");
+
+watch(
+  () => props.userData.descs,
+  (newDesc: string) => {
+    inDescs.value = newDesc;
+  },
+  { immediate: true } // 立即调用一次，确保初始值也被处理
+);
+
+// 切换简介值
+const inChangeDescs = () => {
+  changeDescs(inDescs.value, props.userData.user_id)
+    .then((res) => {
+      usePopup().openPopup("切换成功", "success");
+      // 关闭界面
+      dialogVisibleDescs.value = false;
+    })
+    .catch((err) => {
+      usePopup().openPopup("切换失败", "error");
+    });
+};
 </script>
 <template>
   <div class="user_message">
-    <div class="user_message_descs">
+    <div class="user_message_descs" @click="dialogVisibleDescs = true">
       简介:
-      {{ userData.descs ? userData.descs : "这个人很懒，没有填写简介喔~" }}
+      {{ inDescs !== "" ? inDescs : "这个人很懒，没有填写简介喔~" }}
+
+      <el-dialog
+        v-model="dialogVisibleDescs"
+        title="更换简介"
+        width="90vw"
+        draggable
+      >
+        <textarea
+          type="text"
+          v-model="inDescs"
+          class="user_message_descs_textarea"
+        ></textarea>
+        <el-button type="success" @click="inChangeDescs">确定</el-button>
+      </el-dialog>
     </div>
     <div class="user_message_useradmin">
       <div>
@@ -97,6 +139,12 @@ const gender = computed(() => {
 .user_message_descs::-webkit-scrollbar {
   display: none; /* Chrome */
 }
+.user_message_descs_textarea {
+  width: 80vw;
+  height: 40vh;
+  resize: none;
+  font-size: 1.2rem;
+}
 
 .user_message_useradmin {
   display: flex;
@@ -113,9 +161,9 @@ const gender = computed(() => {
 @media screen and (max-width: 969px) {
   /* 手机 */
   /* 类平板 */
-  .user_message_descs{
+  .user_message_descs {
     border: 0;
-    border-bottom:1px solid #75757586 ;
+    border-bottom: 1px solid #75757586;
   }
 }
 </style>

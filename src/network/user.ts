@@ -27,6 +27,18 @@ export const changeUsername = (newUsername: string, user_id: string) => {
   });
 };
 
+// 更换简介
+// 更换用户名
+export const changeDescs = (newDescs: string, user_id: string) => {
+  return putRequest({
+    url: "/change/descs",
+    data: {
+      descs: newDescs,
+      user_id,
+    },
+  });
+};
+
 export interface Tokendata {
   data: {
     exp: number;

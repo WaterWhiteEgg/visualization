@@ -77,7 +77,7 @@ export const resource = Joi.string().allow("");
 
 export const user_agent = Joi.string().allow("");
 
-export const desc = Joi.string().allow("");
+export const descs = Joi.string().allow("");
 
 export const region = Joi.string().allow("");
 
@@ -90,7 +90,7 @@ export const VdRegister = {
     againPassword,
     resource,
     user_agent,
-    desc,
+    descs,
     region,
     email: emailJoiCanNull,
     emailCode: emailCodeJoiCanNull,
@@ -161,6 +161,13 @@ export const VdQuserId = {
 export const VdChangeUsername = {
   body: {
     username,
+    user_id,
+  },
+};
+// 简介切换认证
+export const VdChangeDescs = {
+  body: {
+    descs,
     user_id,
   },
 };

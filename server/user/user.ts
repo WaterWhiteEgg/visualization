@@ -10,7 +10,7 @@ import { MYkey, isDEV, table_name } from "../key";
 import { selectUsernameAndId, User } from "../login_component/login_component";
 
 import expressJoi from "@escook/express-joi";
-import { VdChangeUsername, VdQuserId } from "../middleware/validationForm";
+import { VdChangeUsername, VdQuserId,VdChangeDescs } from "../middleware/validationForm";
 import { checkLoggedIn } from "../login_component/guest";
 
 const userRouter: Router = express.Router();
@@ -116,7 +116,7 @@ userRouter.get("/easyuser", expressJoi(VdQuserId), async (req, res) => {
   }
 });
 
-// 修改用户名,不允许游客登录
+// 修改用户名,不允许游客登录修改
 userRouter.put(
   "/change/username",checkLoggedIn,
   expressJoi(VdChangeUsername),
@@ -160,6 +160,64 @@ const updateUsername = (newUsername: string, id: string) => {
     connection.query(
       updateQuery,
       [newUsername, id],
+      function (err, updateResults) {
+        // 错误处理
+        if (err) {
+          reject(err);
+        }
+
+        console.log(updateResults);
+
+        // 判断是否修改成功
+        if ((updateResults as ResultSetHeader).affectedRows !== 1) {
+          reject({ status: 1, err: "修改失败！" });
+        } else {
+          resolve({
+            message: "修改成功",
+            status: 0,
+          });
+        }
+      }
+    );
+  });
+};
+
+// 修改简介
+userRouter.put(
+  "/change/descs",
+  expressJoi(VdChangeDescs),
+  async (req, res) => {
+    const {descs, user_id }: {descs:string, user_id: string } =
+      req.body;
+
+    try {
+    
+      // 更新简介
+      const updateResult = await updateDesc(descs, user_id);
+
+      res.send(updateResult);
+
+    } 
+    // 错误处理
+    catch (error) {
+      res.cc(error as Error);
+    }
+  }
+);
+
+// 更新简介
+const updateDesc = ( newDescs:string,id: string) => {
+  const updateQuery = `
+  UPDATE ${table_name}
+  SET descs = ?
+  WHERE user_id = ?;
+`;
+
+  return new Promise((resolve, reject) => {
+    // 尝试更新
+    connection.query(
+      updateQuery,
+      [newDescs, id],
       function (err, updateResults) {
         // 错误处理
         if (err) {
