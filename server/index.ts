@@ -77,7 +77,7 @@ import os from "os";
 
 // 获取系统的空闲内存，单位为字节
 
-let SYSTEMPATH = os.platform() === "win32" ? "c:" : "/";
+const SYSTEMPATH = os.platform() === "win32" ? "c:" : "/";
 
 // Callbacks
 disk.check(SYSTEMPATH, function (err, info) {

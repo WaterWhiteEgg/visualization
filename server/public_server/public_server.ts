@@ -4,13 +4,15 @@ import crypto from "crypto";
 import path from "path";
 import type { Router } from "express";
 import { ResultSetHeader } from "../login_component/login_component";
-import { key } from "../realdata/key";
-import { MYkey, isDEV, LOCALBASEURL } from "../key";
+import { MYkey, isDEV, LOCALBASEURL,DEVtable_name } from "../key";
+import { PROtable_name } from "../realdata/key";
+
 const publicRouter: Router = express.Router();
 
 // 表名
 import connection from "../db/dbmain";
-import { table_name } from "../key";
+// 判断模式更改表名
+const table_name = isDEV ? DEVtable_name : PROtable_name;
 
 import { checkLoggedIn } from "../login_component/guest";
 // 处理文件储存相关

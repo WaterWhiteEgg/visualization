@@ -5,8 +5,11 @@ import { JWTToken } from "../middleware/middleware";
 import connection from "../db/dbmain";
 import { ResultSetHeader } from "../login_component/login_component";
 
-import { key } from "../realdata/key";
-import { MYkey, isDEV, table_name } from "../key";
+import { key ,PROtable_name} from "../realdata/key";
+import { MYkey, isDEV, DEVtable_name } from "../key";
+// 判断模式更改表名
+const table_name = isDEV ? DEVtable_name : PROtable_name;
+
 import { selectUsernameAndId, User } from "../login_component/login_component";
 
 import expressJoi from "@escook/express-joi";

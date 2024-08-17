@@ -1,5 +1,5 @@
-import { MYSECRET_KEY, isDEV } from "../key";
-import { SECRET_KEY } from "../realdata/key";
+import { MYSECRET_KEY, isDEV, DEVtable_name } from "../key";
+import { SECRET_KEY, PROtable_name } from "../realdata/key";
 import jwt from "jsonwebtoken";
 import express from "express";
 import connection from "../db/dbmain";
@@ -25,8 +25,9 @@ import {
 const router = express.Router();
 // 哪个环境决定使用哪个环境的key
 const secret_key = isDEV ? MYSECRET_KEY : SECRET_KEY;
-// 表名
-import { table_name } from "../key";
+
+// 判断模式更改表名
+const table_name = isDEV ? DEVtable_name : PROtable_name;
 
 type RuleRegisterForm = {
   user_agent: string;
@@ -113,9 +114,6 @@ router.post("/register", expressJoi(VdRegister), async (req, res) => {
     region,
     user_agent,
     email,
-    emailCode,
-    phone,
-    phoneCode,
     validate,
   }: RuleRegisterForm = req.body;
 
@@ -247,15 +245,7 @@ router.post("/login", expressJoi(VdLogin), async (req, res) => {
   // console.log(req.body);
   // 登录里的name有可能是user_id 也有可能是用户名
 
-  const {
-    name,
-    password,
-    resource,
-    user_agent,
-    validate,
-    email,
-    emailCode,
-  }: RuleLoginForm = req.body;
+  const { resource, user_agent, validate }: RuleLoginForm = req.body;
 
   // 因为可以通过邮箱登录，密码登录，这个selectUsernameAndId只有在密码登录才搜索，如果用户是邮箱的话
   // 需要做一个搜唯一邮箱的fun然后找这个验证码的对比，再返回数据
