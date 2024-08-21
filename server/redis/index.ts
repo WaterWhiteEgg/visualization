@@ -1,9 +1,11 @@
 import { createClient } from "redis";
+import { isDEV, MyClientURL } from "../key";
+import { clientURL } from "../realdata/key";
 
 const doCreateClient = () => {
   try {
     // 创建 Redis 客户端
-    const client = createClient({ url: "redis://127.0.0.1:6379" });
+    const client = createClient({ url: isDEV ? MyClientURL : clientURL });
 
     // 错误处理
     // 仅提供一次错误

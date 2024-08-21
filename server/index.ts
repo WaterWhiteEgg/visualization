@@ -84,9 +84,7 @@ disk.check(SYSTEMPATH, function (err, info) {
   if (err) {
     console.log(err);
   } else {
-    console.log(info!.available);
-    console.log(info!.free);
-    console.log(info!.total);
+    console.log(`剩余${info!.free}可用空间`);
   }
 });
 
