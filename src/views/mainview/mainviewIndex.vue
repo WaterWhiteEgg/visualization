@@ -153,12 +153,13 @@ const toUser = () => {
   }
   .main {
     position: relative;
+    z-index: 99;
     background-color: #beedffe0;
   }
 
   .main-button {
     position: relative;
-height: 30px;
+    height: 30px;
   }
 
   .main-list {
@@ -170,12 +171,12 @@ height: 30px;
     background-color: #ffffff;
   }
   .main-list-head {
-background-color: #beedffe0;
-}
+    background-color: #beedffe0;
+  }
 
-.main-list-head-title-user {
-  margin-right: 2vw;
-  font-size: 1rem;
-}
+  .main-list-head-title-user {
+    margin-right: 2vw;
+    font-size: 1rem;
+  }
 }
 </style>
