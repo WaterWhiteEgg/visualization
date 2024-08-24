@@ -72,21 +72,21 @@ app.use(globalError);
 // ip请求限制
 app.use(limiter);
 
-import disk from "diskusage";
-import os from "os";
+//import disk from "diskusage";
+//import os from "os";
 
 // 获取系统的空闲内存，单位为字节
 
-const SYSTEMPATH = os.platform() === "win32" ? "c:" : "/";
+//const SYSTEMPATH = os.platform() === "win32" ? "c:" : "/";
 
 // Callbacks
-disk.check(SYSTEMPATH, function (err, info) {
-  if (err) {
-    console.log(err);
-  } else {
-    console.log(`剩余${info!.free}可用空间`);
-  }
-});
+// disk.check(SYSTEMPATH, function (err, info) {
+//   if (err) {
+//     console.log(err);
+//   } else {
+//     console.log(`剩余${info!.free}可用空间`);
+//   }
+// });
 
 app.listen(2000, () => {
   console.log("mode is " + process.env.NODE_ENV);
