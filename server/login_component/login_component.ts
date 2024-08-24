@@ -138,7 +138,7 @@ router.post("/register", expressJoi(VdRegister), async (req, res) => {
   }: RuleRegisterForm = req.body;
 
   try {
-    // 验证登录方式，且验证是否通过
+    // 验证注册方式，且验证是否通过
     const validateRes = await switchLogin(validate, req.body);
     // 如果validateRes不为0则报错,处理没有被catch捕捉到的错误
     if (validateRes.status) {
@@ -579,8 +579,8 @@ router.post("/username", expressJoi(VdUsername), async (req, res) => {
   }
 });
 
-// 验证用户名/用户id的处理resolve名
-interface SelectUsernameAndIdResolve {
+// 验证数据处理resolve名
+export interface SelectUsernameAndIdResolve {
   results: QueryResult;
   length: number;
   status: number;
@@ -626,39 +626,5 @@ export function selectUsernameAndId(name: string) {
   );
 }
 
-// 验证用用户邮箱的处理函数
-export function selectEmail(email: string) {
-  return new Promise(
-    (resolve: (value: SelectUsernameAndIdResolve) => void, reject) => {
-      // 查询name是用户名时找不找到后，再查询是用户id找不找到
-      const set = `SELECT username, email, descs, gender, is_active, last_time, login_count, 
-      registration_time, phone_number, status, is_guest, is_admin, 
-      user_id, avatar_url 
-      FROM ${table_name} 
-      WHERE email = ?`;
-
-      connection.query(set, [email], function (err, results) {
-        // 登录错误处理
-        if (err) {
-          reject(err);
-        }
-        // 如果长度为1则找到，0则未找到
-        if ((results as UserBase[]).length) {
-          resolve({
-            results,
-            length: (results as UserBase[]).length,
-            status: 0,
-            message: `找到了${(results as UserBase[]).length}个用户`,
-          });
-        } else {
-          reject({
-            status: 1,
-            message: "未找到用户名",
-          });
-        }
-      });
-    }
-  );
-}
 
 export default router;

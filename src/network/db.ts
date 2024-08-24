@@ -24,3 +24,10 @@ export const findUsername = (data: {name:string}) => {
     data: data,
   });
 };
+
+export const findJestOneEmail = (data: {email:string}) => {
+  return postRequest({
+    url: "/email/findemail",
+    data: data,
+  });
+};

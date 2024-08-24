@@ -11,8 +11,17 @@ import { emailJoi, VdEmail, VdEmailCode } from "../middleware/validationForm";
 import { ResRej } from "../middleware/middleware";
 
 // 查询用户邮箱对应的数据
-import { selectEmail } from "../login_component/login_component";
+import {
+  type SelectUsernameAndIdResolve,
+  type UserBase,
+} from "../login_component/login_component";
 const router = express.Router();
+
+import connection from "../db/dbmain";
+import { MYSECRET_KEY, isDEV, DEVtable_name } from "../key";
+import { SECRET_KEY, PROtable_name } from "../realdata/key";
+// 判断模式更改表名
+const table_name = isDEV ? DEVtable_name : PROtable_name;
 
 // 发送验证码
 router.post("/emailCode", expressJoi(VdEmail), async (req, res) => {
@@ -25,28 +34,19 @@ router.post("/emailCode", expressJoi(VdEmail), async (req, res) => {
   // 发送验证码
   let sendEmailCodeRes = { status: 1, message: "没有数据" };
   try {
+    // 发送验证码
     sendEmailCodeRes = await sendEmailCode(email, code);
+    // 储存到resis并维持5分钟
+    await CLIENT.setEx(email, 300, code);
+    // 都搞完就建立成功
+    res.send({
+      status: 0,
+      message: "建立成功",
+    });
   } catch (error) {
     // 错误处理
     res.cc(error as Error);
   }
-  // 如果status显示有问题
-  if (sendEmailCodeRes.status) {
-    res.cc(sendEmailCodeRes.message);
-  }
-
-  // 储存到resis并维持5分钟
-
-  try {
-    await CLIENT.setEx(email, 300, code);
-  } catch (error) {
-    res.cc(error as string);
-  }
-
-  res.send({
-    status: 0,
-    message: "建立成功",
-  });
 });
 
 // 随机生成验证码
@@ -79,6 +79,42 @@ function generateRandomCode(length: number, math: boolean = false) {
   return hexString.slice(0, length);
 }
 
+// 验证用用户邮箱对应数据的处理函数
+export function selectEmail(email: string) {
+  return new Promise(
+    (resolve: (value: SelectUsernameAndIdResolve) => void, reject) => {
+      // 查询name是用户名时找不找到后，再查询是用户id找不找到
+      const set = `SELECT username, email, descs, gender, is_active, last_time, login_count, 
+      registration_time, phone_number, status, is_guest, is_admin, 
+      user_id, avatar_url 
+      FROM ${table_name} 
+      WHERE email = ?`;
+
+      connection.query(set, [email], function (err, results) {
+        // 登录错误处理
+        if (err) {
+          reject(err);
+        }
+        // 如果长度为1则找到，0则未找到，超过1的也不行，目前只允许一个邮箱一个账号
+        if ((results as UserBase[]).length === 1) {
+          resolve({
+            results,
+            length: (results as UserBase[]).length,
+            status: 0,
+            message: `找到了${(results as UserBase[]).length}个用户`,
+          });
+        } else {
+          reject({
+            status: 1,
+            length: (results as UserBase[]).length,
+            message: `未找到用户名或不止一个邮箱, ${(results as UserBase[]).length}个用户`,
+          });
+        }
+      });
+    }
+  );
+}
+
 // 发送验证码处理函数
 export function sendEmailCode(email: string, code: string): Promise<ResRej> {
   // 创建信息表单
@@ -91,23 +127,35 @@ export function sendEmailCode(email: string, code: string): Promise<ResRej> {
 
   // 发送验证码
   return new Promise((resolve, reject) => {
-    transporter.sendMail(mailOptions, (error) => {
-      if (error) {
-        // 报错
-        console.log(error);
+    async function inTransporter() {
+      try {
+        // 验证邮箱是否唯一
+        await selectEmail(email);
+        // 尝试发送邮箱
+        transporter.sendMail(mailOptions, (error) => {
+          if (error) {
+            // 报错
+            reject({
+              status: 1,
+              message: "邮箱发送失败",
+            });
+          }
+          // 成功发送
+          else {
+            resolve({
+              status: 0,
+              message: "邮箱发送成功",
+            });
+          }
+        });
+      } catch (error) {
         reject({
           status: 1,
           message: "邮箱发送失败",
         });
       }
-      // 成功发送
-      else {
-        resolve({
-          status: 0,
-          message: "邮箱发送成功",
-        });
-      }
-    });
+    }
+    inTransporter();
   });
 }
 
@@ -142,6 +190,7 @@ export function verificationEmailCode(
     // 从redis里获取信息
     async function inVerificationEmailCode() {
       try {
+        // 获取对应邮箱的验证码
         const realCode = await CLIENT.get(email);
         // 对比验证码正确性
 
@@ -178,16 +227,15 @@ export function findUsernameVerificationEmailCode(
       try {
         const selectEmailres = await selectEmail(email);
         console.log(selectEmailres);
-        // 由于邮箱允许创建多个账号，如果更多需要额外处理
-        
+        // 如果更多需要额外处理
+        // 暂时不允许多账号了不好管理
         let verificationEmailCodeRes: ResRej;
 
         switch (selectEmailres.length) {
           case 0:
-            console.log("找了个寂寞还没有报错");
+            console.log("找了个寂寞");
             break;
           case 1:
-            console.log("找到了唯一的用户");
             verificationEmailCodeRes = await verificationEmailCode(email, code);
             resolve({
               status: verificationEmailCodeRes.status,
@@ -196,7 +244,7 @@ export function findUsernameVerificationEmailCode(
             });
             break;
           default:
-            console.log("找到了更多的用户...");
+            console.log("数据有其他情况");
             break;
         }
       } catch (error) {
@@ -233,5 +281,34 @@ export function verifyEmail(userEmail: string) {
     }
   });
 }
+
+// 验证邮箱唯一性
+router.post("/findemail", expressJoi(VdEmail), async (req, res) => {
+  // 收集数据
+  const { email }: { email: string } = req.body;
+
+  // 验证邮箱是否以存在
+  const set = `SELECT user_id 
+      FROM ${table_name} 
+      WHERE email = ?`;
+
+  connection.query(set, [email], function (err, results) {
+    // 登录错误处理
+    if (err) {
+      res.cc(err);
+    }
+    // 如果是空则之前没有相同的邮箱
+    if ((results as UserBase[]).length === 0) {
+      res.send({
+        status: 0,
+        message: "没有别的邮箱",
+      });
+    }
+    // 其他情况有问题
+    else {
+      res.cc("邮箱已经存在");
+    }
+  });
+});
 
 export default router;

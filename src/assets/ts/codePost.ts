@@ -37,6 +37,6 @@ export async function inPostToGetEmailCode(email: string) {
     })
     .catch((err) => {
       console.log(err);
-      usePopup().openPopup("网络错误", "error");
+      usePopup().openPopup("验证码发送失败", "error");
     });
 }

@@ -6,7 +6,7 @@ import type { FormInstance, FormRules } from "element-plus";
 import { useRegister } from "../../stores/register";
 import { useToken } from "../../stores/token";
 import { usePopup } from "../../stores/popup";
-import { commitUser, findUsername } from "../../network/db";
+import { commitUser, findJestOneEmail } from "../../network/db";
 import { postToFindEmailCode } from "../../network/redis";
 import {
   inPostToGetEmailCode,
@@ -83,8 +83,36 @@ const findAgainPassword = (
 };
 // 寻找用户名实例
 // 用户名验证规则实例
-const usernameRules = inFindUsername(ruleForm)
+const usernameRules = inFindUsername(ruleForm);
 
+// 验证邮箱是否唯一
+const emailRules = async (
+  rule: unknown,
+  value: unknown,
+  callback: (Error?: Error) => void
+) => {
+  // 防抖处理
+  let res = debounce(async () => {
+    try {
+      // 请求搜寻邮箱唯一
+      let postToFindEmailCodeRes = await findJestOneEmail({
+        email: ruleForm.email,
+      });
+      // 可能出现的状态码是200但验证失败
+      if (postToFindEmailCodeRes.data.status) {
+        callback(new Error("邮箱已经存在"));
+      } else {
+        callback();
+      }
+      // 验证失败处理
+    } catch (error) {
+      callback(new Error("邮箱已经存在或网络错误"));
+    }
+  });
+  // 网络请求
+  await res();
+  // console.log(findUsernameRes);
+};
 
 // 验证邮箱验证码
 const findEmailCode = async (
@@ -183,6 +211,17 @@ const rules = reactive<FormRules<RuleForm>>({
       pattern: /^[\w-.]+@(qq|163|gmail)\.com$/,
       message: "请输入格式支持的邮箱，如qq，163，gmail.com",
       trigger: ["blur"],
+    },
+    // 自定义校验规则
+    {
+      validator: emailRules as unknown as (
+        rule: unknown,
+        value: unknown,
+        callback: (error?: string | Error) => void,
+        source: unknown,
+        options: unknown
+      ) => void,
+      trigger: "blur",
     },
   ],
   emailCode: [
