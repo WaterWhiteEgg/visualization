@@ -10,7 +10,7 @@ const table_name = isDEV ? DEVtable_name : PROtable_name;
 // 检查token的用户是否是游客登录
 export function checkLoggedIn(req: Request, res: Response, next: NextFunction) {
   //   查询数据
-  const set = `SELECT * 
+  const set = `SELECT user_id 
   FROM ${table_name} 
   WHERE user_id = ? AND is_guest = 1`;
 

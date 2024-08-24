@@ -10,7 +10,7 @@ import { MYkey, isDEV, DEVtable_name } from "../key";
 // 判断模式更改表名
 const table_name = isDEV ? DEVtable_name : PROtable_name;
 
-import { selectUsernameAndId, User } from "../login_component/login_component";
+import { selectUsernameAndId, UserBase } from "../login_component/login_component";
 
 import expressJoi from "@escook/express-joi";
 import { VdChangeUsername, VdQuserId,VdChangeDescs } from "../middleware/validationForm";
@@ -44,7 +44,7 @@ userRouter.get("/user", async (req, res) => {
       is_admin,
       user_id,
       avatar_url,
-    } = (selectUsernameAndIdRes.results as User[])[0];
+    } = (selectUsernameAndIdRes.results as UserBase[])[0];
     res.send({
       status: 0,
       data: JSON.stringify({
@@ -99,7 +99,7 @@ userRouter.get("/easyuser", expressJoi(VdQuserId), async (req, res) => {
       registration_time,
       user_id,
       avatar_url,
-    } = (selectUsernameAndIdRes.results as User[])[0];
+    } = (selectUsernameAndIdRes.results as UserBase[])[0];
     res.send({
       status: 0,
       data: JSON.stringify({

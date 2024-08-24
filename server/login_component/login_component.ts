@@ -76,6 +76,7 @@ export interface ResultSetHeader {
   changedRows: number;
 }
 
+
 // 数据库列表数据
 export interface User {
   id: number;
@@ -97,6 +98,25 @@ export interface User {
   other_security: string;
   user_agent: string;
   token: string;
+  avatar_url: string;
+}
+
+// 用户基本需要的数据
+
+export interface UserBase {
+  username: string;
+  status: number;
+  descs: string;
+  gender: number;
+  user_id: string;
+  is_guest: number;
+  email: string;
+  phone_number: string;
+  registration_time: string;
+  last_time: string;
+  login_count: number;
+  is_active: number;
+  is_admin: number;
   avatar_url: string;
 }
 
@@ -256,7 +276,8 @@ router.post("/login", expressJoi(VdLogin), async (req, res) => {
     // console.log(validateRes);
 
     if (validateRes.status) {
-      return res.cc(validateRes.message, 1, 200);
+      
+      return res.cc(validateRes.message, 1, 401);
     }
 
     // 各种验证没问题时，创建个token并更新登录信息
@@ -570,7 +591,9 @@ export function selectUsernameAndId(name: string) {
   return new Promise(
     (resolve: (value: SelectUsernameAndIdResolve) => void, reject) => {
       // 查询name是用户名时找不找到后，再查询是用户id找不找到
-      const set = `SELECT * 
+      const set = `SELECT username, email, descs, gender, is_active, last_time, login_count, 
+      registration_time, phone_number, status, is_guest, is_admin, 
+      user_id, avatar_url 
       FROM ${table_name} 
       WHERE username = ? 
       OR user_id = ? 
@@ -608,7 +631,9 @@ export function selectEmail(email: string) {
   return new Promise(
     (resolve: (value: SelectUsernameAndIdResolve) => void, reject) => {
       // 查询name是用户名时找不找到后，再查询是用户id找不找到
-      const set = `SELECT * 
+      const set = `SELECT username, email, descs, gender, is_active, last_time, login_count, 
+      registration_time, phone_number, status, is_guest, is_admin, 
+      user_id, avatar_url 
       FROM ${table_name} 
       WHERE email = ?`;
 
@@ -618,17 +643,15 @@ export function selectEmail(email: string) {
           reject(err);
         }
         // 如果长度为1则找到，0则未找到
-        if ((results as User[]).length) {
+        if ((results as UserBase[]).length) {
           resolve({
             results,
-            length: (results as User[]).length,
+            length: (results as UserBase[]).length,
             status: 0,
-            message: `找到了${(results as User[]).length}个用户`,
+            message: `找到了${(results as UserBase[]).length}个用户`,
           });
         } else {
-          resolve({
-            results,
-            length: (results as User[]).length,
+          reject({
             status: 1,
             message: "未找到用户名",
           });
