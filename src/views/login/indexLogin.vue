@@ -217,7 +217,6 @@ const justSubmitForm = async (formEl: FormInstance | undefined) => {
   await formEl.validate((valid, fields) => {
     if (valid) {
       // 验证登录，若没有该账户则跳转注册
-      // 测试登录
       const loginForm = {
         ...ruleForm,
         ...{ user_agent: useRegister().userAgent },
@@ -232,10 +231,10 @@ const justSubmitForm = async (formEl: FormInstance | undefined) => {
         ) => {
           // 根据status返回的结果决定登录状态,1就是失败了
           console.log(res);
-
+// 判断状态码是否正确
           if (res.data.status) {
-            // 提示登录失败
-            usePopup().openPopup(res.data.error!.message, "error");
+            // 提示登录失败 
+            usePopup().openPopup("登录失败，账户已经注册或密码错误", "error");
           }
           // 登录成功
           else {
@@ -249,7 +248,14 @@ const justSubmitForm = async (formEl: FormInstance | undefined) => {
             router.replace("/");
           }
         }
-      );
+      )
+      // 网络错误以及各种验证错误
+      .catch((err)=>{
+        console.log(err);
+        // 提示弹窗
+        usePopup().openPopup("登录失败，账户已经注册或密码错误", "error");
+        
+      })
     }
     // 规则错误
     else {
