@@ -231,7 +231,7 @@ const updateDesc = ( newDescs:string,id: string) => {
 
         // 判断是否修改成功
         if ((updateResults as ResultSetHeader).affectedRows !== 1) {
-          reject({ status: 1, err: "修改失败！" });
+          reject({ status: 1, message: "修改失败！" });
         } else {
           resolve({
             message: "修改成功",

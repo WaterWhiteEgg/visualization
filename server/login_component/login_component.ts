@@ -474,7 +474,7 @@ function userIdLogin(name: string, password: string): Promise<ResRej> {
       } catch (error) {
         reject({
           status: 1,
-          message: error,
+          err: error,
         });
       }
     }

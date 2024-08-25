@@ -106,7 +106,7 @@ const emailRules = async (
       }
       // 验证失败处理
     } catch (error) {
-      callback(new Error("邮箱已经存在或网络错误"));
+      callback(new Error("邮箱已存在或网络错误"));
     }
   });
   // 网络请求
@@ -122,6 +122,7 @@ const findEmailCode = async (
 ) => {
   // 防抖处理
   let res = debounce(async () => {
+    ;
     try {
       // 请求postToFindEmailCode，获取res，若有问题catch捕捉
       let postToFindEmailCodeRes = await postToFindEmailCode(
@@ -319,10 +320,11 @@ const resetForm = () => {
 const getEmailCode = async (formEl: FormInstance | undefined) => {
   if (!formEl) return;
   await formEl.validate((valid, fields) => {
-    console.log(fields);
     // 邮箱地址不能有错,如果存在错误处理
+    console.log(valid);
+    
     if (fields && fields.email && fields.email.length > 0) {
-      usePopup().openPopup("未填写邮箱", "error");
+      usePopup().openPopup("邮箱错误", "error");
     }
     // 验证成功
     else {

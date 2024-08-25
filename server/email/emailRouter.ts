@@ -114,6 +114,39 @@ export function selectEmail(email: string) {
     }
   );
 }
+// 验证邮箱是否已存在
+export function findEmailExists(email: string) {
+  const set = `SELECT user_id 
+  FROM ${table_name} 
+  WHERE email = ?`;
+
+  return new Promise((resolve, reject) => {
+    connection.query(set, [email], function (err, results) {
+      // 登录错误处理
+
+      if (err) {
+        reject({
+          status: 1,
+          err,
+        });
+      }
+      // 如果是空则之前没有相同的邮箱
+      if ((results as UserBase[]).length === 0) {
+        resolve({
+          status: 0,
+          message: "没有别的邮箱",
+        });
+      }
+      // 其他情况有问题
+      else {
+        reject({
+          status: 1,
+          message: "验证失败",
+        });
+      }
+    });
+  });
+}
 
 // 发送验证码处理函数
 export function sendEmailCode(email: string, code: string): Promise<ResRej> {
@@ -128,32 +161,23 @@ export function sendEmailCode(email: string, code: string): Promise<ResRej> {
   // 发送验证码
   return new Promise((resolve, reject) => {
     async function inTransporter() {
-      try {
-        // 验证邮箱是否唯一
-        await selectEmail(email);
-        // 尝试发送邮箱
-        transporter.sendMail(mailOptions, (error) => {
-          if (error) {
-            // 报错
-            reject({
-              status: 1,
-              message: "邮箱发送失败",
-            });
-          }
-          // 成功发送
-          else {
-            resolve({
-              status: 0,
-              message: "邮箱发送成功",
-            });
-          }
-        });
-      } catch (error) {
-        reject({
-          status: 1,
-          message: "邮箱发送失败",
-        });
-      }
+      // 尝试发送邮箱
+      transporter.sendMail(mailOptions, (error) => {
+        if (error) {
+          // 报错
+          reject({
+            status: 1,
+            message: "邮箱发送失败",
+          });
+        }
+        // 成功发送
+        else {
+          resolve({
+            status: 0,
+            message: "邮箱发送成功",
+          });
+        }
+      });
     }
     inTransporter();
   });
@@ -209,7 +233,7 @@ export function verificationEmailCode(
         // 其他错误
         reject({
           status: 1,
-          message: error,
+          err: error,
         });
       }
     }
@@ -271,13 +295,16 @@ export function verifyEmail(userEmail: string) {
         if (saveEmail === userEmail) {
           resolve({ status: 0, email: saveEmail, message: "验证成功" });
         } else {
-          reject({ status: 1, error: "未知错误。。。难道还能数据不一样的？" });
+          reject({
+            status: 1,
+            message: "未知错误。。。难道还能数据不一样的？",
+          });
         }
       });
     } catch (error) {
       // 处理/验证失败
       //   console.log(error);
-      reject({ status: 1, error });
+      reject({ status: 1, err: error });
     }
   });
 }
@@ -286,29 +313,18 @@ export function verifyEmail(userEmail: string) {
 router.post("/findemail", expressJoi(VdEmail), async (req, res) => {
   // 收集数据
   const { email }: { email: string } = req.body;
-
-  // 验证邮箱是否以存在
-  const set = `SELECT user_id 
-      FROM ${table_name} 
-      WHERE email = ?`;
-
-  connection.query(set, [email], function (err, results) {
-    // 登录错误处理
-    if (err) {
-      res.cc(err);
-    }
-    // 如果是空则之前没有相同的邮箱
-    if ((results as UserBase[]).length === 0) {
-      res.send({
-        status: 0,
-        message: "没有别的邮箱",
-      });
-    }
-    // 其他情况有问题
-    else {
-      res.cc("邮箱已经存在");
-    }
-  });
+  try {
+    // 寻找是否存在重复的邮箱
+    await findEmailExists(email);
+    res.send({
+      status: 0,
+      message: "处理成功",
+    });
+  } 
+  // 错误情况
+  catch (error) {
+    res.cc(error as string);
+  }
 });
 
 export default router;
