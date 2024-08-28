@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from "vue";
+import { onMounted, ref, watch, defineAsyncComponent } from "vue";
 import { type ECElementEvent } from "echarts";
 import { getCitys } from "@/network/city";
 import { debounce } from "@/assets/ts/debounce";
@@ -12,15 +12,17 @@ import {
   redrawValue,
   inGetWeather,
 } from "@/assets/ts/initMap";
-import {  myPicChart } from "@/assets/ts/initPie";
-import {  myLineChart, redrawLineValue } from "@/assets/ts/initLine";
+import { myPicChart } from "@/assets/ts/initPie";
+import { myLineChart, redrawLineValue } from "@/assets/ts/initLine";
 import { changeAnimation } from "../../assets/ts/child/echartsAnimationFlag";
-
-import mapOfLeft from "./child/mapOfLeft.vue";
-import mapSearch from "./child/mapSearch.vue";
-import mapOfRight from "./child/mapOfRight.vue";
 import "animate.css";
-
+// import mapOfRight from "./child/mapOfRight.vue"
+// import mapSearch from "./child/mapSearch.vue"
+import mapOfLeft from "./child/mapOfLeft.vue";
+// 异步加载组件mapOfLeft要我这里初始化就不异步了
+const mapOfRight = defineAsyncComponent(() => import("./child/mapOfRight.vue"));
+const mapSearch = defineAsyncComponent(() => import("./child/mapSearch.vue"));
+// const mapOfLeft = defineAsyncComponent(() => import("./child/mapOfLeft.vue"));
 // 加载化地图配置
 onMounted(() => {
   thisInitMap(document.getElementById("china"), mapClick);
@@ -157,6 +159,7 @@ watch(
 
     <div class="view_right">
       <mapOfRight
+        :is="mapOfRight"
         :isHaddenBgc="isHaddenBgc"
         @chooseCityWeather="ChooseCityWeather"
       ></mapOfRight>
