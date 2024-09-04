@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {  onMounted } from "vue";
+import { onMounted } from "vue";
 import { initPie } from "@/assets/ts/initPie";
 import { initLine } from "@/assets/ts/initLine";
 import { useCityArray } from "@/stores/item";
@@ -12,14 +12,15 @@ import { useCityArray } from "@/stores/item";
 //     msg: "",
 //   }
 // );
-// const emits = defineEmits<{
-//   (e: "emit", i: void): void;
-// }>();
+const emits = defineEmits<{
+  (e: "initOther", i: void): void;
+}>();
 
 // 监听图表以及响应式调整窗口
 onMounted(() => {
   initPie(document.querySelector(".view_left_pie"));
   initLine(document.querySelector(".view_left_line"));
+  emits("initOther");
 });
 </script>
 <template>

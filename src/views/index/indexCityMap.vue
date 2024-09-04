@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, watch, defineAsyncComponent } from "vue";
+import { onMounted, ref, watch, defineAsyncComponent, nextTick } from "vue";
 import { type ECElementEvent } from "echarts";
 import { getCitys } from "@/network/city";
 import { debounce } from "@/assets/ts/debounce";
@@ -14,34 +14,32 @@ import {
 } from "@/assets/ts/initMap";
 import { myPicChart } from "@/assets/ts/initPie";
 import { myLineChart, redrawLineValue } from "@/assets/ts/initLine";
+
 import { changeAnimation } from "../../assets/ts/child/echartsAnimationFlag";
 import "animate.css";
-// import mapOfRight from "./child/mapOfRight.vue"
-// import mapSearch from "./child/mapSearch.vue"
-import mapOfLeft from "./child/mapOfLeft.vue";
-// 异步加载组件mapOfLeft要我这里初始化就不异步了
+
 const mapOfRight = defineAsyncComponent(() => import("./child/mapOfRight.vue"));
 const mapSearch = defineAsyncComponent(() => import("./child/mapSearch.vue"));
-// const mapOfLeft = defineAsyncComponent(() => import("./child/mapOfLeft.vue"));
-// 加载化地图配置
-onMounted(() => {
-  thisInitMap(document.getElementById("china"), mapClick);
-});
+const mapOfLeft = defineAsyncComponent(() => import("./child/mapOfLeft.vue"));
 
-// 屏幕大小
-const thisInnerWidth = ref(window.innerWidth);
-// thisInnerWidth.value <= 969 的判断flag
-const isInnerWidthLess969 = ref(false);
+// window.innerWidth <= 969 的判断flag
+const isInnerWidthLess969 = ref(window.innerWidth <= 969);
 
 // 注册监听屏幕大小的事件
 onMounted(() => {
   window.addEventListener("resize", handleResize);
-  // console.log(thisInnerWidth.value);
-  // 检测屏幕宽度
-  isInnerWidthLess969.value = thisInnerWidth.value <= 969;
+});
+
+// 子组件的echats渲染完毕函数
+const initOther = async () => {
+  // 子组件渲染完毕将地图中心的组件也渲染
+  await thisInitMap(document.getElementById("china"), mapClick);
+
+  // 检测开始时的屏幕宽度
+  isInnerWidthLess969.value = window.innerWidth <= 969;
   // 仅关闭或开启动画
   resizeAndChangeAnimation(isInnerWidthLess969.value, false);
-});
+};
 
 // 注册监听屏幕大小的函数
 const handleResize = (e: UIEvent) => {
@@ -49,8 +47,8 @@ const handleResize = (e: UIEvent) => {
 
   let resize = debounce(() => {
     // 获取屏幕宽度
-    thisInnerWidth.value = (e.target as Window).innerWidth;
-    isInnerWidthLess969.value = thisInnerWidth.value <= 969;
+
+    isInnerWidthLess969.value = window.innerWidth <= 969;
     // console.log(isInnerWidthLess969.value);
 
     // 类似媒体查询要操作的事，低于这个值应该做的事，这个值是小于pc，类平板以下的
@@ -64,7 +62,13 @@ const resizeAndChangeAnimation = (
   isWidth: boolean,
   isResize: boolean = true
 ) => {
-  // 图表的动画开关，决定宽少于969时动画关闭
+  // 图表的动画开关，决定宽少于969时动画关闭,优先检查图表是否已经创建
+  // console.log(myChart, myPicChart, myLineChart);
+  if (!(myChart && myPicChart && myLineChart)) {
+    // 没有初始化所有图表停止修改动画属性
+
+    return false;
+  }
   changeAnimation(myChart, !isWidth);
   changeAnimation(myPicChart, !isWidth);
   changeAnimation(myLineChart, !isWidth);
@@ -148,7 +152,7 @@ watch(
 <template>
   <div class="view">
     <!-- 地图绘制 -->
-    <mapOfLeft></mapOfLeft>
+    <mapOfLeft @initOther="initOther"></mapOfLeft>
     <div
       id="china"
       style="width: 100vw; height: 60vh; position: absolute; bottom: 20vh"
