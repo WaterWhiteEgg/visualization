@@ -2,7 +2,6 @@
 import { ref, onMounted } from "vue";
 import indexList from "./child/indexList.vue";
 import indexSearch from "./child/indexSearch.vue";
-import { getUserData, userVerifyToken } from "../../network/user";
 import { useRegister, type ParseUserData } from "../../stores/register";
 import { useRouter } from "vue-router";
 

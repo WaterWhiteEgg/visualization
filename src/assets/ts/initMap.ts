@@ -1,12 +1,12 @@
 import * as echarts from "echarts";
 import "./chinaMapData";
 import { getCitys } from "../../network/city";
-import { getWeather } from "../../network/weather";
-import { forDistricts, type DataWeather } from "../ts/forDistricts";
+import { forDistricts} from "../ts/forDistricts";
 import { useCityArray } from "../../stores/item";
 import { getMyIpCity } from "./toGetIp";
+import { inGetWeather } from "./getWeather";
 
-import { myPicChart, redrawPieValue } from "./initPie";
+
 
 export let myChart: echarts.ECharts;
 export async function thisInitMap(
@@ -179,14 +179,3 @@ export function redrawValue(myChart: echarts.ECharts) {
     ],
   });
 }
-// 城市天气请求，一定要城市编码
-export const inGetWeather = (code: string) => {
-  getWeather(code).then((res) => {
-    const weatherData = res.data.data as DataWeather;
-    const weatherLive = weatherData.lives;
-    useCityArray().addLocalWeather(weatherLive);
-    // console.log(weatherLive);
-    // 刷新饼图的数据
-    redrawPieValue(myPicChart);
-  });
-};
