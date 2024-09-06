@@ -7,31 +7,21 @@ import { forDistricts, type City } from "@/assets/ts/forDistricts";
 import { useSearchItem } from "@/stores/mapSearch";
 import { useCityArray } from "@/stores/item";
 import { inGetWeather } from "@/assets/ts/getWeather";
-// import { myPicChart } from "@/assets/ts/initPie";
-// import { myLineChart, redrawLineValue } from "@/assets/ts/initLine";
-
+import { myPicChart } from "@/assets/ts/initPie";
+import { myLineChart, redrawLineValue } from "@/assets/ts/initLine";
+import {thisInitMap, myChart, redrawValue } from "@/assets/ts/initMap"
 import { changeAnimation } from "../../assets/ts/child/echartsAnimationFlag";
 import "animate.css";
 
-let inMyPicChart;
-let inMyLineChart;
-let inRedrawLineValue;
-let inMyChart;
-let inRedrawValue;
 async function asyncInit() {
-  const { myPicChart } = await import("@/assets/ts/initPie");
-  const { myLineChart, redrawLineValue } = await import("@/assets/ts/initLine");
-  const { thisInitMap, myChart, redrawValue } = await import(
-    "@/assets/ts/initMap"
-  );
+  // const { myPicChart } = await import("@/assets/ts/initPie");
+  // const { myLineChart, redrawLineValue } = await import("@/assets/ts/initLine");
+  // const { thisInitMap, myChart, redrawValue } = await import(
+  //   "@/assets/ts/initMap"
+  // );
     // 子组件渲染完毕将地图中心的组件也渲染
     await thisInitMap(document.getElementById("china"), mapClick);
 
-  inMyPicChart = myPicChart;
-  inMyLineChart = myLineChart;
-  inRedrawLineValue = redrawLineValue;
-  inMyChart = myChart;
-  inRedrawValue = redrawValue;
 }
 
 const mapOfRight = defineAsyncComponent(() => import("./child/mapOfRight.vue"));
@@ -81,20 +71,20 @@ const resizeAndChangeAnimation = (
 ) => {
   // 图表的动画开关，决定宽少于969时动画关闭,优先检查图表是否已经创建
   // console.log(myChart, myPicChart, myLineChart);
-  if (!(inMyChart && inMyPicChart && inMyLineChart)) {
+  if (!(myChart && myPicChart && myLineChart)) {
     // 没有初始化所有图表停止修改动画属性
 
     return false;
   }
-  changeAnimation(inMyChart, !isWidth);
-  changeAnimation(inMyPicChart, !isWidth);
-  changeAnimation(inMyLineChart, !isWidth);
+  changeAnimation(myChart, !isWidth);
+  changeAnimation(myPicChart, !isWidth);
+  changeAnimation(myLineChart, !isWidth);
 
   // 询问决定重新检查大小这些图表
   if (isResize) {
-    inMyChart.resize();
-    inMyPicChart.resize();
-    inMyLineChart.resize();
+    myChart.resize();
+    myPicChart.resize();
+    myLineChart.resize();
   }
 };
 
@@ -127,7 +117,7 @@ const mapClick = (e: ECElementEvent) => {
       // 赋值给全局
       useCityArray().addLocalCityArray(forDistricts(res.data.data?.districts));
       // 同步小圆点,重新绘制标点
-      inRedrawValue(inMyChart);
+      redrawValue(myChart);
       // 然后请求天气
       inGetWeather(useCityArray()?.localCityArray[0]?.adcode);
     });
@@ -148,7 +138,7 @@ watch(
   () => useCityArray().localCityArray,
   () => {
     // 改变时刷新图标数据
-    inRedrawLineValue(inMyLineChart);
+    redrawLineValue(myLineChart);
 
     console.log(isInnerWidthLess969.value);
     // 手机端不执行
