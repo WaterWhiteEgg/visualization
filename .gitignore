@@ -2,6 +2,7 @@
 logs
 server/realdata/*
 src/network/realdata/*
+visualizer.html
 
 *.log
 npm-debug.log*
