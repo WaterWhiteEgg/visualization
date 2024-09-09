@@ -39,6 +39,18 @@ export default defineConfig({
     cdn({
       modules: [
         {
+          name: "vue",
+          var: "Vue",
+          path: ["https://cdn.bootcdn.net/ajax/libs/vue/3.4.15/vue.global.prod.js"],
+        },
+        {
+          name: "ElementPlus",
+          var: "ElementPlus",
+          path: [
+            "https://cdn.bootcdn.net/ajax/libs/element-plus/2.6.1/index.full.js",
+          ],
+        },
+        {
           name: "echarts",
           var: "echarts",
           path: ["https://cdn.bootcdn.net/ajax/libs/echarts/5.5.0/echarts.js"],
