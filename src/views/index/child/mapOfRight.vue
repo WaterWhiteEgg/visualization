@@ -9,6 +9,20 @@ const emits = defineEmits<{
   (e: "chooseCityWeather", i: City): void;
 }>();
 
+// 父元素处理数据减少事件创建
+const handleTableClick = (event: Event) => {
+  // 查找最近的<td>元素，并且需要检查其class是否匹配
+  const targetClickedTd = (event.target as HTMLElement).closest(
+    ".view_right_table_tdname"
+  );
+  if (targetClickedTd) {
+    const item = JSON.parse(
+      targetClickedTd.getAttribute("data-item") as string
+    ) as City;
+    rightChooseCityWeather(item);
+  }
+};
+
 // 请求天气以及城市数据
 const rightChooseCityWeather = (item: City) => {
   emits("chooseCityWeather", item);
@@ -18,9 +32,9 @@ const rightChooseCityWeather = (item: City) => {
 <template>
   <div
     class="view_right_table animated fadeInDown"
-    :class="{ hig:props.isHaddenBgc }"
+    :class="{ hig: props.isHaddenBgc }"
   >
-    <table :class="{ 'bgc-hid': isHaddenBgc }">
+    <table :class="{ 'bgc-hid': isHaddenBgc }" @click="handleTableClick">
       <tr>
         <th>顺序</th>
         <th>城市编号</th>
@@ -41,10 +55,7 @@ const rightChooseCityWeather = (item: City) => {
           <td>
             {{ item.citycode?.length === 0 ? "无编号" : item.citycode }}
           </td>
-          <td
-            class="view_right_table_tdname"
-            @click="rightChooseCityWeather(item)"
-          >
+          <td class="view_right_table_tdname" :data-item="JSON.stringify(item)">
             {{ item.name }}
           </td>
           <td>{{ item.adcode }}</td>
