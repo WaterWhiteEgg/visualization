@@ -20,6 +20,7 @@ import publicRouter from "./public_server/public_server";
 // 防止一个ip请求过多
 import { limiter } from "./limit/index";
 
+// 跨域相关，不过变量放在key里了这里不用管
 const corsOptions: CorsOptions = {
   origin: [],
   optionsSuccessStatus: 200,

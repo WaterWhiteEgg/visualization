@@ -48,7 +48,7 @@ export default defineConfig({
           var: "ElementPlus",
           path: [
             "https://cdn.bootcdn.net/ajax/libs/element-plus/2.6.1/index.full.js",
-          ],
+          ],         
         },
         {
           name: "echarts",
