@@ -41,14 +41,16 @@ export default defineConfig({
         {
           name: "vue",
           var: "Vue",
-          path: ["https://cdn.bootcdn.net/ajax/libs/vue/3.4.15/vue.global.prod.js"],
+          path: [
+            "https://cdn.bootcdn.net/ajax/libs/vue/3.4.15/vue.global.prod.js",
+          ],
         },
         {
           name: "ElementPlus",
           var: "ElementPlus",
           path: [
             "https://cdn.bootcdn.net/ajax/libs/element-plus/2.6.1/index.full.js",
-          ],         
+          ],
         },
         {
           name: "echarts",
@@ -58,6 +60,15 @@ export default defineConfig({
       ],
     }),
   ],
+  // 打包后去除log debug的内容
+  esbuild: {
+    drop: ["console", "debugger"],
+  },
+  build: {
+    sourcemap: false,
+    minify: "esbuild",
+  },
+
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
