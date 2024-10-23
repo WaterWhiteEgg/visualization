@@ -154,7 +154,7 @@ watch(
     animate();
   }
 );
-// 观察bom
+
 </script>
 <template>
   <div class="view">

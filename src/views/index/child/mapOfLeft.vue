@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { onMounted } from "vue";
+import { onMounted, computed } from "vue";
 import { initPie } from "@/assets/ts/initPie";
 import { initLine } from "@/assets/ts/initLine";
 import { useCityArray } from "@/stores/item";
+import weatherSvgJson from "../../../assets/js/weatherSvgTsble.json";
 
 // const props = withDefaults(
 //   defineProps<{
@@ -22,6 +23,19 @@ onMounted(() => {
   initLine(document.querySelector(".view_left_line"));
   emits("initOther");
 });
+
+// 根据json推送图标
+const weatherSvg = computed(() => {
+  return (item: string) => {
+    for (const key in weatherSvgJson) {
+      if (item === key) {
+        return (weatherSvgJson as Record<string, string | number>)[
+          key
+        ]; // 返回匹配的值
+      }
+    }
+  };
+});
 </script>
 <template>
   <div class="view_left">
@@ -38,7 +52,9 @@ onMounted(() => {
           </div>
           <div>
             <span>天气状况</span>
-            {{ item.weather }}
+            {{  }}
+            <!-- 根据天气更换图标，使用和风css文件 -->
+            <span><i :class="'qi-' + weatherSvg(item.weather)"></i> {{ item.weather }}</span>
           </div>
           <div>
             <span>气温</span>
@@ -64,6 +80,7 @@ onMounted(() => {
   </div>
 </template>
 <style scoped>
+@import url("https://cdn.jsdelivr.net/npm/qweather-icons@1.3.0/font/qweather-icons.css");
 .animated {
   /* 任何过度持续时间加快 */
   animation-duration: 0.5s !important;
