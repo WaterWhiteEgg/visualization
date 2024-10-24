@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted,onBeforeUnmount } from "vue";
 import indexList from "./child/indexList.vue";
 import indexSearch from "./child/indexSearch.vue";
 import { useRegister, type ParseUserData } from "../../stores/register";
@@ -7,15 +7,36 @@ import { useRouter } from "vue-router";
 
 // 实例化
 const router = useRouter();
-
+// 组件的ref
+const listRef = ref<HTMLElement | null>(null);
 // 挂载时
-onMounted(() => {});
+onMounted(() => {
+  // 添加事件监听
+  document.addEventListener("click", handleClickOutside);
+});
+// 卸载时
+    // 清除事件监听
+    onBeforeUnmount(() => {
+      document.removeEventListener('click', handleClickOutside);
+    });
+
+// 处理handleClickOutside点击事件
+const handleClickOutside = (event: MouseEvent) => {
+  // 判断是否点击在列表之外
+  if (listRef.value && !listRef.value.contains(event.target as Node)) {
+    changeIsShowListFlag(false); // 点击外部区域，关闭列表
+    // console.log(!listRef.value.contains(event.target as Node));
+
+
+  }
+};
 
 // 判断是否显示列表
 const isShowListFlag = ref(false);
 // 切换isShowListFlag,默认直接切换
 const changeIsShowListFlag = (bool: boolean = !isShowListFlag.value) => {
   isShowListFlag.value = bool;
+  console.log("切换bool" + bool);
 };
 
 // 前往/user 还需要额外给名字
@@ -28,7 +49,7 @@ const toUser = () => {
 };
 </script>
 <template>
-  <div class="main">
+  <div class="main" ref="listRef">
     <Transition
       :enter-active-class="isShowListFlag ? 'animated slideInLeft' : 'hidden'"
       :leave-active-class="isShowListFlag ? '' : 'animated slideOutLeft'"

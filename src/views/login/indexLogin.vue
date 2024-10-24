@@ -16,6 +16,7 @@ import {
   inPostToGetEmailCode,
   waitEmailCodeClick,
 } from "../../assets/ts/codePost";
+import mainviewIndex from "@/views/mainview/mainviewIndex.vue";
 
 interface RuleForm {
   name: string;
@@ -221,41 +222,41 @@ const justSubmitForm = async (formEl: FormInstance | undefined) => {
         ...ruleForm,
         ...{ user_agent: useRegister().userAgent },
       };
-      loginUser(loginForm).then(
-        (
-          res: AxiosResponse<{
-            token?: string;
-            status: 0 | 1;
-            error?: { status: number; message: string };
-          }>
-        ) => {
-          // 根据status返回的结果决定登录状态,1就是失败了
-          console.log(res);
-// 判断状态码是否正确
-          if (res.data.status) {
-            // 提示登录失败 
-            usePopup().openPopup("登录失败，账户已经注册或密码错误", "error");
-          }
-          // 登录成功
-          else {
-            // 记录token
-            // console.log(res.data.token);
-            useToken().changeToken(res.data.token as string);
+      loginUser(loginForm)
+        .then(
+          (
+            res: AxiosResponse<{
+              token?: string;
+              status: 0 | 1;
+              error?: { status: number; message: string };
+            }>
+          ) => {
+            // 根据status返回的结果决定登录状态,1就是失败了
+            console.log(res);
+            // 判断状态码是否正确
+            if (res.data.status) {
+              // 提示登录失败
+              usePopup().openPopup("登录失败，账户已经注册或密码错误", "error");
+            }
+            // 登录成功
+            else {
+              // 记录token
+              // console.log(res.data.token);
+              useToken().changeToken(res.data.token as string);
 
-            // 提示登录成功
-            usePopup().openPopup("登录成功", "success");
-            // 跳转路由
-            router.replace("/");
+              // 提示登录成功
+              usePopup().openPopup("登录成功", "success");
+              // 跳转路由
+              router.replace("/");
+            }
           }
-        }
-      )
-      // 网络错误以及各种验证错误
-      .catch((err)=>{
-        console.log(err);
-        // 提示弹窗
-        usePopup().openPopup("登录失败，账户已经注册或密码错误", "error");
-        
-      })
+        )
+        // 网络错误以及各种验证错误
+        .catch((err) => {
+          console.log(err);
+          // 提示弹窗
+          usePopup().openPopup("登录失败，账户已经注册或密码错误", "error");
+        });
     }
     // 规则错误
     else {
@@ -340,6 +341,8 @@ const getEmailCode = async (formEl: FormInstance | undefined) => {
 </script>
 
 <template>
+  <mainviewIndex></mainviewIndex>
+
   <el-form
     ref="ruleFormRef"
     :model="ruleForm"

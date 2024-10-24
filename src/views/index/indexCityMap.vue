@@ -9,8 +9,9 @@ import { useCityArray } from "@/stores/item";
 import { inGetWeather } from "@/assets/ts/getWeather";
 import { myPicChart } from "@/assets/ts/initPie";
 import { myLineChart, redrawLineValue } from "@/assets/ts/initLine";
-import {thisInitMap, myChart, redrawValue } from "@/assets/ts/initMap"
+import { thisInitMap, myChart, redrawValue } from "@/assets/ts/initMap";
 import { changeAnimation } from "../../assets/ts/child/echartsAnimationFlag";
+import mainviewIndex from "@/views/mainview/mainviewIndex.vue";
 import "animate.css";
 
 async function asyncInit() {
@@ -19,9 +20,8 @@ async function asyncInit() {
   // const { thisInitMap, myChart, redrawValue } = await import(
   //   "@/assets/ts/initMap"
   // );
-    // 子组件渲染完毕将地图中心的组件也渲染
-    await thisInitMap(document.getElementById("china"), mapClick);
-
+  // 子组件渲染完毕将地图中心的组件也渲染
+  await thisInitMap(document.getElementById("china"), mapClick);
 }
 
 const mapOfRight = defineAsyncComponent(() => import("./child/mapOfRight.vue"));
@@ -34,14 +34,12 @@ const isInnerWidthLess969 = ref(window.innerWidth <= 969);
 // 注册监听屏幕大小的事件
 onMounted(() => {
   // 加载组件数据
-  asyncInit()
+  asyncInit();
   window.addEventListener("resize", handleResize);
 });
 
 // 子组件的echats渲染完毕函数
 const initOther = async () => {
-
-
   // 检测开始时的屏幕宽度
   isInnerWidthLess969.value = window.innerWidth <= 969;
   // 仅关闭或开启动画
@@ -154,9 +152,9 @@ watch(
     animate();
   }
 );
-
 </script>
 <template>
+  <mainviewIndex></mainviewIndex>
   <div class="view">
     <!-- 地图绘制 -->
     <mapOfLeft @initOther="initOther"></mapOfLeft>
