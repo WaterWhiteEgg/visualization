@@ -341,7 +341,7 @@ const getEmailCode = async (formEl: FormInstance | undefined) => {
 </script>
 
 <template>
-  <mainviewIndex></mainviewIndex>
+  <mainviewIndex color="#707070"></mainviewIndex>
 
   <el-form
     ref="ruleFormRef"

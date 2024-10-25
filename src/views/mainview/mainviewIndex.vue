@@ -1,9 +1,18 @@
 <script setup lang="ts">
-import { ref, onMounted,onBeforeUnmount } from "vue";
+import { ref, onMounted, onBeforeUnmount } from "vue";
 import indexList from "./child/indexList.vue";
 import indexSearch from "./child/indexSearch.vue";
 import { useRegister, type ParseUserData } from "../../stores/register";
 import { useRouter } from "vue-router";
+
+const props = withDefaults(
+  defineProps<{
+    color: string;
+  }>(),
+  {
+    color: "#ffffff",
+  }
+);
 
 // 实例化
 const router = useRouter();
@@ -15,10 +24,10 @@ onMounted(() => {
   document.addEventListener("click", handleClickOutside);
 });
 // 卸载时
-    // 清除事件监听
-    onBeforeUnmount(() => {
-      document.removeEventListener('click', handleClickOutside);
-    });
+// 清除事件监听
+onBeforeUnmount(() => {
+  document.removeEventListener("click", handleClickOutside);
+});
 
 // 处理handleClickOutside点击事件
 const handleClickOutside = (event: MouseEvent) => {
@@ -26,8 +35,6 @@ const handleClickOutside = (event: MouseEvent) => {
   if (listRef.value && !listRef.value.contains(event.target as Node)) {
     changeIsShowListFlag(false); // 点击外部区域，关闭列表
     // console.log(!listRef.value.contains(event.target as Node));
-
-
   }
 };
 
@@ -59,7 +66,7 @@ const toUser = () => {
         v-if="!isShowListFlag"
         @click="changeIsShowListFlag()"
       >
-        <el-icon size="30" color="#ffffffe3" class="expand">
+        <el-icon size="30" color="#ffffffe3" class="expand" :style="{color:color}">
           <Expand />
         </el-icon>
       </div>
