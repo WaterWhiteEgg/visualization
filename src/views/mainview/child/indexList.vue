@@ -23,10 +23,10 @@ const toRouter = (str: string) => {
   <div class="collapse" @click.stop>
     <el-collapse v-model="activeName" accordion>
       <el-collapse-item title="用户管理" name="1">
-        <listLeft @click="toRouter('/login')">
-          <template #title
-            > 登录/注册 </template
-          >
+        <listLeft @click="toRouter('/login')" borderBottom="0.5px solid #3300ff">
+          <template #title >
+            登录/注册
+          </template>
         </listLeft>
         <div>
           <div class="collapse-item-desc">
@@ -35,17 +35,19 @@ const toRouter = (str: string) => {
         </div>
       </el-collapse-item>
       <el-collapse-item title="项目管理" name="2">
-        <div>
-          目前想要储存一些简单的数据并进行增删改查
-        </div>
-        
+        <div>目前想要储存一些简单的数据并进行增删改查</div>
       </el-collapse-item>
       <el-collapse-item title="记录" name="3">
         希望储存用户的操作以及一些数据的展示
       </el-collapse-item>
-      <el-collapse-item title="其他" name="4">
+      <el-collapse-item title="操作" name="4">
         <div>
-         给不是主要使用功能提供
+          <listLeft @click="toRouter('/')">
+            <template #title> 返回主页</template>
+          </listLeft>
+          <listLeft @click="toRouter('/system')">
+            <template #title> 设置</template>
+          </listLeft>
         </div>
       </el-collapse-item>
     </el-collapse>
