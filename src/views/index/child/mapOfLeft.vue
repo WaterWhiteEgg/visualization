@@ -53,7 +53,7 @@ const hasWeatherData = computed(() => {
         <div
           class="view_left_weather_item"
           v-for="(item, index) in useCityArray().localWeather"
-          :key="item.adcode + index"
+          :key="item.adcode + index.toString()"
         >
           <div>
             <span>城市名</span>

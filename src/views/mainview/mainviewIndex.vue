@@ -7,7 +7,7 @@ import { useRouter } from "vue-router";
 
 const props = withDefaults(
   defineProps<{
-    color: string;
+    color?: string;
   }>(),
   {
     color: "#ffffff",
