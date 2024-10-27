@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, computed } from "vue";
+import { onMounted, computed, watchEffect, ref } from "vue";
 import { initPie } from "@/assets/ts/initPie";
 import { initLine } from "@/assets/ts/initLine";
 import { useCityArray } from "@/stores/item";
@@ -29,17 +29,26 @@ const weatherSvg = computed(() => {
   return (item: string) => {
     for (const key in weatherSvgJson) {
       if (item === key) {
-        return (weatherSvgJson as Record<string, string | number>)[
-          key
-        ]; // 返回匹配的值
+        return (weatherSvgJson as Record<string, string | number>)[key]; // 返回匹配的值
       }
     }
   };
 });
+
+// 判断是否拥有weather的数据
+const hasWeatherData = computed(() => {
+  return (
+    useCityArray().localWeather[0] &&
+    Object.keys(useCityArray().localWeather[0]).length > 0
+  );
+});
 </script>
 <template>
   <div class="view_left">
-    <div class="view_left_weather animated fadeInDown">
+    <div class="view_left_err" v-show="!hasWeatherData">
+      无法获取天气情况，请具体到市名
+    </div>
+    <div class="view_left_weather animated fadeInDown" v-show="hasWeatherData">
       <transition-group enter-active-class="animated rotateInDownLeft">
         <div
           class="view_left_weather_item"
@@ -52,9 +61,11 @@ const weatherSvg = computed(() => {
           </div>
           <div>
             <span>天气状况</span>
-            {{  }}
             <!-- 根据天气更换图标，使用和风css文件 -->
-            <span><i :class="'qi-' + weatherSvg(item.weather)"></i> {{ item.weather }}</span>
+            <span
+              ><i :class="'qi-' + weatherSvg(item.weather)"></i>
+              {{ item.weather }}</span
+            >
           </div>
           <div>
             <span>气温</span>
@@ -75,8 +86,8 @@ const weatherSvg = computed(() => {
         </div>
       </transition-group>
     </div>
-    <div class="view_left_pie"></div>
-    <div class="view_left_line"></div>
+    <div class="view_left_pie" v-show="hasWeatherData"></div>
+    <div class="view_left_line" v-show="hasWeatherData"></div>
   </div>
 </template>
 <style scoped>
@@ -123,7 +134,15 @@ const weatherSvg = computed(() => {
   backdrop-filter: blur(10px);
   /* 添加模糊效果 */
 }
-
+.view_left_err {
+  background-color: rgba(255, 255, 255, 0.342);
+  position: relative;
+  height: 80vh;
+  width: 20vw;
+  padding: 1vh 1vw;
+  border-radius: 5px;
+  color: #fafafa;
+}
 .view_left_pie {
   margin-top: 5vh;
   width: 20vw;
