@@ -46,7 +46,7 @@ const toRouter = (str: string) => {
             <template #title> 返回主页</template>
           </listLeft>
           <listLeft @click="toRouter('/system')">
-            <template #title> 设置</template>
+            <template #title>设置</template>
           </listLeft>
         </div>
       </el-collapse-item>

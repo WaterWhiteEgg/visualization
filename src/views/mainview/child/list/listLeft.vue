@@ -3,7 +3,7 @@ withDefaults(
   defineProps<{
     borderBottom?: string;
   }>(),
-  { borderBottom: "0.5px solid #fff" }
+  { borderBottom: ".0313rem solid #fff" }
 );
 </script>
 <template>
@@ -19,6 +19,6 @@ withDefaults(
   align-items: center;
   justify-content: space-between;
   padding: 0.5vh 0;
-  border-bottom: 0.5px solid #fff;
+  border-bottom: .0313rem solid #fff;
 }
 </style>

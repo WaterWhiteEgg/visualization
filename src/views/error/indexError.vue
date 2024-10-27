@@ -20,12 +20,13 @@ const backIndex = () => {
 };
 </script>
 <template>
+
   <div class="error">
     <div class="error_title">哦吼，欢迎来到错误界面！</div>
     <div>
       你输入的网址我们无法识别，这个网址内容
       <span>{{
-        previousFormRoute?.fullPath === "/"
+        previousFormRoute?.fullPath === "/" || previousFormRoute?.fullPath === "/index"
           ? previousErrorTofullPath
           : previousFormRoute?.fullPath
       }}</span>
