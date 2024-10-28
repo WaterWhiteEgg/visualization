@@ -32,6 +32,7 @@ const backIndex = () => {
       }}</span>
       可能没了，也可能是压根没有，请检查你输入的网址是否有误 你可以<span
         @click="back"
+       
         >点击返回</span
       >也可以<span @click="backIndex">回到首页</span>
     </div>
@@ -52,6 +53,7 @@ const backIndex = () => {
   font-weight: 900;
 }
 .error span {
+  cursor: pointer;
   color: #ff0000;
   text-decoration: underline;
 }

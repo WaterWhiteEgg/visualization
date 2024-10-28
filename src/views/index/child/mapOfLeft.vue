@@ -168,7 +168,7 @@ const hasWeatherData = computed(() => {
   .view_left {
     margin: 0;
     /* 提供绝对定位的视窗 */
-    padding-bottom: 40vh;
+    /* padding-bottom: 40vh; */
   }
 
   .view_left_weather {
@@ -208,15 +208,24 @@ const hasWeatherData = computed(() => {
     width: 50vw;
     height: 6vh;
   }
-
+  .view_left_err {
+  background-color: rgba(255, 255, 255, 0.342);
+  position: relative;
+  width: 100%;
+  padding: 1vh 1vw;
+  border-radius: 5px;
+  color: #fafafa;
+}
   .view_left_pie {
+    position: relative;
     margin-top: 0;
     width: 100vw;
     height: 40vh;
   }
 
   .view_left_line {
-    margin-top: 0;
+    position: relative;
+    margin-bottom: 1vh;
     width: 100vw;
     height: 40vh;
   }
