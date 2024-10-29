@@ -4,7 +4,6 @@ import { initPie } from "@/assets/ts/initPie";
 import { initLine } from "@/assets/ts/initLine";
 import { useCityArray } from "@/stores/item";
 import weatherSvgJson from "../../../assets/js/weatherSvgTsble.json";
-
 // const props = withDefaults(
 //   defineProps<{
 //     msg: string;
@@ -91,7 +90,8 @@ const hasWeatherData = computed(() => {
   </div>
 </template>
 <style scoped>
-@import url("https://cdn.jsdelivr.net/npm/qweather-icons@1.3.0/font/qweather-icons.css");
+@import url("../../../assets/qweather-icons.css");
+
 .animated {
   /* 任何过度持续时间加快 */
   animation-duration: 0.5s !important;
@@ -209,13 +209,13 @@ const hasWeatherData = computed(() => {
     height: 6vh;
   }
   .view_left_err {
-  background-color: rgba(255, 255, 255, 0.342);
-  position: relative;
-  width: 100%;
-  padding: 1vh 1vw;
-  border-radius: 5px;
-  color: #fafafa;
-}
+    background-color: rgba(255, 255, 255, 0.342);
+    position: relative;
+    width: 100%;
+    padding: 1vh 1vw;
+    border-radius: 5px;
+    color: #fafafa;
+  }
   .view_left_pie {
     position: relative;
     margin-top: 0;
