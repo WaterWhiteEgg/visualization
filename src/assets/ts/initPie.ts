@@ -24,8 +24,8 @@ export function initPie(doc: HTMLElement | null) {
     },
 
     legend: {
-      top: "5%",
-      left: "center",
+      top: "3%",
+      left: "5%",
       textStyle: {
         color: "#e0e5ff",
       },
@@ -33,8 +33,8 @@ export function initPie(doc: HTMLElement | null) {
     series: [
       {
         type: "pie",
-        radius: ["40%", "70%"],
-
+        radius: ["40%", "65%"],
+        center: ["35%", "55%"],  // 调整此行，将饼图整体靠左
         itemStyle: {
           borderRadius: 0,
           borderColor: "#f0f8ff",

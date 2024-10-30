@@ -6,7 +6,7 @@ import { useSearchItem } from "@/stores/mapSearch";
 import { useCityArray } from "@/stores/item";
 import { forDistricts, type City } from "@/assets/ts/forDistricts";
 import { myChart, redrawValue } from "@/assets/ts/initMap";
-
+import loadingIndex from "@/components/loading/loadingIndex.vue";
 const emits = defineEmits<{
   (e: "chooseCityWeather", i: City): void;
 }>();
@@ -89,7 +89,9 @@ const handleCityClick = (event: Event) => {
     ".view_center_search_view_item"
   );
   if (clickedElement) {
-    const item = JSON.parse(clickedElement.getAttribute("data-item") as string) as City;
+    const item = JSON.parse(
+      clickedElement.getAttribute("data-item") as string
+    ) as City;
     ChooseCityWeather(item);
     changeFocus(false);
   }
@@ -105,12 +107,28 @@ const closeSearch = () => {
 const ChooseCityWeather = (item: City) => {
   emits("chooseCityWeather", item);
 };
+// 获取加载的ref
+const loadRef = ref();
+// 监听变化做出加载条
+watch(
+  () => {
+    return useSearchItem().isGetCitysFinally;
+  },
+  (value, oldvalue) => {
+    // console.log(value);
+    // 用判断做更新
+    if (value) {
+      loadRef.value?.startLoading();
+    } else {
+      loadRef.value?.endLoading();
+    }
+  }
+);
 </script>
 <template>
   <div class="view_center_search">
-    <div style="color: #fff" v-show="!useSearchItem().isGetCitysFinally">
-      加载中
-    </div>
+    <loadingIndex ref="loadRef" color="yellow"></loadingIndex>
+    <div style="color: #fff" v-show="!useSearchItem().isGetCitysFinally"></div>
     <div class="view_center_search_input">
       <input
         type="text"
@@ -118,6 +136,7 @@ const ChooseCityWeather = (item: City) => {
         :value="useSearchItem().cityText"
         @focus="changeFocus(true)"
         @input="changeInput"
+        :class="isFocus ? 'isfocus' : ''"
       />
       <span
         class="view_center_search_input_close"
@@ -130,9 +149,7 @@ const ChooseCityWeather = (item: City) => {
       </span>
     </div>
     <div class="view_center_search_view" v-if="isFocus">
-      <div v-show="!useSearchItem().isGetCitysFinally">
-        {{ "加载中。。。" }}
-      </div>
+      <div v-show="!useSearchItem().isGetCitysFinally"></div>
       <div
         v-show="
           (useSearchItem().cityText.length === 0 &&
@@ -171,7 +188,9 @@ const ChooseCityWeather = (item: City) => {
   </div>
 </template>
 <style scoped>
-.view_center_search {
+.isfocus {
+  background-color: #0040ff !important;
+  color: #fff;
 }
 
 .view_center_search_input {

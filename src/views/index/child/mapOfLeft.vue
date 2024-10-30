@@ -90,13 +90,15 @@ const hasWeatherData = computed(() => {
   </div>
 </template>
 <style scoped>
-@import url("../../../assets/qweather-icons.css");
+@import url("@/assets/qweather-icons.css");
 
 .animated {
   /* 任何过度持续时间加快 */
   animation-duration: 0.5s !important;
 }
 .view_left {
+  display: flex;
+  flex-direction: column;
   flex: 1;
   margin-top: 10vh;
   margin-left: 2vw;
@@ -147,14 +149,12 @@ const hasWeatherData = computed(() => {
   margin-top: 5vh;
   width: 20vw;
   height: 30vh;
-  z-index: 99999;
 }
 
 .view_left_line {
-  position: absolute;
   width: 40vw;
   height: 35vh;
-  z-index: 9999;
+  margin-left:1vw ;
 }
 
 @media screen and (max-width: 969px) {
